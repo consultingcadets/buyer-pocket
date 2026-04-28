@@ -101,6 +101,8 @@ export type Database = {
           created_at: string;
           updated_at: string;
           archived_at: string | null;
+          searchable_text?: string | null;
+          temperature_sort?: number | null;
         };
         Insert: {
           id?: string;
