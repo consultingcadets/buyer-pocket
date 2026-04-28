@@ -2,7 +2,7 @@
 ALTER TABLE public.buyers
   ADD COLUMN IF NOT EXISTS searchable_text tsvector
   GENERATED ALWAYS AS (
-    to_tsvector('english',
+    to_tsvector('english'::regconfig,
       coalesce(name, '') || ' ' ||
       coalesce(phone, '') || ' ' ||
       coalesce(email, '') || ' ' ||
