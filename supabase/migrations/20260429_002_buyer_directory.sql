@@ -1,15 +1,42 @@
--- Add searchable_text tsvector generated column
+-- searchable_text: cannot use GENERATED STORED because to_tsvector(regconfig, text) is
+-- STABLE, not IMMUTABLE (PostgreSQL 42P17). Use a plain column + trigger instead.
 ALTER TABLE public.buyers
-  ADD COLUMN IF NOT EXISTS searchable_text tsvector
-  GENERATED ALWAYS AS (
-    to_tsvector('english'::regconfig,
-      coalesce(name, '') || ' ' ||
-      coalesce(phone, '') || ' ' ||
-      coalesce(email, '') || ' ' ||
-      coalesce(array_to_string(preferred_suburbs, ' '), '') || ' ' ||
-      coalesce(notes_summary, '')
-    )
-  ) STORED;
+  DROP COLUMN IF EXISTS searchable_text CASCADE;
+
+ALTER TABLE public.buyers
+  ADD COLUMN searchable_text tsvector;
+
+CREATE OR REPLACE FUNCTION public.buyers_set_searchable_text()
+RETURNS trigger AS $$
+BEGIN
+  NEW.searchable_text := to_tsvector(
+    'english'::regconfig,
+    coalesce(NEW.name, '') || ' ' ||
+    coalesce(NEW.phone, '') || ' ' ||
+    coalesce(NEW.email, '') || ' ' ||
+    coalesce(array_to_string(NEW.preferred_suburbs, ' '), '') || ' ' ||
+    coalesce(NEW.notes_summary, '')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS buyers_searchable_text_biu ON public.buyers;
+CREATE TRIGGER buyers_searchable_text_biu
+  BEFORE INSERT OR UPDATE OF name, phone, email, preferred_suburbs, notes_summary
+  ON public.buyers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.buyers_set_searchable_text();
+
+UPDATE public.buyers SET
+  searchable_text = to_tsvector(
+    'english'::regconfig,
+    coalesce(name, '') || ' ' ||
+    coalesce(phone, '') || ' ' ||
+    coalesce(email, '') || ' ' ||
+    coalesce(array_to_string(preferred_suburbs, ' '), '') || ' ' ||
+    coalesce(notes_summary, '')
+  );
 
 -- Add temperature sort order (1=hot, 2=warm, 3=cold, 4=null)
 ALTER TABLE public.buyers
@@ -39,10 +66,13 @@ CREATE INDEX IF NOT EXISTS idx_buyers_bedrooms ON public.buyers (user_id, bedroo
 
 -- ============================================================
 -- SEED DATA — 50 diverse buyers for development/testing
--- Replace '00000000-0000-0000-0000-000000000001' with your auth.uid() for testing
+-- Runs only if public.profiles already has this id (buyers.user_id → profiles.id → auth.users).
+-- After you have a test user, either replace the UUID below with auth.users.id, or create a user
+-- whose id is 00000000-0000-0000-0000-000000000001 (local only), then re-run this block.
 -- ============================================================
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM public.buyers WHERE name = 'Sarah & Tom Jenkins') THEN
+  IF EXISTS (SELECT 1 FROM public.profiles WHERE id = '00000000-0000-0000-0000-000000000001'::uuid)
+     AND NOT EXISTS (SELECT 1 FROM public.buyers WHERE name = 'Sarah & Tom Jenkins') THEN
 
     INSERT INTO public.buyers (
       user_id, name, phone, email,
