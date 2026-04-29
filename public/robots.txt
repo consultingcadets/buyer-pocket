@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /today
+Disallow: /dashboard
+Disallow: /buyers
+Disallow: /add
+Disallow: /reminders
+Disallow: /settings
+Disallow: /offline
 
 Sitemap: https://buyerpocket.com.au/sitemap.xml

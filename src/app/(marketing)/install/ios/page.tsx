@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Install BuyerPocket on iPhone — BuyerPocket",
+  title: { absolute: "Install BuyerPocket on iPhone — BuyerPocket" },
+  robots: { index: false, follow: false },
 };
 
 const steps = [

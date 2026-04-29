@@ -2,7 +2,14 @@ import Link from "next/link";
 import { LEGAL_ABN, LEGAL_ENTITY, SUPPORT_EMAIL } from "@/lib/company";
 
 export const metadata = {
-  title: "Terms of Service — BuyerPocket",
+  title: { absolute: "Terms of Service — BuyerPocket" },
+  description: "Terms of Service for BuyerPocket — the buyer list and reminder tool for independent Australian real estate agents.",
+  openGraph: {
+    title: "Terms of Service — BuyerPocket",
+    description: "Terms of Service for BuyerPocket — the buyer list and reminder tool for independent Australian real estate agents.",
+    url: "https://buyerpocket.com.au/terms",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+  },
 };
 
 const EFFECTIVE_DATE = "1 May 2026";

@@ -17,9 +17,16 @@ import {
 import CTAButton from "@/components/marketing/cta-button";
 
 export const metadata = {
-  title: "Capture buyers fast. Follow up on time. — BuyerPocket",
+  title: { absolute: "Capture buyers fast. Follow up on time. — BuyerPocket" },
   description:
     "A simple buyer list and reminder tool built for Australian real estate agents. Save buyer details in seconds, find matching buyers for new listings, and never miss a follow-up.",
+  openGraph: {
+    title: "Capture buyers fast. Follow up on time. — BuyerPocket",
+    description:
+      "A simple buyer list and reminder tool built for Australian real estate agents. Save buyer details in seconds, find matching buyers for new listings, and never miss a follow-up.",
+    url: "https://buyerpocket.com.au",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+  },
 };
 
 export default function MarketingHome() {

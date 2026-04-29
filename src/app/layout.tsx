@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { PWASetup, InstallPrompt } from "@/components/PWASetup";
+import { PWASetup, InstallPrompt, IOSInstallPrompt } from "@/components/PWASetup";
 import { PHProvider } from "@/components/analytics/posthog-provider";
 
 const inter = Inter({
@@ -26,6 +26,13 @@ export const metadata: Metadata = {
     title: "BuyerPocket",
     description: "Your buyers, always in your pocket.",
     type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BuyerPocket",
+    description: "Your buyers, always in your pocket.",
+    images: ["/og-image.png"],
   },
 };
 
@@ -59,6 +66,7 @@ export default function RootLayout({
         </PHProvider>
         <PWASetup />
         <InstallPrompt />
+        <IOSInstallPrompt />
       </body>
     </html>
   );

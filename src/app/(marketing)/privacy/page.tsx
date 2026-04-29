@@ -2,7 +2,14 @@ import Link from "next/link";
 import { LEGAL_ABN, LEGAL_ENTITY, SUPPORT_EMAIL } from "@/lib/company";
 
 export const metadata = {
-  title: "Privacy Policy — BuyerPocket",
+  title: { absolute: "Privacy Policy — BuyerPocket" },
+  description: "How BuyerPocket collects, uses, and protects your personal information under Australian privacy law.",
+  openGraph: {
+    title: "Privacy Policy — BuyerPocket",
+    description: "How BuyerPocket collects, uses, and protects your personal information under Australian privacy law.",
+    url: "https://buyerpocket.com.au/privacy",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+  },
 };
 
 const EFFECTIVE_DATE = "1 May 2026";
