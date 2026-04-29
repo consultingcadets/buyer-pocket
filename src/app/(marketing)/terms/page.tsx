@@ -13,8 +13,6 @@ export default function TermsPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <Link href="/" className="text-sm text-accent mb-8 inline-block">← Home</Link>
-
         <h1 className="text-3xl font-bold text-text-primary mb-2">Terms of Service</h1>
         <p className="text-sm text-text-secondary mb-10">
           Effective date: {EFFECTIVE_DATE} · {COMPANY} (ABN pending)

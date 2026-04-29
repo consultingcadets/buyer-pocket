@@ -91,15 +91,12 @@ export function EligibilityForm() {
 
       {/* Warning card for "unconfirmed" */}
       {selected === "unconfirmed" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex flex-col gap-2">
-          <p className="text-[14px] font-semibold text-amber-900">
-            Check with your agency first.
+        <div className="bg-warning-bg border border-warning-text/20 rounded-lg p-4 flex flex-col gap-2">
+          <p className="text-[14px] font-semibold text-warning-text">
+            Please check your contract first.
           </p>
-          <p className="text-[14px] text-amber-800">
-            Using external tools without your agency&apos;s explicit permission
-            may violate your agency&apos;s policies. By continuing, you
-            acknowledge this risk and take personal responsibility for checking
-            your agency&apos;s tool policies before using BuyerPocket.
+          <p className="text-[14px] text-warning-text">
+            Buyer data captured during agency work is often agency property. If you proceed without confirming permission, you take responsibility for compliance with your employment terms.
           </p>
         </div>
       )}

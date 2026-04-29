@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useCallback, useRef, useEffect } from "react";
+import { Phone, MessageSquare, Mail, Bell, Pencil, MoreHorizontal, CheckCircle, Clock, Check, X, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -97,8 +98,8 @@ const TEMP_STYLES: Record<
   { label: string; chip: string }
 > = {
   hot: { label: "Hot", chip: "bg-secondary text-white" },
-  warm: { label: "Warm", chip: "bg-amber-100 text-amber-800" },
-  cold: { label: "Cold", chip: "bg-sky-100 text-sky-700" },
+  warm: { label: "Warm", chip: "bg-accent text-white" },
+  cold: { label: "Cold", chip: "bg-white text-primary border border-primary" },
 };
 
 const CONTACT_TYPES = ["Call", "SMS", "Email", "Inspection follow-up", "Finance follow-up", "Offer follow-up", "General"];
@@ -498,7 +499,7 @@ function EditBuyerModal({
     }
 
     let tempValue: "hot" | "warm" | "cold" | null = null;
-    const t = buyerTemperature.toLowerCase().replace(" 🔥", "");
+    const t = buyerTemperature.toLowerCase();
     if (t === "hot" || t === "warm" || t === "cold") tempValue = t;
 
     setError("");
@@ -740,8 +741,8 @@ function EditBuyerModal({
           {/* Section: Status */}
           <div className="rounded-lg bg-surface-container p-4 space-y-4">
             <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Buyer Status</p>
-            <ChipField label="Buying timeline" options={["Ready now", "1-3 months", "3-6 months", "6-12 months", "12+ months"]} value={buyingTimeline} onChange={setBuyingTimeline} />
-            <ChipField label="Buyer temperature" options={["Hot 🔥", "Warm", "Cold"]} value={buyerTemperature} onChange={setBuyerTemperature} />
+            <ChipField label="Buying timeline" options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]} value={buyingTimeline} onChange={setBuyingTimeline} />
+            <ChipField label="Buyer temperature" options={["Hot", "Warm", "Cold"]} value={buyerTemperature} onChange={setBuyerTemperature} />
             <ChipField label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
             <ChipField label="Lead status" options={["New lead", "Active", "Inspection booked", "Under offer", "Settled", "Lost"]} value={leadStatus} onChange={setLeadStatus} />
             <ChipField label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
@@ -1021,8 +1022,8 @@ function NotesActivity({
               return (
                 <div key={n.id} className="flex gap-3">
                   {/* Icon */}
-                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center text-xs">
-                    {n.contact_type === "Call" ? "📞" : n.contact_type === "SMS" ? "💬" : n.contact_type === "Email" ? "✉️" : "📝"}
+                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                    {n.contact_type === "Call" ? <Phone className="w-3.5 h-3.5" /> : n.contact_type === "SMS" ? <MessageSquare className="w-3.5 h-3.5" /> : n.contact_type === "Email" ? <Mail className="w-3.5 h-3.5" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -1090,8 +1091,8 @@ function NotesActivity({
             // Activity event
             return (
               <div key={`activity-${i}`} className="flex gap-3">
-                <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-xs">
-                  {item.type === "reminder-completed" ? "✅" : "⏰"}
+                <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center">
+                  {item.type === "reminder-completed" ? <CheckCircle className="w-3.5 h-3.5 text-secondary" /> : <Clock className="w-3.5 h-3.5 text-text-secondary" />}
                 </div>
                 <div className="flex-1">
                   <span className="text-xs text-text-secondary">{item.label}</span>
@@ -1212,7 +1213,7 @@ function RemindersCard({
                           <p className="text-xs text-text-secondary mt-0.5 italic">{r.reminder_note}</p>
                         )}
                         {r.status === "snoozed" && (
-                          <p className="text-xs text-amber-600 mt-0.5">Snoozed</p>
+                          <p className="text-xs text-text-secondary mt-0.5">Snoozed</p>
                         )}
                       </div>
                     </div>
@@ -1252,8 +1253,8 @@ function RemindersCard({
                 <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Past</p>
                 {past.slice(0, 3).map((r) => (
                   <div key={r.id} className="py-2 border-b border-border last:border-0 flex items-center gap-2">
-                    <span className="text-xs">
-                      {r.status === "completed" ? "✅" : "❌"}
+                    <span className="flex items-center">
+                      {r.status === "completed" ? <Check className="w-3.5 h-3.5 text-secondary" /> : <X className="w-3.5 h-3.5 text-error" />}
                     </span>
                     <div>
                       <p className="text-xs text-text-secondary line-through">
@@ -1478,7 +1479,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                     href={phoneHref}
                     className="h-9 px-4 rounded-lg bg-secondary text-white text-sm font-semibold flex items-center gap-1.5"
                   >
-                    📞 Call
+                    <Phone className="w-4 h-4" /> Call
                   </a>
                 )}
                 {smsHref && (
@@ -1486,7 +1487,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                     href={smsHref}
                     className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
                   >
-                    💬 SMS
+                    <MessageSquare className="w-4 h-4" /> SMS
                   </a>
                 )}
                 {emailHref && (
@@ -1494,7 +1495,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                     href={emailHref}
                     className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
                   >
-                    ✉️ Email
+                    <Mail className="w-4 h-4" /> Email
                   </a>
                 )}
                 <button
@@ -1502,14 +1503,14 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                   onClick={() => setShowAddReminder(true)}
                   className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
                 >
-                  ⏰ Add reminder
+                  <Bell className="w-4 h-4" /> Add reminder
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEditBuyer(true)}
                   className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
                 >
-                  ✏️ Edit
+                  <Pencil className="w-4 h-4" /> Edit
                 </button>
                 <div className="relative">
                   <button
@@ -1518,7 +1519,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                     className="h-9 w-9 rounded-lg border border-border text-text-secondary flex items-center justify-center hover:bg-surface-container"
                     aria-label="More options"
                   >
-                    ···
+                    <MoreHorizontal className="w-4 h-4" />
                   </button>
                   {showMoreMenu && (
                     <MoreMenu
@@ -1604,34 +1605,34 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
           <div className="flex items-center justify-around mt-4">
             {phoneHref ? (
               <a href={phoneHref} className={mobileActionBtn}>
-                <div className={cn(mobileIconBtn, "bg-secondary/10")}>📞</div>
+                <div className={cn(mobileIconBtn, "bg-secondary/10 text-secondary")}><Phone className="w-5 h-5" /></div>
                 <span>Call</span>
               </a>
             ) : (
               <div className={cn(mobileActionBtn, "opacity-30")}>
-                <div className={mobileIconBtn}>📞</div>
+                <div className={mobileIconBtn}><Phone className="w-5 h-5" /></div>
                 <span>Call</span>
               </div>
             )}
             {smsHref ? (
               <a href={smsHref} className={mobileActionBtn}>
-                <div className={mobileIconBtn}>💬</div>
+                <div className={mobileIconBtn}><MessageSquare className="w-5 h-5" /></div>
                 <span>SMS</span>
               </a>
             ) : (
               <div className={cn(mobileActionBtn, "opacity-30")}>
-                <div className={mobileIconBtn}>💬</div>
+                <div className={mobileIconBtn}><MessageSquare className="w-5 h-5" /></div>
                 <span>SMS</span>
               </div>
             )}
             {emailHref ? (
               <a href={emailHref} className={mobileActionBtn}>
-                <div className={mobileIconBtn}>✉️</div>
+                <div className={mobileIconBtn}><Mail className="w-5 h-5" /></div>
                 <span>Email</span>
               </a>
             ) : (
               <div className={cn(mobileActionBtn, "opacity-30")}>
-                <div className={mobileIconBtn}>✉️</div>
+                <div className={mobileIconBtn}><Mail className="w-5 h-5" /></div>
                 <span>Email</span>
               </div>
             )}
@@ -1640,7 +1641,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               onClick={() => setShowAddReminder(true)}
               className={mobileActionBtn}
             >
-              <div className={mobileIconBtn}>⏰</div>
+              <div className={mobileIconBtn}><Bell className="w-5 h-5" /></div>
               <span>Reminder</span>
             </button>
             <button
@@ -1648,7 +1649,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               onClick={() => setShowEditBuyer(true)}
               className={mobileActionBtn}
             >
-              <div className={mobileIconBtn}>✏️</div>
+              <div className={mobileIconBtn}><Pencil className="w-5 h-5" /></div>
               <span>Edit</span>
             </button>
           </div>
@@ -1703,7 +1704,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               href={phoneHref}
               className="flex-1 h-12 rounded-lg bg-secondary text-white font-semibold flex items-center justify-center gap-2"
             >
-              📞 Call {buyer.name.split(" ")[0]}
+              <Phone className="w-5 h-5" /> Call {buyer.name.split(" ")[0]}
             </a>
           ) : (
             <div className="flex-1 h-12 rounded-lg bg-surface-container text-text-secondary font-semibold flex items-center justify-center gap-2 opacity-50">
@@ -1713,17 +1714,17 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
           {smsHref && (
             <a
               href={smsHref}
-              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-xl"
+              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-text-primary"
             >
-              💬
+              <MessageSquare className="w-5 h-5" />
             </a>
           )}
           {emailHref && (
             <a
               href={emailHref}
-              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-xl"
+              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-text-primary"
             >
-              ✉️
+              <Mail className="w-5 h-5" />
             </a>
           )}
         </div>

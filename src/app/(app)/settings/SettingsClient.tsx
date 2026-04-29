@@ -237,17 +237,17 @@ function NotificationsSection({
   return (
     <Section id="notifications" title="Notifications">
       {denied && (
-        <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
-          <p className="text-sm font-semibold text-amber-900 mb-1">Push notifications are blocked</p>
-          <p className="text-xs text-amber-800 mb-3">
+        <div className="p-4 rounded-lg bg-warning-bg border border-warning-text/20">
+          <p className="text-sm font-semibold text-warning-text mb-1">Push notifications are blocked</p>
+          <p className="text-xs text-warning-text mb-3">
             You previously denied permission. To enable them:
           </p>
-          <ul className="text-xs text-amber-800 space-y-1 mb-3 list-disc list-inside">
+          <ul className="text-xs text-warning-text space-y-1 mb-3 list-disc list-inside">
             <li><strong>Chrome:</strong> Click the lock icon in the address bar → Site settings → Notifications → Allow</li>
             <li><strong>Safari (Mac):</strong> Safari → Settings → Websites → Notifications → Allow for this site</li>
             <li><strong>Firefox:</strong> Click the shield icon → Permissions → Allow notifications</li>
           </ul>
-          <p className="text-xs text-amber-800">
+          <p className="text-xs text-warning-text">
             After changing the setting, reload this page.
           </p>
         </div>
@@ -424,10 +424,10 @@ function ExportConfirmModal({ onClose }: { onClose: () => void }) {
     <ModalBackdrop onClose={onClose}>
       <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl space-y-4">
         <h2 className="text-lg font-semibold text-text-primary">Export your buyers</h2>
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="text-sm text-amber-900 font-medium mb-1">Responsible use reminder</p>
-          <p className="text-sm text-amber-800">
-            Only export contacts you have permission to store and contact. Handle this data in accordance with the Australian Privacy Act and your agency's privacy policy.
+        <div className="p-4 bg-warning-bg border border-warning-text/20 rounded-lg">
+          <p className="text-sm text-warning-text font-medium mb-1">Responsible use reminder</p>
+          <p className="text-sm text-warning-text">
+            Only export contacts you have permission to store and contact. Handle this data in accordance with the Australian Privacy Act and your agency&apos;s privacy policy.
           </p>
         </div>
         <div className="flex gap-3">

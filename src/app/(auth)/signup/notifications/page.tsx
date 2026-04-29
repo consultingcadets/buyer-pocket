@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
 import { savePushToken } from "@/app/(app)/reminders/actions";
@@ -154,17 +155,24 @@ export default function NotificationsPage() {
             © 2026 BuyerPocket. All rights reserved.
           </div>
           <div className="flex flex-wrap justify-center gap-6">
-            {["Privacy Policy", "Terms of Service", "Help Centre"].map(
-              (link) => (
-                <a
-                  key={link}
-                  href="#"
-                  className="text-[14px] font-semibold tracking-wider text-on-surface-variant hover:text-brand-navy transition-colors"
-                >
-                  {link}
-                </a>
-              )
-            )}
+            <Link
+              href="/privacy"
+              className="text-[14px] font-semibold tracking-wider text-on-surface-variant hover:text-brand-navy transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-[14px] font-semibold tracking-wider text-on-surface-variant hover:text-brand-navy transition-colors"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/contact"
+              className="text-[14px] font-semibold tracking-wider text-on-surface-variant hover:text-brand-navy transition-colors"
+            >
+              Help Centre
+            </Link>
           </div>
         </div>
       </footer>

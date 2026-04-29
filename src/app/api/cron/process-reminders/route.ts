@@ -66,6 +66,9 @@ export async function POST(request: Request) {
       name: string;
       phone: string | null;
       email: string | null;
+      preferred_suburbs: string[] | null;
+      budget_min: number | null;
+      budget_max: number | null;
     };
 
     // Get push tokens for this user
@@ -75,10 +78,16 @@ export async function POST(request: Request) {
       .eq("user_id", reminder.user_id)
       .eq("is_active", true);
 
-    const title = `Follow up: ${buyer.name}`;
-    const body =
-      reminder.reminder_note ??
-      (reminder.reminder_type ? `${reminder.reminder_type} reminder` : `Check in with ${buyer.name}`);
+    const reminderType = reminder.reminder_type as string | null;
+    const title = `Reminder: ${reminderType ? reminderType + " " : ""}${buyer.name}`;
+    const suburb = buyer.preferred_suburbs?.[0]?.split(",")?.[0] ?? null;
+    const budgetMin = buyer.budget_min;
+    const budgetMax = buyer.budget_max;
+    const budgetStr = budgetMin
+      ? `$${Math.round(budgetMin / 1000)}k${budgetMax ? `–$${Math.round(budgetMax / 1000)}k` : "+"}`
+      : null;
+    const infoLine = [suburb, budgetStr].filter(Boolean).join(", ");
+    const body = reminder.reminder_note ?? (infoLine || `Check in with ${buyer.name}`);
 
     let pushSent = false;
 

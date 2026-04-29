@@ -3,11 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PWASetup, InstallPrompt } from "@/components/PWASetup";
+import { PHProvider } from "@/components/analytics/posthog-provider";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -31,8 +33,6 @@ export const viewport: Viewport = {
   themeColor: "#0F1C2C",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -54,7 +54,9 @@ export default function RootLayout({
         <link rel="mask-icon" href="/icons/icon.svg" color="#0F1C2C" />
       </head>
       <body className="min-h-full flex flex-col">
-        {children}
+        <PHProvider>
+          {children}
+        </PHProvider>
         <PWASetup />
         <InstallPrompt />
       </body>

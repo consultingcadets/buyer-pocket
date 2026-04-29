@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Phone, MessageSquare, Check, Clock, MoreVertical, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { ReminderWithBuyer } from "@/types/reminders";
@@ -35,10 +36,10 @@ function formatReminderDate(iso: string): string {
 
 function TempBadge({ temp }: { temp: "hot" | "warm" | "cold" | null }) {
   if (!temp) return null;
-  const styles = {
-    hot: "bg-amber-100 text-amber-700",
-    warm: "bg-teal-100 text-teal-700",
-    cold: "bg-gray-100 text-gray-500",
+  const styles: Record<string, string> = {
+    hot: "bg-secondary text-white",
+    warm: "bg-accent text-white",
+    cold: "bg-surface border border-primary text-primary",
   };
   return (
     <span className={cn("text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full", styles[temp])}>
@@ -63,47 +64,47 @@ export function ReminderCard({ reminder, showDate = false, onComplete, onSnooze,
   const suburbDisplay = buyer.preferred_suburbs?.[0]?.split(",")[0] ?? "";
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_-2px_rgba(15,28,44,0.08)] p-4 flex gap-3">
+    <div className="bg-surface rounded shadow-card p-4 flex gap-3">
       {/* Avatar */}
-      <div className="shrink-0 w-11 h-11 rounded-full bg-[#2EC4B6] flex items-center justify-center">
+      <div className="shrink-0 w-11 h-11 rounded-full bg-secondary flex items-center justify-center">
         <span className="text-white text-[13px] font-bold">{initials(buyer.name)}</span>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Name row */}
+        {/* Name + badge */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[15px] font-semibold text-[#1B1B1D] leading-tight">{buyer.name}</span>
+          <span className="text-[15px] font-semibold text-foreground leading-tight">{buyer.name}</span>
           <TempBadge temp={buyer.buyer_temperature} />
         </div>
 
         {/* Time + type */}
         <div className="flex items-center gap-1 mt-0.5">
-          <span className="text-[12px] text-[#44474C]">
+          <span className="text-[12px] text-muted-foreground">
             {showDate ? formatReminderDate(reminder.reminder_at) + " · " : ""}
             {formatReminderTime(reminder.reminder_at)}
           </span>
           {reminder.reminder_type && (
             <>
-              <span className="text-[#C5C6CD]">·</span>
-              <span className="text-[12px] text-[#44474C]">{reminder.reminder_type}</span>
+              <span className="text-outline-variant">·</span>
+              <span className="text-[12px] text-muted-foreground">{reminder.reminder_type}</span>
             </>
           )}
         </div>
 
         {/* Note */}
         {reminder.reminder_note && (
-          <p className="text-[13px] text-[#44474C] mt-1 line-clamp-2">{reminder.reminder_note}</p>
+          <p className="text-[13px] text-muted-foreground mt-1 line-clamp-2">{reminder.reminder_note}</p>
         )}
 
-        {/* Buyer details */}
+        {/* Buyer tags */}
         {(budgetLabel || suburbDisplay) && (
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             {suburbDisplay && (
-              <span className="text-[11px] text-[#75777D] bg-[#F5F3F4] rounded px-1.5 py-0.5">{suburbDisplay}</span>
+              <span className="text-[11px] text-foreground-subtle bg-surface-container-low rounded px-1.5 py-0.5">{suburbDisplay}</span>
             )}
             {budgetLabel && (
-              <span className="text-[11px] text-[#75777D] bg-[#F5F3F4] rounded px-1.5 py-0.5">{budgetLabel}</span>
+              <span className="text-[11px] text-foreground-subtle bg-surface-container-low rounded px-1.5 py-0.5">{budgetLabel}</span>
             )}
           </div>
         )}
@@ -113,7 +114,7 @@ export function ReminderCard({ reminder, showDate = false, onComplete, onSnooze,
           {buyer.phone && (
             <a
               href={`tel:${buyer.phone}`}
-              className="text-[13px] font-medium text-white bg-[#2EC4B6] rounded-full px-3 py-1.5 leading-none"
+              className="min-h-[36px] flex items-center text-[13px] font-medium text-white bg-secondary rounded-full px-3 py-1.5 leading-none"
             >
               Call
             </a>
@@ -121,47 +122,47 @@ export function ReminderCard({ reminder, showDate = false, onComplete, onSnooze,
           {buyer.phone && (
             <a
               href={`sms:${buyer.phone}`}
-              className="text-[13px] font-medium text-[#2EC4B6] border border-[#2EC4B6] rounded-full px-3 py-1.5 leading-none"
+              className="min-h-[36px] flex items-center text-[13px] font-medium text-secondary border border-secondary rounded-full px-3 py-1.5 leading-none"
             >
               SMS
             </a>
           )}
+
+          {/* Done */}
           <button
             onClick={() => onComplete(reminder.id)}
             disabled={isCompleting}
-            className="ml-auto flex items-center justify-center w-8 h-8 rounded-full border border-[#E0E1DD] text-[#2EC4B6] hover:bg-[#F0FFFE] transition-colors disabled:opacity-50"
+            className="ml-auto flex items-center justify-center w-10 h-10 rounded-full border border-border text-secondary hover:bg-surface-container transition-colors disabled:opacity-50"
             aria-label="Mark done"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
+            <Check size={16} />
           </button>
+
+          {/* Snooze */}
           <button
             onClick={() => onSnooze(reminder.id)}
-            className="flex items-center justify-center w-8 h-8 rounded-full border border-[#E0E1DD] text-[#44474C] hover:bg-[#F5F3F4] transition-colors"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-border text-muted-foreground hover:bg-surface-container-low transition-colors"
             aria-label="Snooze"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-            </svg>
+            <Clock size={16} />
           </button>
+
+          {/* More */}
           <div className="relative">
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center justify-center w-8 h-8 rounded-full border border-[#E0E1DD] text-[#44474C] hover:bg-[#F5F3F4] transition-colors"
-              aria-label="More"
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-border text-muted-foreground hover:bg-surface-container-low transition-colors"
+              aria-label="More options"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" />
-              </svg>
+              <MoreVertical size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 z-20 bg-white rounded-xl shadow-lg border border-[#E0E1DD] py-1 min-w-[140px]">
+                <div className="absolute right-0 top-11 z-20 bg-surface rounded-lg shadow-[0_4px_16px_rgba(13,27,42,0.08)] border border-border py-1 min-w-[140px]">
                   <a
                     href={`/buyers/${buyer.id}`}
-                    className="block px-4 py-2.5 text-[13px] text-[#1B1B1D] hover:bg-[#F5F3F4]"
+                    className="block px-4 py-2.5 text-[13px] text-foreground hover:bg-surface-container-low"
                     onClick={() => setMenuOpen(false)}
                   >
                     Open profile
@@ -169,7 +170,7 @@ export function ReminderCard({ reminder, showDate = false, onComplete, onSnooze,
                   {buyer.email && (
                     <a
                       href={`mailto:${buyer.email}`}
-                      className="block px-4 py-2.5 text-[13px] text-[#1B1B1D] hover:bg-[#F5F3F4]"
+                      className="block px-4 py-2.5 text-[13px] text-foreground hover:bg-surface-container-low"
                       onClick={() => setMenuOpen(false)}
                     >
                       Email

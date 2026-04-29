@@ -266,7 +266,7 @@ export function AddBuyerForm() {
     // Normalise buyer temperature label
     let tempValue: "hot" | "warm" | "cold" | null = null;
     if (buyerTemperature) {
-      const t = buyerTemperature.toLowerCase().replace(" 🔥", "");
+      const t = buyerTemperature.toLowerCase();
       if (t === "hot" || t === "warm" || t === "cold") tempValue = t;
     }
 
@@ -681,17 +681,17 @@ export function AddBuyerForm() {
                   label="Buying timeline"
                   options={[
                     "Ready now",
-                    "1-3 months",
-                    "3-6 months",
-                    "6-12 months",
-                    "12+ months",
+                    "0–3 months",
+                    "3–6 months",
+                    "6+ months",
+                    "Just researching",
                   ]}
                   value={buyingTimeline}
                   onChange={setBuyingTimeline}
                 />
                 <ChipField
                   label="Buyer temperature"
-                  options={["Hot 🔥", "Warm", "Cold"]}
+                  options={["Hot", "Warm", "Cold"]}
                   value={buyerTemperature}
                   onChange={setBuyerTemperature}
                 />

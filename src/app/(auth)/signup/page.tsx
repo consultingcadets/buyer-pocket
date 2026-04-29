@@ -159,8 +159,8 @@ export default function SignupPage() {
                         ? strength === 1
                           ? "bg-error"
                           : strength === 2
-                          ? "bg-yellow-400"
-                          : "bg-teal-action"
+                          ? "bg-warning-strong"
+                          : "bg-secondary"
                         : "bg-surface-variant"
                     }`}
                   />

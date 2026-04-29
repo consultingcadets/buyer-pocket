@@ -67,7 +67,7 @@ export function InstallPrompt() {
       <button
         type="button"
         onClick={handleInstall}
-        className="flex-shrink-0 h-9 px-4 rounded-lg bg-secondary text-white text-sm font-semibold"
+        className="flex-shrink-0 h-9 px-4 rounded-lg bg-teal-action text-white text-sm font-semibold"
       >
         Install
       </button>
