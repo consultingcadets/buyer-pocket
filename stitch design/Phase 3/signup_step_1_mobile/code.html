@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BuyerPocket - Signup Step 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#fbf9fa",
+                        "surface-container-low": "#f5f3f4",
+                        "surface-tint": "#535f72",
+                        "secondary": "#006a62",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303032",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#feddb9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#3b4859",
+                        "on-tertiary-fixed": "#281803",
+                        "surface-bright": "#fbf9fa",
+                        "outline-variant": "#c5c6cd",
+                        "primary-fixed-dim": "#bac7dd",
+                        "surface-container": "#f0edef",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#70f8e8",
+                        "tertiary-container": "#281803",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e4e2e3",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#44474c",
+                        "primary-container": "#0f1c2c",
+                        "surface-dim": "#dbd9db",
+                        "surface-variant": "#e4e2e3",
+                        "tertiary": "#000000",
+                        "secondary-container": "#70f8e8",
+                        "on-primary-container": "#788599",
+                        "on-surface": "#1b1b1d",
+                        "on-secondary-fixed-variant": "#005049",
+                        "on-secondary-fixed": "#00201d",
+                        "surface-container-high": "#eae7e9",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f2f0f1",
+                        "primary": "#000000",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#e0c19f",
+                        "on-background": "#1b1b1d",
+                        "on-secondary-container": "#007168",
+                        "primary-fixed": "#d6e3fa",
+                        "on-primary-fixed": "#0f1c2c",
+                        "on-tertiary-container": "#9a7f60",
+                        "background": "#fbf9fa",
+                        "on-tertiary-fixed-variant": "#584328",
+                        "outline": "#75777d",
+                        "inverse-primary": "#bac7dd",
+                        "secondary-fixed-dim": "#4fdbcc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "xl": "48px",
+                        "lg": "32px",
+                        "container-max": "1280px",
+                        "xs": "8px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Inter"],
+                        "h2": ["Inter"],
+                        "button": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "h1": ["Inter"],
+                        "body": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h3": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "h2": ["32px", { "lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "button": ["16px", { "lineHeight": "1", "fontWeight": "600" }],
+                        "label-caps": ["14px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "h1": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-body text-on-background min-h-screen flex items-center justify-center p-sm md:p-lg">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(13,27,42,0.05)] p-md flex flex-col gap-lg">
+<!-- Header -->
+<div class="flex flex-col items-center gap-md text-center">
+<!-- Progress Dots -->
+<div class="flex gap-xs justify-center mb-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+</div>
+<div class="text-h3 font-h3 text-primary-container font-bold tracking-tight">BuyerPocket</div>
+<div class="flex flex-col gap-xs">
+<h2 class="font-h2 text-h2 text-primary-container">Start your 7-day free trial.</h2>
+<p class="font-body text-body text-on-surface-variant">No credit card needed.</p>
+</div>
+</div>
+<!-- Social Login -->
+<button class="w-full flex items-center justify-center gap-xs py-3 px-4 border border-outline-variant rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-colors text-on-background font-button text-button min-h-[48px]" type="button">
+<svg class="w-5 h-5" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+            Continue with Google
+        </button>
+<!-- Divider -->
+<div class="relative flex items-center">
+<div class="flex-grow border-t border-surface-variant"></div>
+<span class="flex-shrink-0 mx-4 font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">or</span>
+<div class="flex-grow border-t border-surface-variant"></div>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-caps text-label-caps text-on-surface" for="fullName">Full name</label>
+<input class="w-full h-[48px] px-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4] outline-none transition-colors font-body text-body text-on-surface" id="fullName" placeholder="Jane Doe" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-caps text-label-caps text-on-surface" for="email">Email</label>
+<input class="w-full h-[48px] px-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4] outline-none transition-colors font-body text-body text-on-surface" id="email" placeholder="jane@example.com" type="email"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-caps text-label-caps text-on-surface" for="password">Password</label>
+<input class="w-full h-[48px] px-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4] outline-none transition-colors font-body text-body text-on-surface" id="password" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-caps text-label-caps text-on-surface" for="mobile">Mobile</label>
+<div class="flex relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 font-body text-body text-on-surface-variant">+61</span>
+<input class="w-full h-[48px] pl-[56px] pr-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4] outline-none transition-colors font-body text-body text-on-surface" id="mobile" placeholder="400 000 000" type="tel"/>
+</div>
+</div>
+<button class="w-full min-h-[48px] bg-secondary text-on-secondary font-button text-button rounded-lg hover:bg-opacity-90 transition-opacity mt-xs" type="submit">
+                Continue
+            </button>
+</form>
+<!-- Footer -->
+<p class="text-center font-body-sm text-body-sm text-on-surface-variant mt-sm">
+            By continuing, you agree to our <a class="text-secondary hover:underline" href="#">Terms of Service</a> and <a class="text-secondary hover:underline" href="#">Privacy Policy</a>.
+        </p>
+</div>
+</body></html>

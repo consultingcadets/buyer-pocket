@@ -1,0 +1,1756 @@
+"use client";
+
+import { useState, useTransition, useCallback, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SuburbCombobox } from "@/components/ui/suburb-combobox";
+import { formatPhone, parseAmount, formatAmount } from "@/lib/format";
+import { getReminderDate, type ReminderChip } from "@/lib/reminder-utils";
+import type { Database } from "@/types/database";
+import {
+  addNote,
+  updateNote,
+  deleteNote,
+  completeReminder,
+  snoozeReminder,
+  deleteReminder,
+  addReminder,
+  updateBuyer,
+  archiveBuyer,
+} from "./actions";
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Buyer = Database["public"]["Tables"]["buyers"]["Row"];
+type Note = Database["public"]["Tables"]["notes"]["Row"];
+type Reminder = Database["public"]["Tables"]["reminders"]["Row"];
+type MobileTab = "looking-for" | "notes" | "reminders" | "contact";
+
+interface Props {
+  buyer: Buyer;
+  notes: Note[];
+  reminders: Reminder[];
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function fmtBudget(min: number | null, max: number | null): string {
+  if (!min && !max) return "—";
+  const f = (n: number) =>
+    n >= 1_000_000
+      ? `$${(n / 1_000_000 % 1 === 0 ? n / 1_000_000 : (n / 1_000_000).toFixed(1))}m`
+      : `$${Math.round(n / 1000)}k`;
+  if (min && max) return `${f(min)} – ${f(max)}`;
+  if (min) return `${f(min)}+`;
+  return `Up to ${f(max!)}`;
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  return (
+    d.toLocaleDateString("en-AU", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    }) +
+    " · " +
+    d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })
+  );
+}
+
+function fmtRelative(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86_400_000);
+  if (days === 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+  return new Date(iso).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function fmtReminderTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const isToday = d.toDateString() === now.toDateString();
+  const isTomorrow = d.toDateString() === tomorrow.toDateString();
+  const time = d.toLocaleTimeString("en-AU", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  if (isToday) return `Today ${time}`;
+  if (isTomorrow) return `Tomorrow ${time}`;
+  return (
+    d.toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" }) +
+    ` ${time}`
+  );
+}
+
+const TEMP_STYLES: Record<
+  string,
+  { label: string; chip: string }
+> = {
+  hot: { label: "Hot", chip: "bg-secondary text-white" },
+  warm: { label: "Warm", chip: "bg-amber-100 text-amber-800" },
+  cold: { label: "Cold", chip: "bg-sky-100 text-sky-700" },
+};
+
+const CONTACT_TYPES = ["Call", "SMS", "Email", "Inspection follow-up", "Finance follow-up", "Offer follow-up", "General"];
+const REMINDER_TYPES = ["Call", "SMS", "Email", "Inspection follow-up", "Finance follow-up", "Offer follow-up", "General"];
+
+const SNOOZE_OPTIONS = [
+  { label: "1 hour", fn: () => { const d = new Date(); d.setHours(d.getHours() + 1); return d; } },
+  { label: "Tonight 7pm", fn: () => { const d = new Date(); d.setHours(19, 0, 0, 0); if (new Date() >= d) d.setDate(d.getDate() + 1); return d; } },
+  { label: "Tomorrow 9am", fn: () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); return d; } },
+  { label: "Next Monday", fn: () => { const d = new Date(); const day = d.getDay(); const daysUntilMon = day === 1 ? 7 : (8 - day) % 7 || 7; d.setDate(d.getDate() + daysUntilMon); d.setHours(9, 0, 0, 0); return d; } },
+];
+
+const REMINDER_CHIPS: Array<{ id: Exclude<ReminderChip, null>; label: string }> = [
+  { id: "tonight-7pm", label: "Tonight 7pm" },
+  { id: "tomorrow-9am", label: "Tomorrow 9am" },
+  { id: "tomorrow-5pm", label: "Tomorrow 5pm" },
+  { id: "saturday-morning", label: "Sat morning" },
+  { id: "next-monday-9am", label: "Mon 9am" },
+  { id: "custom", label: "Custom…" },
+];
+
+const MUST_HAVES_OPTIONS = [
+  "Pool", "Double garage", "Study/home office", "Alfresco/outdoor living",
+  "Solar panels", "Granny flat", "Workshop", "Side access",
+  "North-facing", "Large garden", "Street appeal", "Open plan living",
+];
+
+// ─── Shared UI primitives ─────────────────────────────────────────────────────
+
+const inputBase =
+  "w-full h-12 px-4 rounded-lg border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:ring-0 focus:border-2 focus:border-accent transition-colors";
+
+function Field({
+  label,
+  value,
+  fallback = "—",
+}: {
+  label: string;
+  value?: string | null | number;
+  fallback?: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">
+        {label}
+      </p>
+      <p className="text-sm text-text-primary">{value ?? fallback}</p>
+    </div>
+  );
+}
+
+function Chip({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center h-6 px-2.5 rounded-full text-xs font-medium",
+        className
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+function Card({
+  title,
+  action,
+  children,
+  className,
+}: {
+  title?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "bg-white rounded-lg border border-border shadow-card p-4 space-y-4",
+        className
+      )}
+    >
+      {title && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            {title}
+          </p>
+          {action}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+// ─── Add Reminder Modal ───────────────────────────────────────────────────────
+
+function AddReminderModal({
+  buyerId,
+  onClose,
+}: {
+  buyerId: string;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [chip, setChip] = useState<ReminderChip>(null);
+  const [customDate, setCustomDate] = useState("");
+  const [reminderType, setReminderType] = useState("");
+  const [reminderNote, setReminderNote] = useState("");
+  const [error, setError] = useState("");
+
+  function handleSet() {
+    if (!chip) { setError("Pick a time"); return; }
+    let at: string;
+    if (chip === "custom") {
+      if (!customDate) { setError("Enter a date"); return; }
+      at = new Date(customDate).toISOString();
+    } else {
+      at = getReminderDate(chip).toISOString();
+    }
+    setError("");
+    startTransition(async () => {
+      const res = await addReminder(buyerId, at, reminderType || null, reminderNote || null);
+      if (res.error) { setError(res.error); return; }
+      router.refresh();
+      onClose();
+    });
+  }
+
+  return (
+    <ModalBackdrop onClose={onClose}>
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl space-y-6">
+        <h2 className="text-xl font-semibold text-text-primary">When to follow up</h2>
+
+        <div className="grid grid-cols-3 gap-2">
+          {REMINDER_CHIPS.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setChip((prev) => (prev === c.id ? null : c.id))}
+              className={cn(
+                "h-11 px-3 rounded-lg border text-sm font-medium transition-colors",
+                chip === c.id
+                  ? "bg-secondary border-secondary text-white"
+                  : "bg-white border-border text-text-secondary hover:border-secondary/40"
+              )}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        {chip === "custom" && (
+          <input
+            type="datetime-local"
+            value={customDate}
+            onChange={(e) => setCustomDate(e.target.value)}
+            className={cn(inputBase, "border-border")}
+          />
+        )}
+
+        <div>
+          <p className="text-base font-semibold text-text-primary mb-3">What kind of follow-up?</p>
+          <div className="flex flex-wrap gap-2">
+            {REMINDER_TYPES.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setReminderType((prev) => (prev === t ? "" : t))}
+                className={cn(
+                  "h-8 px-3 rounded-full border text-sm font-medium transition-colors",
+                  reminderType === t
+                    ? "bg-secondary border-secondary text-white"
+                    : "bg-white border-border text-text-secondary hover:border-secondary/40"
+                )}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <textarea
+          placeholder="Optional note for yourself…"
+          value={reminderNote}
+          onChange={(e) => setReminderNote(e.target.value)}
+          rows={3}
+          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none"
+        />
+
+        {error && <p className="text-xs text-error">{error}</p>}
+
+        <div className="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-accent text-sm font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSet}
+            disabled={isPending}
+            className="h-11 px-6 rounded-lg bg-secondary text-white font-semibold text-sm disabled:opacity-60"
+          >
+            {isPending ? "Saving…" : "Set reminder"}
+          </button>
+        </div>
+      </div>
+    </ModalBackdrop>
+  );
+}
+
+// ─── Snooze Modal ─────────────────────────────────────────────────────────────
+
+function SnoozeModal({
+  reminderId,
+  buyerId,
+  onClose,
+}: {
+  reminderId: string;
+  buyerId: string;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [customDate, setCustomDate] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
+  const [error, setError] = useState("");
+
+  function handleSnooze(until: Date) {
+    startTransition(async () => {
+      const res = await snoozeReminder(reminderId, buyerId, until.toISOString());
+      if (res.error) { setError(res.error); return; }
+      router.refresh();
+      onClose();
+    });
+  }
+
+  function handleCustom() {
+    if (!customDate) { setError("Enter a date and time"); return; }
+    handleSnooze(new Date(customDate));
+  }
+
+  return (
+    <ModalBackdrop onClose={onClose}>
+      <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl space-y-4">
+        <h2 className="text-xl font-semibold text-text-primary">Snooze until</h2>
+        <div className="space-y-2">
+          {SNOOZE_OPTIONS.map((opt) => (
+            <button
+              key={opt.label}
+              type="button"
+              disabled={isPending}
+              onClick={() => handleSnooze(opt.fn())}
+              className="w-full h-12 rounded-lg border border-border text-sm font-medium text-text-primary hover:border-secondary/40 hover:bg-secondary/5 transition-colors disabled:opacity-60"
+            >
+              {opt.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => setShowCustom((v) => !v)}
+            className="w-full h-12 rounded-lg border border-border text-sm font-medium text-text-primary hover:border-secondary/40 hover:bg-secondary/5 transition-colors"
+          >
+            Custom…
+          </button>
+          {showCustom && (
+            <div className="space-y-2">
+              <input
+                type="datetime-local"
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+                className={cn(inputBase, "border-border")}
+              />
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={handleCustom}
+                className="w-full h-11 rounded-lg bg-secondary text-white font-semibold text-sm disabled:opacity-60"
+              >
+                Snooze
+              </button>
+            </div>
+          )}
+        </div>
+        {error && <p className="text-xs text-error">{error}</p>}
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full text-center text-sm text-accent font-medium pt-1"
+        >
+          Cancel
+        </button>
+      </div>
+    </ModalBackdrop>
+  );
+}
+
+// ─── Modal backdrop ───────────────────────────────────────────────────────────
+
+function ModalBackdrop({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(15,28,44,0.4)", backdropFilter: "blur(4px)" }}
+    >
+      <div
+        className="absolute inset-0"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 w-full max-w-lg">{children}</div>
+    </div>
+  );
+}
+
+// ─── Edit Buyer Modal ─────────────────────────────────────────────────────────
+
+function EditBuyerModal({
+  buyer,
+  onClose,
+}: {
+  buyer: Buyer;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
+
+  // Form state pre-populated from buyer
+  const [name, setName] = useState(buyer.name);
+  const [phone, setPhone] = useState(buyer.phone ?? "");
+  const [email, setEmail] = useState(buyer.email ?? "");
+  const [suburbs, setSuburbs] = useState<string[]>(buyer.preferred_suburbs ?? []);
+  const [budgetMin, setBudgetMin] = useState(buyer.budget_min ? buyer.budget_min.toLocaleString("en-AU") : "");
+  const [budgetMax, setBudgetMax] = useState(buyer.budget_max ? buyer.budget_max.toLocaleString("en-AU") : "");
+  const [bedrooms, setBedrooms] = useState(buyer.bedrooms ?? "Any");
+  const [bathrooms, setBathrooms] = useState(buyer.bathrooms ?? "Any");
+  const [carSpaces, setCarSpaces] = useState(buyer.car_spaces ?? "Any");
+  const [propertyType, setPropertyType] = useState(buyer.property_type ?? "");
+  const [houseType, setHouseType] = useState(buyer.house_type ?? "");
+  const [conditionPreference, setConditionPreference] = useState(buyer.condition_preference ?? "");
+  const [landSizeMin, setLandSizeMin] = useState(
+    buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any"
+  );
+  const [buildingSizeMin, setBuildingSizeMin] = useState(
+    buyer.building_size_min ? String(buyer.building_size_min) : ""
+  );
+  const [blockPreference, setBlockPreference] = useState(buyer.block_preference ?? "");
+  const [mustHaves, setMustHaves] = useState<string[]>(buyer.must_haves ?? []);
+  const [buyingTimeline, setBuyingTimeline] = useState(buyer.buying_timeline ?? "");
+  const [buyerTemperature, setBuyerTemperature] = useState(
+    buyer.buyer_temperature ? buyer.buyer_temperature.charAt(0).toUpperCase() + buyer.buyer_temperature.slice(1) : ""
+  );
+  const [buyerType, setBuyerType] = useState(buyer.buyer_type ?? "");
+  const [leadStatus, setLeadStatus] = useState(buyer.lead_status ?? "");
+  const [leadSource, setLeadSource] = useState(buyer.lead_source ?? "");
+  const [preferredContactMethod, setPreferredContactMethod] = useState(buyer.preferred_contact_method ?? "");
+  const [bestTimeToContact, setBestTimeToContact] = useState(buyer.best_time_to_contact ?? "");
+  const [contactConsent, setContactConsent] = useState(buyer.contact_consent ?? "");
+  const [notesSummary, setNotesSummary] = useState(buyer.notes_summary ?? "");
+
+  const toggleMustHave = useCallback((item: string) => {
+    setMustHaves((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  }, []);
+
+  function handleSave() {
+    if (!name.trim()) { setError("Name is required"); return; }
+    const min = parseAmount(budgetMin);
+    const max = parseAmount(budgetMax);
+    if (min !== null && max !== null && min > max) {
+      setError("Budget max must be greater than min");
+      return;
+    }
+
+    let landSizeValue: number | null = null;
+    if (landSizeMin !== "Any") {
+      landSizeValue = parseInt(landSizeMin, 10) || null;
+    }
+
+    let tempValue: "hot" | "warm" | "cold" | null = null;
+    const t = buyerTemperature.toLowerCase().replace(" 🔥", "");
+    if (t === "hot" || t === "warm" || t === "cold") tempValue = t;
+
+    setError("");
+    startTransition(async () => {
+      const res = await updateBuyer(buyer.id, {
+        name: name.trim(),
+        phone: phone || null,
+        email: email || null,
+        preferred_suburbs: suburbs.length > 0 ? suburbs : null,
+        budget_min: min,
+        budget_max: max,
+        bedrooms: bedrooms === "Any" ? null : bedrooms,
+        bathrooms: bathrooms === "Any" ? null : bathrooms,
+        car_spaces: carSpaces === "Any" ? null : carSpaces,
+        property_type: propertyType || null,
+        house_type: houseType || null,
+        condition_preference: conditionPreference || null,
+        land_size_min: landSizeValue,
+        building_size_min: buildingSizeMin ? parseInt(buildingSizeMin, 10) || null : null,
+        block_preference: blockPreference || null,
+        must_haves: mustHaves.length > 0 ? mustHaves : null,
+        buying_timeline: buyingTimeline || null,
+        buyer_temperature: tempValue,
+        buyer_type: buyerType || null,
+        lead_status: leadStatus || null,
+        lead_source: leadSource || null,
+        preferred_contact_method: preferredContactMethod || null,
+        best_time_to_contact: bestTimeToContact || null,
+        contact_consent: contactConsent || null,
+        notes_summary: notesSummary || null,
+      });
+      if (res.error) { setError(res.error); return; }
+      router.refresh();
+      onClose();
+    });
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-background flex flex-col"
+      style={{ overscrollBehavior: "contain" }}
+    >
+      {/* Header */}
+      <header className="sticky top-0 bg-surface z-10 border-b border-border">
+        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-accent text-sm font-medium w-16"
+          >
+            Cancel
+          </button>
+          <h1 className="text-base font-semibold text-text-primary">Edit Buyer</h1>
+          <div className="w-16" />
+        </div>
+      </header>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto pb-32">
+        <div className="max-w-2xl mx-auto px-6 py-6 space-y-6">
+          {error && (
+            <div className="px-4 py-3 rounded-lg bg-error/10 border border-error/20 text-sm text-error">
+              {error}
+            </div>
+          )}
+
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Buyer Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={cn(inputBase, "border-border")}
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              onBlur={(e) => setPhone(formatPhone(e.target.value))}
+              className={cn(inputBase, "border-border")}
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={cn(inputBase, "border-border")}
+            />
+          </div>
+
+          {/* Suburbs */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Preferred Suburbs</label>
+            <SuburbCombobox
+              value={suburbs}
+              onChange={setSuburbs}
+              placeholder="Search and add suburbs…"
+            />
+          </div>
+
+          {/* Budget */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Budget</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Min"
+                  value={budgetMin}
+                  onChange={(e) => setBudgetMin(e.target.value.replace(/[^0-9]/g, ""))}
+                  onBlur={(e) => setBudgetMin(formatAmount(e.target.value))}
+                  className={cn(inputBase, "pl-8 border-border")}
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Max"
+                  value={budgetMax}
+                  onChange={(e) => setBudgetMax(e.target.value.replace(/[^0-9]/g, ""))}
+                  onBlur={(e) => setBudgetMax(formatAmount(e.target.value))}
+                  className={cn(inputBase, "pl-8 border-border")}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bedrooms */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Bedrooms</label>
+            <SegmentedControl
+              options={["Any", "1+", "2+", "3+", "4+", "5+"]}
+              value={bedrooms}
+              onChange={setBedrooms}
+            />
+          </div>
+
+          {/* Bathrooms */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Bathrooms</label>
+            <SegmentedControl
+              options={["Any", "1+", "2+", "3+"]}
+              value={bathrooms}
+              onChange={setBathrooms}
+            />
+          </div>
+
+          {/* Car spaces */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Car spaces</label>
+            <SegmentedControl
+              options={["Any", "1+", "2+", "3+"]}
+              value={carSpaces}
+              onChange={setCarSpaces}
+            />
+          </div>
+
+          {/* Land size */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Land Size (min)</label>
+            <div className="overflow-x-auto -mx-6 px-6">
+              <div className="min-w-max">
+                <SegmentedControl
+                  options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]}
+                  value={landSizeMin}
+                  onChange={setLandSizeMin}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Contact */}
+          <div className="rounded-lg bg-surface-container p-4 space-y-4">
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Contact Preferences</p>
+            <ChipField label="Preferred contact method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
+            <ChipField label="Best time to contact" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
+            <ChipField label="Contact consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
+          </div>
+
+          {/* Section: Property */}
+          <div className="rounded-lg bg-surface-container p-4 space-y-4">
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Property Preferences</p>
+            <ChipField label="Property type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
+            <ChipField label="House type" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
+            <ChipField label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
+            <ChipField label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
+            <div>
+              <p className="text-sm font-medium text-text-secondary mb-2">Building size min (squares)</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="e.g. 25"
+                  value={buildingSizeMin}
+                  onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
+                  className={cn(inputBase, "border-border pr-12")}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">sq</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Must-haves */}
+          <div className="rounded-lg bg-surface-container p-4 space-y-3">
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Must-Haves</p>
+            <div className="flex flex-wrap gap-2">
+              {MUST_HAVES_OPTIONS.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => toggleMustHave(item)}
+                  className={cn(
+                    "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
+                    mustHaves.includes(item)
+                      ? "bg-primary border-primary text-white"
+                      : "bg-white border-border text-text-secondary hover:border-primary/30"
+                  )}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Section: Status */}
+          <div className="rounded-lg bg-surface-container p-4 space-y-4">
+            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Buyer Status</p>
+            <ChipField label="Buying timeline" options={["Ready now", "1-3 months", "3-6 months", "6-12 months", "12+ months"]} value={buyingTimeline} onChange={setBuyingTimeline} />
+            <ChipField label="Buyer temperature" options={["Hot 🔥", "Warm", "Cold"]} value={buyerTemperature} onChange={setBuyerTemperature} />
+            <ChipField label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
+            <ChipField label="Lead status" options={["New lead", "Active", "Inspection booked", "Under offer", "Settled", "Lost"]} value={leadStatus} onChange={setLeadStatus} />
+            <ChipField label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
+          </div>
+
+          {/* Notes summary */}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1.5">Notes summary</label>
+            <textarea
+              value={notesSummary}
+              onChange={(e) => setNotesSummary(e.target.value)}
+              rows={3}
+              placeholder="Any extra details about this buyer…"
+              className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border">
+        <div className="max-w-2xl mx-auto px-6 py-4">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isPending}
+            className="w-full h-14 rounded-lg bg-secondary text-white font-semibold text-base disabled:opacity-60"
+          >
+            {isPending ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ChipField helper (used in EditBuyerModal) ────────────────────────────────
+
+function ChipField({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <p className="text-sm font-medium text-text-secondary mb-2">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(value === opt ? "" : opt)}
+            className={cn(
+              "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
+              value === opt
+                ? "bg-primary border-primary text-white"
+                : "bg-white border-border text-text-secondary hover:border-primary/30"
+            )}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Looking For Card ─────────────────────────────────────────────────────────
+
+function LookingForCard({ buyer }: { buyer: Buyer }) {
+  const budget = fmtBudget(buyer.budget_min, buyer.budget_max);
+
+  return (
+    <Card title="Looking for">
+      {/* Suburbs */}
+      <div>
+        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Suburbs</p>
+        {buyer.preferred_suburbs && buyer.preferred_suburbs.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {buyer.preferred_suburbs.map((s) => (
+              <Chip key={s} label={s} className="bg-secondary/10 text-secondary-container font-semibold" />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-text-primary">—</p>
+        )}
+      </div>
+
+      {/* Budget */}
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Budget" value={budget} />
+        <Field label="Finance" value={buyer.finance_status} />
+      </div>
+
+      {/* Property type */}
+      {(buyer.property_type || buyer.house_type || buyer.bedrooms || buyer.bathrooms || buyer.car_spaces) && (
+        <div>
+          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Property Criteria</p>
+          <p className="text-sm text-text-primary">
+            {[buyer.property_type, buyer.house_type].filter(Boolean).join(" or ")}
+            {buyer.bedrooms && `, ${buyer.bedrooms} bed`}
+            {buyer.bathrooms && `, ${buyer.bathrooms} bath`}
+            {buyer.car_spaces && `, ${buyer.car_spaces} car`}
+            {buyer.land_size_min && `, ${buyer.land_size_min}m²+ land`}
+          </p>
+        </div>
+      )}
+
+      {/* Must-haves */}
+      {buyer.must_haves && buyer.must_haves.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Must-haves</p>
+          <div className="flex flex-wrap gap-1.5">
+            {buyer.must_haves.map((m) => (
+              <Chip key={m} label={m} className="bg-surface-container text-text-secondary" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other fields */}
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Timeline" value={buyer.buying_timeline} />
+        <Field label="Condition" value={buyer.condition_preference} />
+        {buyer.block_preference && <Field label="Block" value={buyer.block_preference} />}
+        {buyer.building_size_min && <Field label="Building size" value={`${buyer.building_size_min} sq min`} />}
+        {buyer.deposit_ready && <Field label="Deposit" value={buyer.deposit_ready} />}
+        {buyer.school_zone_required && <Field label="School zone" value={buyer.school_zone_required} />}
+      </div>
+
+      {buyer.deal_breakers && (
+        <Field label="Deal breakers" value={buyer.deal_breakers} />
+      )}
+      {buyer.other_must_haves && (
+        <Field label="Other must-haves" value={buyer.other_must_haves} />
+      )}
+      {buyer.notes_summary && (
+        <Field label="Notes" value={buyer.notes_summary} />
+      )}
+    </Card>
+  );
+}
+
+// ─── Notes & Activity ─────────────────────────────────────────────────────────
+
+function NotesActivity({
+  buyer,
+  notes,
+  reminders,
+}: {
+  buyer: Buyer;
+  notes: Note[];
+  reminders: Reminder[];
+}) {
+  const router = useRouter();
+  const [isPendingAdd, startAdd] = useTransition();
+  const [isPendingEdit, startEdit] = useTransition();
+  const [isPendingDelete, startDelete] = useTransition();
+
+  const [noteText, setNoteText] = useState("");
+  const [contactType, setContactType] = useState("");
+  const [noteError, setNoteError] = useState("");
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+
+  function handleAddNote() {
+    if (!noteText.trim()) { setNoteError("Note can't be empty"); return; }
+    if (!contactType) { setNoteError("Select a contact type"); return; }
+    setNoteError("");
+    startAdd(async () => {
+      const res = await addNote(buyer.id, noteText, contactType);
+      if (res.error) { setNoteError(res.error); return; }
+      setNoteText("");
+      setContactType("");
+      router.refresh();
+    });
+  }
+
+  function handleEditSave(noteId: string) {
+    if (!editText.trim()) return;
+    startEdit(async () => {
+      const res = await updateNote(noteId, buyer.id, editText);
+      if (!res.error) { setEditingId(null); router.refresh(); }
+    });
+  }
+
+  function handleDelete(noteId: string) {
+    startDelete(async () => {
+      const res = await deleteNote(noteId, buyer.id);
+      if (!res.error) router.refresh();
+    });
+  }
+
+  // Build combined timeline: notes + completed reminders
+  type TimelineItem =
+    | { kind: "note"; data: Note }
+    | { kind: "activity"; type: string; at: string; label: string };
+
+  const timeline: TimelineItem[] = [
+    ...notes.map((n) => ({ kind: "note" as const, data: n })),
+    ...reminders
+      .filter((r) => r.status === "completed" && r.completed_at)
+      .map((r) => ({
+        kind: "activity" as const,
+        type: "reminder-completed",
+        at: r.completed_at!,
+        label: `Reminder completed${r.reminder_type ? ` · ${r.reminder_type}` : ""}`,
+      })),
+    ...reminders
+      .filter((r) => r.status === "snoozed")
+      .map((r) => ({
+        kind: "activity" as const,
+        type: "reminder-snoozed",
+        at: r.updated_at,
+        label: `Reminder snoozed${r.reminder_type ? ` · ${r.reminder_type}` : ""}`,
+      })),
+  ].sort((a, b) => {
+    const aDate = a.kind === "note" ? a.data.created_at : a.at;
+    const bDate = b.kind === "note" ? b.data.created_at : b.at;
+    return new Date(bDate).getTime() - new Date(aDate).getTime();
+  });
+
+  return (
+    <Card title="Notes & activity">
+      {/* Add note input */}
+      <div className="space-y-3">
+        <textarea
+          placeholder="Type a note…"
+          value={noteText}
+          onChange={(e) => setNoteText(e.target.value)}
+          rows={2}
+          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none text-sm"
+        />
+        <div className="flex items-center gap-2">
+          <select
+            value={contactType}
+            onChange={(e) => setContactType(e.target.value)}
+            className="h-9 px-3 rounded-lg border border-border bg-white text-sm text-text-primary focus:outline-none focus:border-accent"
+          >
+            <option value="">Contact type…</option>
+            {CONTACT_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleAddNote}
+            disabled={isPendingAdd}
+            className="ml-auto h-9 px-5 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-60"
+          >
+            {isPendingAdd ? "Adding…" : "Add note"}
+          </button>
+        </div>
+        {noteError && <p className="text-xs text-error">{noteError}</p>}
+      </div>
+
+      {/* Timeline */}
+      {timeline.length === 0 ? (
+        <div className="py-8 text-center">
+          <div className="text-4xl mb-3">📝</div>
+          <p className="font-semibold text-text-primary mb-1">No notes yet.</p>
+          <p className="text-sm text-text-secondary">Add a note after your next call or inspection.</p>
+        </div>
+      ) : (
+        <div className="space-y-4 pt-2">
+          {timeline.map((item, i) => {
+            if (item.kind === "note") {
+              const n = item.data;
+              const isEditing = editingId === n.id;
+              return (
+                <div key={n.id} className="flex gap-3">
+                  {/* Icon */}
+                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center text-xs">
+                    {n.contact_type === "Call" ? "📞" : n.contact_type === "SMS" ? "💬" : n.contact_type === "Email" ? "✉️" : "📝"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="text-xs font-medium text-text-secondary">
+                          {n.contact_type ?? "Note"}
+                        </span>
+                        <span className="text-xs text-text-secondary ml-2">
+                          {fmtDate(n.created_at)}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => { setEditingId(n.id); setEditText(n.note); }}
+                          className="text-xs text-accent font-medium"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(n.id)}
+                          disabled={isPendingDelete}
+                          className="text-xs text-error font-medium disabled:opacity-60"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    {isEditing ? (
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          rows={3}
+                          autoFocus
+                          className="w-full px-3 py-2 rounded-lg border border-accent bg-white text-sm text-text-primary focus:outline-none resize-none"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditSave(n.id)}
+                            disabled={isPendingEdit}
+                            className="h-8 px-4 rounded-lg bg-primary text-white text-xs font-semibold disabled:opacity-60"
+                          >
+                            {isPendingEdit ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingId(null)}
+                            className="h-8 px-3 text-xs text-text-secondary"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-sm text-text-primary whitespace-pre-wrap">{n.note}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+
+            // Activity event
+            return (
+              <div key={`activity-${i}`} className="flex gap-3">
+                <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-xs">
+                  {item.type === "reminder-completed" ? "✅" : "⏰"}
+                </div>
+                <div className="flex-1">
+                  <span className="text-xs text-text-secondary">{item.label}</span>
+                  <span className="text-xs text-text-secondary ml-2">· {fmtRelative(item.at)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ─── Contact Card ─────────────────────────────────────────────────────────────
+
+function ContactCard({ buyer }: { buyer: Buyer }) {
+  return (
+    <Card title="Contact">
+      <div className="space-y-3">
+        {buyer.phone ? (
+          <div>
+            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Phone</p>
+            <a href={`tel:${buyer.phone.replace(/\s/g, "")}`} className="text-sm text-accent font-medium">
+              {buyer.phone}
+            </a>
+          </div>
+        ) : (
+          <Field label="Phone" value={null} />
+        )}
+        {buyer.email ? (
+          <div>
+            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Email</p>
+            <a href={`mailto:${buyer.email}`} className="text-sm text-accent font-medium break-all">
+              {buyer.email}
+            </a>
+          </div>
+        ) : (
+          <Field label="Email" value={null} />
+        )}
+        <Field label="Preferred contact" value={buyer.preferred_contact_method} />
+        <Field label="Best time" value={buyer.best_time_to_contact} />
+        {buyer.contact_consent && <Field label="Consent" value={buyer.contact_consent} />}
+      </div>
+    </Card>
+  );
+}
+
+// ─── Reminders Card ───────────────────────────────────────────────────────────
+
+function RemindersCard({
+  buyer,
+  reminders,
+  onAddReminder,
+}: {
+  buyer: Buyer;
+  reminders: Reminder[];
+  onAddReminder: () => void;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [snoozeTarget, setSnoozeTarget] = useState<string | null>(null);
+
+  const upcoming = reminders.filter(
+    (r) => r.status === "pending" || r.status === "snoozed" || r.status === "sent"
+  ).sort((a, b) => new Date(a.reminder_at).getTime() - new Date(b.reminder_at).getTime());
+
+  const past = reminders.filter(
+    (r) => r.status === "completed" || r.status === "cancelled"
+  ).sort((a, b) => new Date(b.reminder_at).getTime() - new Date(a.reminder_at).getTime());
+
+  function handleComplete(id: string) {
+    startTransition(async () => {
+      const res = await completeReminder(id, buyer.id);
+      if (!res.error) router.refresh();
+    });
+  }
+
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      const res = await deleteReminder(id, buyer.id);
+      if (!res.error) router.refresh();
+    });
+  }
+
+  return (
+    <>
+      <Card
+        title="Reminders"
+        action={
+          <button
+            type="button"
+            onClick={onAddReminder}
+            className="text-xs font-semibold text-accent"
+          >
+            + Add
+          </button>
+        }
+      >
+        {upcoming.length === 0 && past.length === 0 ? (
+          <p className="text-sm text-text-secondary">No reminders set.</p>
+        ) : (
+          <div className="space-y-3">
+            {upcoming.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Next</p>
+                {upcoming.slice(0, 3).map((r) => (
+                  <div key={r.id} className="py-2 border-b border-border last:border-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">
+                          {fmtReminderTime(r.reminder_at)}
+                        </p>
+                        {r.reminder_type && (
+                          <p className="text-xs text-text-secondary">{r.reminder_type}</p>
+                        )}
+                        {r.reminder_note && (
+                          <p className="text-xs text-text-secondary mt-0.5 italic">{r.reminder_note}</p>
+                        )}
+                        {r.status === "snoozed" && (
+                          <p className="text-xs text-amber-600 mt-0.5">Snoozed</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleComplete(r.id)}
+                        className="h-7 px-3 rounded-full bg-secondary/10 text-secondary-container text-xs font-semibold disabled:opacity-60"
+                      >
+                        Done
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => setSnoozeTarget(r.id)}
+                        className="h-7 px-3 rounded-full border border-border text-xs font-medium text-text-secondary"
+                      >
+                        Snooze
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleDelete(r.id)}
+                        className="h-7 px-3 rounded-full border border-error/20 text-xs font-medium text-error"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {past.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Past</p>
+                {past.slice(0, 3).map((r) => (
+                  <div key={r.id} className="py-2 border-b border-border last:border-0 flex items-center gap-2">
+                    <span className="text-xs">
+                      {r.status === "completed" ? "✅" : "❌"}
+                    </span>
+                    <div>
+                      <p className="text-xs text-text-secondary line-through">
+                        {fmtRelative(r.reminder_at)}
+                        {r.reminder_type ? ` · ${r.reminder_type}` : ""}
+                      </p>
+                      {r.completed_at && (
+                        <p className="text-xs text-text-secondary">
+                          Completed {fmtRelative(r.completed_at)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {snoozeTarget && (
+        <SnoozeModal
+          reminderId={snoozeTarget}
+          buyerId={buyer.id}
+          onClose={() => setSnoozeTarget(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Quick Stats Card ─────────────────────────────────────────────────────────
+
+function StatsCard({
+  buyer,
+  notes,
+  reminders,
+}: {
+  buyer: Buyer;
+  notes: Note[];
+  reminders: Reminder[];
+}) {
+  return (
+    <Card title="Engagement">
+      <div className="space-y-3">
+        <Field
+          label="Added"
+          value={new Date(buyer.created_at).toLocaleDateString("en-AU", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        />
+        <Field
+          label="Last contacted"
+          value={buyer.last_contacted_at ? fmtRelative(buyer.last_contacted_at) : null}
+        />
+        <Field label="Lead source" value={buyer.lead_source} />
+        <Field
+          label="Engagement"
+          value={`${notes.length} note${notes.length !== 1 ? "s" : ""} · ${reminders.length} reminder${reminders.length !== 1 ? "s" : ""}`}
+        />
+        {buyer.buyer_type && <Field label="Buyer type" value={buyer.buyer_type} />}
+        {buyer.priority && <Field label="Priority" value={buyer.priority} />}
+      </div>
+    </Card>
+  );
+}
+
+// ─── Archive confirm ──────────────────────────────────────────────────────────
+
+function ArchiveConfirm({
+  buyerName,
+  buyerId,
+  onClose,
+}: {
+  buyerName: string;
+  buyerId: string;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
+
+  function handleArchive() {
+    startTransition(async () => {
+      const res = await archiveBuyer(buyerId);
+      if (res.error) { setError(res.error); return; }
+      router.push("/buyers");
+    });
+  }
+
+  return (
+    <ModalBackdrop onClose={onClose}>
+      <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl space-y-4">
+        <h2 className="text-lg font-semibold text-text-primary">Archive {buyerName}?</h2>
+        <p className="text-sm text-text-secondary">
+          This buyer will be hidden from your directory. You can restore them from Settings → Archived buyers.
+        </p>
+        {error && <p className="text-xs text-error">{error}</p>}
+        <div className="flex gap-3 pt-2">
+          <button type="button" onClick={onClose} className="flex-1 h-11 rounded-lg border border-border text-sm font-medium text-text-secondary">
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleArchive}
+            disabled={isPending}
+            className="flex-1 h-11 rounded-lg bg-error text-white text-sm font-semibold disabled:opacity-60"
+          >
+            {isPending ? "Archiving…" : "Archive"}
+          </button>
+        </div>
+      </div>
+    </ModalBackdrop>
+  );
+}
+
+// ─── More menu ────────────────────────────────────────────────────────────────
+
+function MoreMenu({
+  onArchive,
+  onClose,
+}: {
+  onArchive: () => void;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={ref}
+      className="absolute right-0 top-full mt-1 bg-white rounded-lg border border-border shadow-lg py-1 z-20 min-w-[140px]"
+    >
+      <button
+        type="button"
+        onClick={() => { onClose(); onArchive(); }}
+        className="w-full text-left px-4 py-2.5 text-sm text-error hover:bg-error/5"
+      >
+        Archive buyer
+      </button>
+    </div>
+  );
+}
+
+// ─── Main BuyerProfile ────────────────────────────────────────────────────────
+
+export function BuyerProfile({ buyer, notes, reminders }: Props) {
+  const [activeTab, setActiveTab] = useState<MobileTab>("looking-for");
+  const [showAddReminder, setShowAddReminder] = useState(false);
+  const [showEditBuyer, setShowEditBuyer] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+
+  const tempConfig = buyer.buyer_temperature ? TEMP_STYLES[buyer.buyer_temperature] : null;
+
+  const initials = buyer.name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  const phoneHref = buyer.phone ? `tel:${buyer.phone.replace(/\s/g, "")}` : null;
+  const smsHref = buyer.phone ? `sms:${buyer.phone.replace(/\s/g, "")}` : null;
+  const emailHref = buyer.email ? `mailto:${buyer.email}` : null;
+
+  const mobileActionBtn = "flex flex-col items-center gap-1 text-xs text-text-secondary";
+  const mobileIconBtn = "w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-xl";
+
+  const MOBILE_TABS: Array<{ id: MobileTab; label: string }> = [
+    { id: "looking-for", label: "Looking for" },
+    { id: "notes", label: "Notes" },
+    { id: "reminders", label: "Reminders" },
+    { id: "contact", label: "Contact" },
+  ];
+
+  return (
+    <>
+      {/* ── Desktop Layout ── */}
+      <div className="hidden md:block min-h-screen bg-background">
+        <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-text-secondary">
+            <Link href="/buyers" className="hover:text-text-primary">Buyers</Link>
+            <span>/</span>
+            <span className="text-text-primary">{buyer.name}</span>
+          </nav>
+
+          {/* Header card */}
+          <div className="bg-white rounded-lg border border-border shadow-card p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-text-primary tracking-tight">
+                  {buyer.name}
+                </h1>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {tempConfig && (
+                    <Chip label={tempConfig.label} className={tempConfig.chip} />
+                  )}
+                  {buyer.lead_status && (
+                    <Chip label={buyer.lead_status} className="bg-primary text-white" />
+                  )}
+                  {buyer.buyer_type && (
+                    <Chip label={buyer.buyer_type} className="bg-surface-container text-text-secondary" />
+                  )}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
+                {phoneHref && (
+                  <a
+                    href={phoneHref}
+                    className="h-9 px-4 rounded-lg bg-secondary text-white text-sm font-semibold flex items-center gap-1.5"
+                  >
+                    📞 Call
+                  </a>
+                )}
+                {smsHref && (
+                  <a
+                    href={smsHref}
+                    className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                  >
+                    💬 SMS
+                  </a>
+                )}
+                {emailHref && (
+                  <a
+                    href={emailHref}
+                    className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                  >
+                    ✉️ Email
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowAddReminder(true)}
+                  className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                >
+                  ⏰ Add reminder
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditBuyer(true)}
+                  className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                >
+                  ✏️ Edit
+                </button>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreMenu((v) => !v)}
+                    className="h-9 w-9 rounded-lg border border-border text-text-secondary flex items-center justify-center hover:bg-surface-container"
+                    aria-label="More options"
+                  >
+                    ···
+                  </button>
+                  {showMoreMenu && (
+                    <MoreMenu
+                      onArchive={() => setShowArchive(true)}
+                      onClose={() => setShowMoreMenu(false)}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Two-column body */}
+          <div className="grid grid-cols-[1fr_320px] gap-6 items-start">
+            {/* Left column */}
+            <div className="space-y-6">
+              <LookingForCard buyer={buyer} />
+              <NotesActivity buyer={buyer} notes={notes} reminders={reminders} />
+            </div>
+
+            {/* Right column */}
+            <div className="space-y-4">
+              <ContactCard buyer={buyer} />
+              <RemindersCard
+                buyer={buyer}
+                reminders={reminders}
+                onAddReminder={() => setShowAddReminder(true)}
+              />
+              <StatsCard buyer={buyer} notes={notes} reminders={reminders} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Layout ── */}
+      <div className="md:hidden min-h-screen bg-background pb-28">
+        {/* Mobile header */}
+        <header className="sticky top-0 bg-white border-b border-border z-10">
+          <div className="px-4 h-14 flex items-center justify-between">
+            <Link href="/buyers" className="text-text-primary text-xl">←</Link>
+            <h1 className="text-base font-semibold text-text-primary truncate max-w-[200px]">
+              {buyer.name}
+            </h1>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMoreMenu((v) => !v)}
+                className="text-text-secondary text-xl w-9 h-9 flex items-center justify-center"
+                aria-label="More options"
+              >
+                ⋮
+              </button>
+              {showMoreMenu && (
+                <MoreMenu
+                  onArchive={() => setShowArchive(true)}
+                  onClose={() => setShowMoreMenu(false)}
+                />
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile hero */}
+        <div className="bg-white px-4 pt-4 pb-5 border-b border-border">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <h2 className="text-2xl font-bold text-text-primary">{buyer.name}</h2>
+              <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                {tempConfig && (
+                  <Chip label={tempConfig.label} className={tempConfig.chip} />
+                )}
+                {buyer.lead_status && (
+                  <Chip label={buyer.lead_status} className="bg-primary text-white" />
+                )}
+              </div>
+            </div>
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+              {initials}
+            </div>
+          </div>
+
+          {/* Mobile action icons */}
+          <div className="flex items-center justify-around mt-4">
+            {phoneHref ? (
+              <a href={phoneHref} className={mobileActionBtn}>
+                <div className={cn(mobileIconBtn, "bg-secondary/10")}>📞</div>
+                <span>Call</span>
+              </a>
+            ) : (
+              <div className={cn(mobileActionBtn, "opacity-30")}>
+                <div className={mobileIconBtn}>📞</div>
+                <span>Call</span>
+              </div>
+            )}
+            {smsHref ? (
+              <a href={smsHref} className={mobileActionBtn}>
+                <div className={mobileIconBtn}>💬</div>
+                <span>SMS</span>
+              </a>
+            ) : (
+              <div className={cn(mobileActionBtn, "opacity-30")}>
+                <div className={mobileIconBtn}>💬</div>
+                <span>SMS</span>
+              </div>
+            )}
+            {emailHref ? (
+              <a href={emailHref} className={mobileActionBtn}>
+                <div className={mobileIconBtn}>✉️</div>
+                <span>Email</span>
+              </a>
+            ) : (
+              <div className={cn(mobileActionBtn, "opacity-30")}>
+                <div className={mobileIconBtn}>✉️</div>
+                <span>Email</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowAddReminder(true)}
+              className={mobileActionBtn}
+            >
+              <div className={mobileIconBtn}>⏰</div>
+              <span>Reminder</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowEditBuyer(true)}
+              className={mobileActionBtn}
+            >
+              <div className={mobileIconBtn}>✏️</div>
+              <span>Edit</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile tabs */}
+        <div className="sticky top-14 bg-white border-b border-border z-10">
+          <div className="flex">
+            {MOBILE_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex-1 py-3 text-xs font-semibold transition-colors border-b-2",
+                  activeTab === tab.id
+                    ? "text-secondary border-secondary"
+                    : "text-text-secondary border-transparent"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile tab content */}
+        <div className="px-4 pt-4 space-y-4">
+          {activeTab === "looking-for" && <LookingForCard buyer={buyer} />}
+          {activeTab === "notes" && (
+            <NotesActivity buyer={buyer} notes={notes} reminders={reminders} />
+          )}
+          {activeTab === "reminders" && (
+            <RemindersCard
+              buyer={buyer}
+              reminders={reminders}
+              onAddReminder={() => setShowAddReminder(true)}
+            />
+          )}
+          {activeTab === "contact" && (
+            <>
+              <ContactCard buyer={buyer} />
+              <StatsCard buyer={buyer} notes={notes} reminders={reminders} />
+            </>
+          )}
+        </div>
+
+        {/* Mobile sticky bottom bar */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border px-4 py-3 flex gap-3">
+          {phoneHref ? (
+            <a
+              href={phoneHref}
+              className="flex-1 h-12 rounded-lg bg-secondary text-white font-semibold flex items-center justify-center gap-2"
+            >
+              📞 Call {buyer.name.split(" ")[0]}
+            </a>
+          ) : (
+            <div className="flex-1 h-12 rounded-lg bg-surface-container text-text-secondary font-semibold flex items-center justify-center gap-2 opacity-50">
+              No phone number
+            </div>
+          )}
+          {smsHref && (
+            <a
+              href={smsHref}
+              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-xl"
+            >
+              💬
+            </a>
+          )}
+          {emailHref && (
+            <a
+              href={emailHref}
+              className="w-12 h-12 rounded-lg border border-border flex items-center justify-center text-xl"
+            >
+              ✉️
+            </a>
+          )}
+        </div>
+      </div>
+
+      {/* ── Modals ── */}
+      {showAddReminder && (
+        <AddReminderModal
+          buyerId={buyer.id}
+          onClose={() => setShowAddReminder(false)}
+        />
+      )}
+
+      {showEditBuyer && (
+        <EditBuyerModal
+          buyer={buyer}
+          onClose={() => setShowEditBuyer(false)}
+        />
+      )}
+
+      {showArchive && (
+        <ArchiveConfirm
+          buyerName={buyer.name}
+          buyerId={buyer.id}
+          onClose={() => setShowArchive(false)}
+        />
+      )}
+    </>
+  );
+}

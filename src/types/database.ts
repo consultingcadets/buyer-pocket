@@ -336,6 +336,7 @@ export type Database = {
           trial_start: string | null;
           trial_end: string | null;
           cancel_at_period_end: boolean;
+          cancel_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -350,6 +351,7 @@ export type Database = {
           trial_start?: string | null;
           trial_end?: string | null;
           cancel_at_period_end?: boolean;
+          cancel_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
