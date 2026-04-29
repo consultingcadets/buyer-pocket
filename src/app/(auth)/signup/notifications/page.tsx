@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
+import { savePushToken } from "@/app/(app)/reminders/actions";
 
 const DOTS = [false, false, false, true];
 
@@ -8,8 +10,18 @@ export default function NotificationsPage() {
   const router = useRouter();
 
   async function handleEnableNotifications() {
-    if ("Notification" in window) {
-      await Notification.requestPermission();
+    const permission = await requestPushPermission();
+    if (permission === "granted") {
+      const token = await getFCMToken();
+      if (token) {
+        const browser = navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")
+          ? "safari"
+          : navigator.userAgent.includes("Firefox")
+          ? "firefox"
+          : "chrome";
+        const device = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
+        await savePushToken(token, device, browser);
+      }
     }
     router.push("/today");
   }
