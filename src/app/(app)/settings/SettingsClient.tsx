@@ -13,6 +13,7 @@ import {
   signOut,
   requestDeleteAccount,
 } from "./actions";
+import { SUPPORT_EMAIL } from "@/lib/company";
 import type { Database } from "@/types/database";
 import type { AccessLevel } from "@/lib/subscription";
 
@@ -153,7 +154,7 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
           <div className="flex gap-2">
             <input type="email" value={email} readOnly className={cn(inputCls, "bg-surface-container text-text-secondary flex-1")} />
             <a
-              href="mailto:support@buyerpocket.com.au?subject=Change email address"
+              href={`mailto:${SUPPORT_EMAIL}?subject=Change email address`}
               className="h-12 px-4 rounded-lg border border-border text-accent text-sm font-medium flex items-center flex-shrink-0 hover:bg-surface-container"
             >
               Change
@@ -474,7 +475,7 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
             </p>
             <ul className="text-sm text-text-secondary space-y-1 list-disc list-inside">
               <li>Your data is deleted after 30 days</li>
-              <li>You can email <a href="mailto:support@buyerpocket.com.au" className="text-accent">support@buyerpocket.com.au</a> within 30 days to restore your account</li>
+              <li>You can email <a href={`mailto:${SUPPORT_EMAIL}`} className="text-accent">{SUPPORT_EMAIL}</a> within 30 days to restore your account</li>
               <li>Any active subscription will be cancelled</li>
             </ul>
             <div className="flex gap-3 pt-1">
@@ -636,8 +637,8 @@ function HelpSection() {
       <div className="space-y-3">
         <div className="flex items-center justify-between py-2">
           <p className="text-sm text-text-primary">Support</p>
-          <a href="mailto:support@buyerpocket.com.au" className="text-sm text-accent">
-            support@buyerpocket.com.au
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm text-accent">
+            {SUPPORT_EMAIL}
           </a>
         </div>
         <div className="h-px bg-border" />

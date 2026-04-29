@@ -1,29 +1,28 @@
 import Link from "next/link";
+import { LEGAL_ABN, LEGAL_ENTITY, SUPPORT_EMAIL } from "@/lib/company";
 
 export const metadata = {
   title: "Privacy Policy — BuyerPocket",
 };
 
 const EFFECTIVE_DATE = "1 May 2026";
-const COMPANY = "BuyerPocket Pty Ltd";
-const EMAIL = "privacy@buyerpocket.com.au";
 const APP = "BuyerPocket";
 const URL = "buyerpocket.com.au";
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold text-text-primary mb-2">Privacy Policy</h1>
         <p className="text-sm text-text-secondary mb-10">
-          Effective date: {EFFECTIVE_DATE} · {COMPANY} (ABN pending)
+          Effective date: {EFFECTIVE_DATE} · {APP} is operated by {LEGAL_ENTITY} (ABN {LEGAL_ABN})
         </p>
 
         <div className="prose prose-sm max-w-none text-text-primary space-y-8">
 
           <Section title="1. About this policy">
             <p>
-              {COMPANY} (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) operates {APP} at {URL}. This policy explains how we collect, use, disclose, and protect personal information in accordance with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs).
+              {LEGAL_ENTITY} (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) operates {APP} at {URL}. This policy explains how we collect, use, disclose, and protect personal information in accordance with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs).
             </p>
             <p>
               By using {APP} you consent to the practices described in this policy. If you do not agree, please do not use the service.
@@ -95,7 +94,7 @@ export default function PrivacyPage() {
 
           <Section title="7. Data retention and deletion">
             <p>
-              We retain your account data for as long as your account is active. If you delete your account, your data is retained for 30 days (to allow recovery) then permanently deleted. You may email {EMAIL} within 30 days to cancel a deletion request.
+              We retain your account data for as long as your account is active. If you delete your account, your data is retained for 30 days (to allow recovery) then permanently deleted. You may email {SUPPORT_EMAIL} within 30 days to cancel a deletion request.
             </p>
             <p>
               Billing records may be retained for up to 7 years to meet our legal obligations under Australian tax law.
@@ -111,7 +110,7 @@ export default function PrivacyPage() {
               <li><strong>Portability:</strong> Export your buyer data as CSV at any time from Settings</li>
               <li><strong>Complaint:</strong> Lodge a complaint with the Office of the Australian Information Commissioner (OAIC) at oaic.gov.au</li>
             </ul>
-            <p>To exercise any right, email {EMAIL}. We will respond within 30 days.</p>
+            <p>To exercise any right, email {SUPPORT_EMAIL}. We will respond within 30 days.</p>
           </Section>
 
           <Section title="9. Cookies and tracking">
@@ -122,7 +121,7 @@ export default function PrivacyPage() {
 
           <Section title="10. Children">
             <p>
-              {APP} is not directed at children under 18. We do not knowingly collect information from children. If you believe a child has provided us with personal information, contact {EMAIL}.
+              {APP} is not directed at children under 18. We do not knowingly collect information from children. If you believe a child has provided us with personal information, contact {SUPPORT_EMAIL}.
             </p>
           </Section>
 
@@ -134,10 +133,10 @@ export default function PrivacyPage() {
 
           <Section title="12. Contact">
             <p>
-              Privacy enquiries: <a href={`mailto:${EMAIL}`} className="text-accent">{EMAIL}</a>
+              Privacy enquiries: <a href={`mailto:${SUPPORT_EMAIL}`} className="text-accent">{SUPPORT_EMAIL}</a>
             </p>
             <p>
-              {COMPANY}<br />
+              {LEGAL_ENTITY} (ABN {LEGAL_ABN})<br />
               Australia
             </p>
           </Section>
@@ -148,7 +147,7 @@ export default function PrivacyPage() {
           <Link href="/" className="text-sm text-accent">Home</Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -795,7 +795,7 @@ Cancel link (red): Cancel subscription
 
 H3: Help
 
-Email support: Email support — link: support@buyerpocket.com.au  
+Email support: Email support — link: hello@consultingcadets.com  
 Privacy policy link: Privacy policy  
 Terms link: Terms of service  
 Version line: Version [number]

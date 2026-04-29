@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 export default function SignupContactPage() {
   return (
@@ -17,7 +18,7 @@ export default function SignupContactPage() {
           we&apos;ll look into it.
         </p>
         <a
-          href="mailto:hello@buyerpocket.com.au"
+          href={`mailto:${SUPPORT_EMAIL}`}
           className="w-full h-12 bg-teal-action text-on-teal-action text-[16px] font-semibold rounded flex items-center justify-center hover:opacity-90 transition-opacity"
         >
           Contact us

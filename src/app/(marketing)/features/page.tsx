@@ -1,189 +1,285 @@
 import type { Metadata } from "next";
-import { SlidersHorizontal, UserPlus, Bell, MessageCircle, Download, Smartphone } from "lucide-react";
+import type { ReactNode } from "react";
+import Link from "next/link";
+import { Check, Smartphone } from "lucide-react";
 import CTAButton from "@/components/marketing/cta-button";
+import { RevealOnView } from "@/components/marketing/reveal-on-view";
+import {
+  CTADecorationBackdrop,
+  HeroBackdrop,
+  SectionPatternMuted,
+} from "@/components/marketing/landing-decorations";
+import {
+  FeaturesCaptureFormMockup,
+  FeaturesExportCsvMockup,
+  FeaturesFilterResultsMockup,
+  FeaturesHeroTriplePills,
+  FeaturesNotesTimelineMockup,
+  FeaturesRemindStackMockup,
+} from "@/components/marketing/features-mockups";
 
 export const metadata: Metadata = {
-  title: "Features",
+  title: "Features — BuyerPocket",
   description:
-    "Three features. Done well. Filter buyers, capture fast at open homes, and set reminders that actually arrive.",
+    "Capture buyers in the field, filter your list when listings land, reminders on your phone, notes in one place, and CSV export.",
   openGraph: {
     title: "Features — BuyerPocket",
     description:
-      "Filter buyers instantly, capture at open homes, reminders that fire to your phone. We do three things and we do them fast.",
+      "Three simple tools for staying on top of buyers: capture, filter, remind — plus notes history and export.",
     url: "https://buyerpocket.com.au/features",
   },
 };
 
+const MAX = "max-w-6xl mx-auto px-4 sm:px-6";
+const CARD_CALLOUT =
+  "rounded-2xl border border-border bg-surface-container-low/80 p-4 md:p-5 shadow-sm motion-safe:transition-shadow motion-safe:hover:shadow-card";
+
 export default function FeaturesPage() {
   return (
-    <>
+    <div className="overflow-x-hidden bg-background">
       {/* Hero */}
-      <section className="bg-background pt-16 pb-12 md:pt-20 md:pb-16">
-        <div className="max-w-[1440px] mx-auto px-6 text-center">
-          <h1 className="text-[40px] md:text-[48px] font-bold text-primary tracking-[-0.02em] leading-[1.15] mb-4">
-            Three features. Done well.
-          </h1>
-          <p className="text-[18px] text-text-secondary leading-[1.6] max-w-[520px] mx-auto">
-            We don't try to replace your agency CRM. We do three things, and we do them fast.
-          </p>
-        </div>
-      </section>
-
-      {/* Filter */}
-      <section className="bg-white py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="max-w-[760px]">
-            <span className="inline-block text-[11px] font-semibold tracking-[0.08em] uppercase bg-accent text-primary px-3 py-1 rounded-full mb-5">
-              FILTER
+      <section className="relative isolate border-b border-border/60">
+        <HeroBackdrop />
+        <div className={`${MAX} relative z-10 pt-12 pb-12 sm:pt-16 sm:pb-14 md:pt-16 md:pb-16`}>
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="inline-block text-[10px] font-bold tracking-[0.16em] uppercase text-teal-action mb-4">
+              Features
             </span>
-            <h2 className="text-[32px] font-bold text-primary tracking-[-0.01em] mb-4">
-              Match buyers to listings instantly
-            </h2>
-            <p className="text-[17px] text-text-secondary leading-[1.7] mb-8">
-              When a new listing comes in, you don't want to scroll through 200 buyers trying to remember who wanted
-              what. Open BuyerPocket, set the filters, see your matches.
+            <h1 className="text-[1.75rem] sm:text-[2.25rem] md:text-[2.75rem] font-bold text-primary tracking-[-0.03em] leading-[1.08]">
+              Three simple tools for staying on top of buyers.
+            </h1>
+            <p className="mt-4 text-[16px] md:text-[17px] text-text-secondary leading-relaxed">
+              BuyerPocket helps you capture buyer details quickly, find the right match when a listing comes up, and follow
+              up before interest goes cold.
             </p>
-            <div className="bg-background rounded-[8px] p-6 border border-border">
-              <div className="text-[12px] font-semibold tracking-[0.05em] uppercase text-text-secondary mb-4">
-                Filter options
-              </div>
-              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
-                {[
-                  "Suburb (multi-select with typeahead)",
-                  "Budget range",
-                  "Bedrooms minimum",
-                  "Land size minimum",
-                  "Property type",
-                  "Buyer temperature (Hot, Warm, Cold)",
-                  "Buying timeline",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-[14px] text-text-primary">
-                    <SlidersHorizontal size={14} className="text-accent flex-shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+            <p className="mt-4 text-[13px] text-text-secondary leading-snug">
+              Built for independent agents and small-agency principals in Australia.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <CTAButton href="/signup" size="lg">
+                Start free trial
+              </CTAButton>
+              <CTAButton href="/pricing" size="lg" variant="outline">
+                View pricing
+              </CTAButton>
             </div>
           </div>
+          <FeaturesHeroTriplePills />
         </div>
       </section>
 
       {/* Capture */}
-      <section className="bg-background py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="max-w-[760px] md:ml-auto">
-            <span className="inline-block text-[11px] font-semibold tracking-[0.08em] uppercase bg-secondary text-primary px-3 py-1 rounded-full mb-5">
-              CAPTURE
-            </span>
-            <h2 className="text-[32px] font-bold text-primary tracking-[-0.01em] mb-4">
-              Quick capture, designed for the field
-            </h2>
-            <p className="text-[17px] text-text-secondary leading-[1.7]">
-              At an open home, you have 30 seconds. The capture form is short on purpose. Name, phone, suburb,
-              budget, bedrooms, optional note. Save. Add detail later from your car or office.
+      <RevealOnView>
+        <section className="relative bg-white py-14 md:py-16 overflow-hidden border-b border-border/40">
+          <SectionPatternMuted uid="feat-capture" />
+          <div className={`${MAX} relative z-10`}>
+            <FeatureBand
+              eyebrow="CAPTURE"
+              eyebrowClass="bg-teal-action/14 text-teal-action border border-teal-action/25"
+              title="Quick capture, designed for the field"
+              intro="At an open home, you do not have time for a long form. BuyerPocket keeps capture short on purpose. Add the basics — name, phone, suburb, budget, bedrooms, and an optional note — then save and move on. Add more detail later when you are back in the car or at your desk."
+              bullets={[
+                "Fast enough to use between conversations",
+                "Only the key details upfront",
+                "Extra detail can be added later",
+              ]}
+              visual={<FeaturesCaptureFormMockup />}
+              reversed={false}
+            />
+            <p className="text-center text-[12px] text-text-secondary mt-8 md:mt-6 max-w-md mx-auto">
+              Built to be quick, not bloated.
             </p>
-            <div className="mt-8 bg-white rounded-[8px] border border-border p-6">
-              <div className="space-y-3">
-                {["Name", "Phone", "Suburb", "Budget", "Bedrooms", "Note (optional)"].map((field, i) => (
-                  <div key={field} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-surface-container text-text-secondary text-[12px] font-semibold flex items-center justify-center flex-shrink-0">
-                      {i + 1}
+          </div>
+        </section>
+      </RevealOnView>
+
+      {/* Filter */}
+      <RevealOnView>
+        <section className="relative bg-gradient-to-b from-background via-[#faf8f9] to-surface-container-low/70 py-14 md:py-16 border-b border-border/40">
+          <div className={MAX}>
+            <FeatureBand
+              eyebrow="FILTER"
+              eyebrowClass="bg-primary/10 text-primary border border-primary/18"
+              title="Find matching buyers fast"
+              intro="When a new listing comes up, you should not be digging through old notes trying to remember who wanted what. Filter your buyer list by suburb, budget, bedrooms, land size, timing, and notes to quickly find the buyers worth calling first."
+              bullets={[
+                "Find likely matches in seconds",
+                "Reduce memory-based follow-up",
+                "Get to the right buyers first",
+              ]}
+              visual={<FeaturesFilterResultsMockup />}
+              reversed
+            />
+          </div>
+        </section>
+      </RevealOnView>
+
+      {/* Remind */}
+      <RevealOnView>
+        <section className="relative bg-white py-14 md:py-16 border-b border-border/40 overflow-hidden">
+          <SectionPatternMuted uid="feat-remind" flipped />
+          <div className={`${MAX} relative z-10`}>
+            <FeatureBand
+              eyebrow="REMIND"
+              eyebrowClass="bg-primary text-white border border-primary shadow-sm"
+              title="Reminders that actually arrive"
+              intro="Set a reminder when you save a buyer or any time later from their profile. Choose tonight, tomorrow morning, next week, or a custom time. When it is due, BuyerPocket sends a notification to your phone so you can follow up while the conversation is still fresh."
+              bullets={[
+                "Set reminders in seconds",
+                "Phone notification keeps it practical",
+                "Open buyer profile and call from there",
+              ]}
+              visual={<FeaturesRemindStackMockup />}
+              reversed={false}
+              afterVisual={
+                <div className={`${CARD_CALLOUT} w-full max-w-[440px]`}>
+                  <div className="flex gap-3">
+                    <div className="h-11 w-11 rounded-xl bg-teal-action/10 flex items-center justify-center shrink-0">
+                      <Smartphone className="h-5 w-5 text-teal-action" aria-hidden strokeWidth={1.75} />
                     </div>
-                    <div className="flex-1 h-10 bg-background rounded border border-border flex items-center px-3">
-                      <span className="text-[13px] text-text-secondary">{field}</span>
+                    <div>
+                      <div className="text-[13px] font-semibold text-primary mb-1">Heads up for iPhone users</div>
+                      <p className="text-[13px] text-text-secondary leading-relaxed">
+                        To receive reminders, BuyerPocket needs to be added to the Home Screen. We guide you through
+                        that during onboarding.
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="mt-4 h-11 bg-teal-action rounded flex items-center justify-center">
-                <UserPlus size={16} className="text-white mr-2" />
-                <span className="text-[14px] font-semibold text-white">Save buyer</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Reminders */}
-      <section className="bg-white py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="max-w-[760px]">
-            <span className="inline-block text-[11px] font-semibold tracking-[0.08em] uppercase bg-primary text-white px-3 py-1 rounded-full mb-5">
-              REMIND
-            </span>
-            <h2 className="text-[32px] font-bold text-primary tracking-[-0.01em] mb-4">
-              Reminders that actually arrive
-            </h2>
-            <p className="text-[17px] text-text-secondary leading-[1.7] mb-6">
-              Set a reminder when you save a buyer, or anytime later from their profile. Tonight at 7pm, tomorrow
-              morning, next Monday, or pick a custom time. We send a push notification to your phone. Tap it — the
-              buyer profile opens. You call. You log a note. Done.
-            </p>
-            <div className="bg-surface-container-low rounded-[8px] p-5 border border-border">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                  <Smartphone size={18} className="text-secondary" />
                 </div>
-                <div>
-                  <div className="text-[13px] font-semibold text-primary mb-1">Heads up for iPhone users</div>
-                  <p className="text-[13px] text-text-secondary leading-[1.6]">
-                    Apple requires you to add BuyerPocket to your Home Screen to receive push notifications. We'll
-                    walk you through it during onboarding.
-                  </p>
-                </div>
-              </div>
-            </div>
+              }
+            />
           </div>
-        </div>
-      </section>
+        </section>
+      </RevealOnView>
 
-      {/* Notes & history */}
-      <section className="bg-background py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="max-w-[760px] md:ml-auto">
-            <div className="w-12 h-12 rounded-[12px] bg-surface-container flex items-center justify-center mb-5">
-              <MessageCircle size={22} className="text-text-secondary" />
-            </div>
-            <h2 className="text-[32px] font-bold text-primary tracking-[-0.01em] mb-4">
-              Every conversation, in one place
-            </h2>
-            <p className="text-[17px] text-text-secondary leading-[1.7]">
-              Add a note after every call, inspection, or email. BuyerPocket timestamps it and shows the full
-              history on the buyer profile. Six weeks later, you'll know exactly what you said last.
-            </p>
+      {/* Notes */}
+      <RevealOnView>
+        <section className="relative bg-surface-container-low py-14 md:py-16 border-b border-border/40 overflow-hidden">
+          <div className={MAX}>
+            <FeatureBand
+              eyebrow="NOTES"
+              eyebrowClass="bg-teal-action/14 text-teal-action border border-teal-action/22"
+              title="Every conversation, in one place"
+              intro="Add a quick note after a call, inspection, text, or email. BuyerPocket stores the history against the buyer so you can come back weeks later and still know what was said, what they wanted, and what the next step was."
+              bullets={[
+                "Keeps context with the buyer",
+                "Useful after multiple conversations",
+                "Helps avoid repeating questions",
+              ]}
+              visual={<FeaturesNotesTimelineMockup />}
+              reversed
+            />
           </div>
-        </div>
-      </section>
+        </section>
+      </RevealOnView>
 
       {/* Export */}
-      <section className="bg-white py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <div className="max-w-[760px]">
-            <div className="w-12 h-12 rounded-[12px] bg-surface-container flex items-center justify-center mb-5">
-              <Download size={22} className="text-text-secondary" />
-            </div>
-            <h2 className="text-[32px] font-bold text-primary tracking-[-0.01em] mb-4">
-              Your data, exportable any time
-            </h2>
-            <p className="text-[17px] text-text-secondary leading-[1.7]">
-              BuyerPocket isn't a vault. Export your full buyer list as CSV from Settings whenever you want. Use it
-              for analysis, backup, or moving to another tool.
+      <RevealOnView>
+        <section className="relative bg-white py-14 md:py-16 border-b border-border/40 overflow-hidden">
+          <SectionPatternMuted uid="feat-export" />
+          <div className={`${MAX} relative z-10`}>
+            <FeatureBand
+              eyebrow="EXPORT"
+              eyebrowClass="bg-brand-teal/12 text-teal-action border border-brand-teal/28"
+              title="Your data, exportable any time"
+              intro="BuyerPocket is not a locked box. Export your buyer list as CSV whenever you want. Use it for backup, analysis, or moving to another tool later."
+              bullets={[
+                "Simple CSV export",
+                "Gives you control",
+                "Good for backup or admin work",
+              ]}
+              visual={<FeaturesExportCsvMockup />}
+              reversed={false}
+            />
+            <p className="text-[13px] text-text-secondary text-center mt-8 max-w-lg mx-auto">
+              Your buyer list stays yours.
             </p>
+          </div>
+        </section>
+      </RevealOnView>
+
+      {/* Final CTA — aligned with homepage */}
+      <section className="relative overflow-hidden isolate py-11 md:py-14 border-t border-white/5">
+        <CTADecorationBackdrop />
+        <div className={`${MAX} relative z-10 text-center py-2`}>
+          <h2 className="text-[1.45rem] sm:text-[1.75rem] md:text-[2rem] font-bold text-white tracking-[-0.02em] max-w-lg mx-auto leading-tight">
+            Stop losing buyers in your phone notes.
+          </h2>
+          <p className="mt-3 text-[15px] md:text-base text-white/75 max-w-md mx-auto leading-relaxed">
+            Try BuyerPocket free for 7 days. Then it is $19/month. Cancel anytime.
+          </p>
+          <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="inline-flex rounded-xl motion-safe:shadow-[0_0_32px_-6px_rgba(46,196,182,0.45)]">
+              <CTAButton href="/signup" size="lg" className="min-w-[200px]">
+                Start free trial
+              </CTAButton>
+            </div>
+            <Link
+              href="/pricing"
+              className="text-[15px] font-semibold text-white/85 hover:text-white underline underline-offset-4 transition-colors min-h-[48px] flex items-center"
+            >
+              See pricing
+            </Link>
           </div>
         </div>
       </section>
+    </div>
+  );
+}
 
-      {/* Final CTA */}
-      <section className="bg-primary py-16 md:py-20">
-        <div className="max-w-[1440px] mx-auto px-6 text-center">
-          <h2 className="text-[32px] font-bold text-white tracking-[-0.01em] mb-8">
-            Stop losing buyers in your phone notes.
-          </h2>
-          <CTAButton href="/signup" size="lg">
-            Start free trial
-          </CTAButton>
+function FeatureBand({
+  eyebrow,
+  eyebrowClass,
+  title,
+  intro,
+  bullets,
+  visual,
+  reversed,
+  afterVisual,
+}: {
+  eyebrow: string;
+  eyebrowClass: string;
+  title: string;
+  intro: string;
+  bullets: string[];
+  visual: ReactNode;
+  reversed: boolean;
+  afterVisual?: ReactNode;
+}) {
+  return (
+    <div className={`flex flex-col gap-8 md:gap-10 lg:gap-12 ${reversed ? "lg:flex-row-reverse" : "lg:flex-row"} items-start`}>
+      <div className="flex-1 min-w-0 max-w-xl mx-auto lg:mx-0 text-center lg:text-left w-full">
+        <span
+          className={`inline-block text-[10px] font-bold tracking-[0.14em] uppercase px-3 py-1.5 rounded-full mb-4 ${eyebrowClass}`}
+        >
+          {eyebrow}
+        </span>
+        <h2 className="text-xl sm:text-2xl md:text-[1.65rem] font-semibold text-primary leading-snug tracking-[-0.02em]">
+          {title}
+        </h2>
+        <p className="mt-3 text-[15px] md:text-[16px] text-text-secondary leading-relaxed">{intro}</p>
+        <ul className="mt-5 space-y-2.5 text-left mx-auto lg:mx-0 max-w-md lg:max-w-none">
+          {bullets.map((b) => (
+            <li key={b} className="flex items-start gap-2 text-[14px] text-text-primary leading-snug">
+              <Check className="h-4 w-4 text-teal-action mt-0.5 shrink-0" strokeWidth={2.25} aria-hidden />
+              {b}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div
+        className={`flex flex-1 w-full flex-col gap-5 min-w-0 items-center ${reversed ? "lg:items-start" : "lg:items-end"}`}
+      >
+        <div className={`w-full flex justify-center ${reversed ? "lg:justify-start" : "lg:justify-end"}`}>
+          {visual}
         </div>
-      </section>
-    </>
+        {afterVisual ? (
+          <div className={`w-full flex justify-center ${reversed ? "lg:justify-start" : "lg:justify-end"}`}>
+            {afterVisual}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }

@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={cn("h-full antialiased", inter.variable, "font-sans")}
+      className={cn("h-full antialiased scroll-smooth", inter.variable, "font-sans")}
     >
       <head>
         {/* iOS PWA icons */}

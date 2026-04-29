@@ -153,7 +153,7 @@ export async function requestDeleteAccount(): Promise<{ error?: string }> {
   await supabase.auth.signOut();
 
   // Note: hard delete + data purge handled by a scheduled job after 30 days
-  // User can email support@buyerpocket.com.au to cancel within that window
+  // User can email hello@consultingcadets.com to cancel within that window
 
   redirect("/login?deleted=1");
 }

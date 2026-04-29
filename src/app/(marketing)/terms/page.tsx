@@ -1,21 +1,20 @@
 import Link from "next/link";
+import { LEGAL_ABN, LEGAL_ENTITY, SUPPORT_EMAIL } from "@/lib/company";
 
 export const metadata = {
   title: "Terms of Service — BuyerPocket",
 };
 
 const EFFECTIVE_DATE = "1 May 2026";
-const COMPANY = "BuyerPocket Pty Ltd";
-const EMAIL = "support@buyerpocket.com.au";
 const APP = "BuyerPocket";
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold text-text-primary mb-2">Terms of Service</h1>
         <p className="text-sm text-text-secondary mb-10">
-          Effective date: {EFFECTIVE_DATE} · {COMPANY} (ABN pending)
+          Effective date: {EFFECTIVE_DATE} · {APP} is provided by {LEGAL_ENTITY} (ABN {LEGAL_ABN})
         </p>
 
         <div className="space-y-8 text-sm text-text-primary leading-relaxed">
@@ -25,7 +24,7 @@ export default function TermsPage() {
               By accessing or using {APP} at buyerpocket.com.au (&ldquo;Service&rdquo;), you agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree, do not use the Service.
             </p>
             <p>
-              These Terms constitute a legally binding agreement between you and {COMPANY} (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;).
+              These Terms constitute a legally binding agreement between you and {LEGAL_ENTITY} (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;).
             </p>
           </Section>
 
@@ -46,7 +45,7 @@ export default function TermsPage() {
               You must provide accurate and complete information when registering. You are responsible for maintaining the security of your account credentials and for all activity that occurs under your account.
             </p>
             <p>
-              Notify us immediately at {EMAIL} if you believe your account has been compromised.
+              Notify us immediately at {SUPPORT_EMAIL} if you believe your account has been compromised.
             </p>
           </Section>
 
@@ -92,7 +91,7 @@ export default function TermsPage() {
 
           <Section title="7. Intellectual property">
             <p>
-              {APP}, its design, software, and content are owned by {COMPANY} and protected by Australian and international intellectual property laws. You are granted a limited, non-exclusive, non-transferable licence to use the Service for your personal professional purposes.
+              {APP}, its design, software, and content are owned by {LEGAL_ENTITY} and protected by Australian and international intellectual property laws. You are granted a limited, non-exclusive, non-transferable licence to use the Service for your personal professional purposes.
             </p>
             <p>
               You retain all rights to the buyer data you enter. By using the Service, you grant us a limited licence to store and process that data solely to provide the Service to you.
@@ -122,7 +121,7 @@ export default function TermsPage() {
 
           <Section title="10. Indemnity">
             <p>
-              You agree to indemnify and hold {COMPANY} harmless from any claims, damages, or expenses (including legal fees) arising from your use of the Service, your breach of these Terms, or your violation of any third party&apos;s rights.
+              You agree to indemnify and hold {LEGAL_ENTITY} harmless from any claims, damages, or expenses (including legal fees) arising from your use of the Service, your breach of these Terms, or your violation of any third party&apos;s rights.
             </p>
           </Section>
 
@@ -149,10 +148,10 @@ export default function TermsPage() {
 
           <Section title="14. Contact">
             <p>
-              Questions about these Terms: <a href={`mailto:${EMAIL}`} className="text-accent">{EMAIL}</a>
+              Questions about these Terms: <a href={`mailto:${SUPPORT_EMAIL}`} className="text-accent">{SUPPORT_EMAIL}</a>
             </p>
             <p>
-              {COMPANY}<br />
+              {LEGAL_ENTITY} (ABN {LEGAL_ABN})<br />
               Australia
             </p>
           </Section>
@@ -163,7 +162,7 @@ export default function TermsPage() {
           <Link href="/" className="text-sm text-accent">Home</Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

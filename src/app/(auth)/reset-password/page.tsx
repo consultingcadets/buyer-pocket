@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { updatePassword, type ResetPasswordState } from "./actions";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 export default function ResetPasswordPage() {
   const [state, formAction, pending] = useActionState<
@@ -112,7 +113,7 @@ export default function ResetPasswordPage() {
           <p className="text-[14px] text-outline">
             Need help?{" "}
             <Link
-              href="mailto:hello@buyerpocket.com.au"
+              href={`mailto:${SUPPORT_EMAIL}`}
               className="text-brand-electric hover:underline"
             >
               Contact Support

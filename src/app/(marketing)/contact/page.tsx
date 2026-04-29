@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ContactForm from "./contact-form";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -22,10 +23,10 @@ export default function ContactPage() {
           <p className="text-[16px] text-text-secondary mb-8">
             Send us a message and we'll get back to you within one business day. Or email us directly at{" "}
             <a
-              href="mailto:support@buyerpocket.com.au"
+              href={`mailto:${SUPPORT_EMAIL}`}
               className="text-accent underline underline-offset-2"
             >
-              support@buyerpocket.com.au
+              {SUPPORT_EMAIL}
             </a>
             .
           </p>

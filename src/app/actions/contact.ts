@@ -1,6 +1,7 @@
 "use server";
 
 import { Resend } from "resend";
+import { DEFAULT_RESEND_FROM_EMAIL, SUPPORT_EMAIL } from "@/lib/company";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -28,8 +29,8 @@ export async function submitContact(_prev: ContactResult | null, formData: FormD
 
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL ?? "noreply@buyerpocket.com.au",
-      to: "support@buyerpocket.com.au",
+      from: process.env.RESEND_FROM_EMAIL ?? DEFAULT_RESEND_FROM_EMAIL,
+      to: SUPPORT_EMAIL,
       replyTo: email,
       subject: `Contact form — ${name}`,
       html: `
@@ -42,6 +43,6 @@ export async function submitContact(_prev: ContactResult | null, formData: FormD
 
     return { ok: true };
   } catch {
-    return { ok: false, error: "Couldn't send your message. Try again or email support@buyerpocket.com.au directly." };
+    return { ok: false, error: `Couldn't send your message. Try again or email ${SUPPORT_EMAIL} directly.` };
   }
 }

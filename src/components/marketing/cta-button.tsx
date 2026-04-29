@@ -37,14 +37,14 @@ export default function CTAButton({
       href={href}
       onClick={track}
       className={cn(
-        "inline-flex items-center justify-center font-semibold rounded transition-opacity",
+        "inline-flex items-center justify-center font-semibold rounded-xl transition-opacity",
         "min-h-[48px] focus-visible:outline-2 focus-visible:outline-offset-2",
-        size === "sm" && "px-4 text-sm min-h-[40px]",
+        size === "sm" && "px-4 text-sm min-h-[44px] rounded-[10px]",
         size === "default" && "px-6 py-3 text-sm",
-        size === "lg" && "px-8 py-4 text-base rounded-[12px]",
-        variant === "primary" && "bg-secondary text-white hover:opacity-90 focus-visible:outline-secondary",
+        size === "lg" && "px-8 py-4 text-base rounded-xl",
+        variant === "primary" && "bg-teal-action text-on-teal-action hover:opacity-90 focus-visible:outline-teal-action",
         variant === "outline" && "border border-primary text-primary hover:bg-surface-container focus-visible:outline-primary",
-        variant === "dark" && "bg-secondary text-white hover:opacity-90 focus-visible:outline-secondary",
+        variant === "dark" && "bg-teal-action text-white hover:opacity-90 focus-visible:outline-teal-action",
         fullWidth && "w-full",
         className,
       )}

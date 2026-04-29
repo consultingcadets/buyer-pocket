@@ -1,3 +1,4 @@
+import { DEFAULT_RESEND_FROM_EMAIL } from "@/lib/company";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendPushNotification, isInvalidTokenError } from "@/lib/fcm/server";
 import { Resend } from "resend";
@@ -137,7 +138,7 @@ export async function POST(request: Request) {
         const email = authUser.user?.email;
         if (email) {
           await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL ?? "noreply@buyerpocket.com",
+            from: process.env.RESEND_FROM_EMAIL ?? DEFAULT_RESEND_FROM_EMAIL,
             to: email,
             subject: `BuyerPocket: ${title}`,
             html: `
