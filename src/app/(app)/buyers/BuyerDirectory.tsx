@@ -166,7 +166,7 @@ export function BuyerDirectory({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -359,6 +359,24 @@ export function BuyerDirectory({
 
           {/* Desktop toolbar */}
           <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white border-b border-border">
+            <button
+              onClick={() => setIsFilterOpen((v) => !v)}
+              className={cn(
+                "flex items-center gap-1.5 h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors",
+                filterCount > 0
+                  ? "border-teal-action text-teal-action bg-teal-action/5"
+                  : "border-border text-text-primary hover:bg-surface-container-low"
+              )}
+            >
+              <FilterIcon />
+              Filters
+              {filterCount > 0 && (
+                <span className="w-5 h-5 bg-teal-action text-on-teal-action text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {filterCount}
+                </span>
+              )}
+            </button>
+
             <SortDropdown sort={sort} onChange={setSort} />
 
             {/* Active chips — desktop */}
@@ -457,6 +475,7 @@ export function BuyerDirectory({
           onClear={handleClearFilters}
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
+          desktopOpen={isFilterOpen}
         />
       </div>
 

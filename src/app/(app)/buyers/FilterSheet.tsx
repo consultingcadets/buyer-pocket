@@ -116,12 +116,14 @@ export function FilterSheet({
   onClear,
   isOpen,
   onClose,
+  desktopOpen = true,
 }: {
   filters: BuyerFilters;
   onFiltersChange: (f: BuyerFilters) => void;
   onClear: () => void;
   isOpen: boolean;
   onClose: () => void;
+  desktopOpen?: boolean;
 }) {
   const [pending, setPending] = useState<BuyerFilters>(filters);
   const [count, setCount] = useState<number | null>(null);
@@ -305,10 +307,12 @@ export function FilterSheet({
 
   return (
     <>
-      {/* Desktop: persistent right panel */}
-      <aside className="hidden lg:flex flex-col w-[260px] shrink-0 border-l border-border bg-surface-container-low/40 sticky top-0 h-screen">
-        {content}
-      </aside>
+      {/* Desktop: toggleable right panel */}
+      {desktopOpen && (
+        <aside className="hidden lg:flex flex-col w-[260px] shrink-0 border-l border-border bg-surface-container-low/40 sticky top-0 h-screen">
+          {content}
+        </aside>
+      )}
 
       {/* Mobile: bottom sheet */}
       <div
