@@ -212,8 +212,8 @@ export function FeaturesHeroTriplePills() {
           key={l}
           className={`rounded-2xl border px-4 py-3 text-center min-w-[140px] ${c} motion-safe:transition-transform motion-safe:hover:-translate-y-0.5`}
         >
-          <div className="text-[10px] font-bold tracking-[0.14em] uppercase">{l}</div>
-          <div className="text-[11px] text-text-secondary mt-1">{sub}</div>
+          <div className="text-sm font-bold tracking-[0.1em] uppercase">{l}</div>
+          <div className="text-[13px] text-text-secondary mt-1">{sub}</div>
         </div>
       ))}
     </div>
