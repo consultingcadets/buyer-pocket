@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ContactForm from "./contact-form";
-import { SUPPORT_EMAIL } from "@/lib/company";
+import { SUPPORT_EMAIL, LEGAL_ENTITY, LEGAL_ABN } from "@/lib/company";
 import { getPublicAppUrl } from "@/lib/app-url";
 
 const appUrl = getPublicAppUrl();
@@ -35,6 +35,9 @@ export default function ContactPage() {
             .
           </p>
           <ContactForm />
+          <p className="text-[13px] text-text-secondary mt-8 pt-6 border-t border-border/40">
+            {LEGAL_ENTITY} · ABN {LEGAL_ABN}
+          </p>
         </div>
       </div>
     </section>

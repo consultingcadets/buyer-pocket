@@ -51,7 +51,7 @@ export default function FeaturesPage() {
               Features
             </span>
             <h1 className="text-[1.75rem] sm:text-[2.25rem] md:text-[2.75rem] font-bold text-primary tracking-[-0.03em] leading-[1.08]">
-              Three simple tools for staying on top of buyers.
+              Built for Australian real estate agents.
             </h1>
             <p className="mt-4 text-[16px] md:text-[17px] text-text-secondary leading-relaxed">
               BuyerPocket helps you capture buyer details quickly, find the right match when a listing comes up, and follow
@@ -165,11 +165,12 @@ export default function FeaturesPage() {
               eyebrow="NOTES"
               eyebrowClass="bg-teal-action/14 text-teal-action border border-teal-action/22"
               title="Every conversation, in one place"
-              intro="Add a quick note after a call, inspection, text, or email. BuyerPocket stores the history against the buyer so you can come back weeks later and still know what was said, what they wanted, and what the next step was."
+              intro="Add a quick note after a call, inspection, text, or email. BuyerPocket stores the full history against the buyer profile so you can come back weeks later and know exactly what was said, what they wanted, what they didn't, and what you agreed to do next. No more asking a buyer questions you have already asked them before."
               bullets={[
-                "Keeps context with the buyer",
-                "Useful after multiple conversations",
-                "Helps avoid repeating questions",
+                "Log calls, emails, SMS, and in-person conversations",
+                "Notes stay with the buyer — not buried in your phone",
+                "Scroll back through weeks of history in seconds",
+                "Avoids the embarrassing question you already asked last time",
               ]}
               visual={<FeaturesNotesTimelineMockup />}
               reversed
@@ -187,11 +188,12 @@ export default function FeaturesPage() {
               eyebrow="EXPORT"
               eyebrowClass="bg-brand-teal/12 text-teal-action border border-brand-teal/28"
               title="Your data, exportable any time"
-              intro="BuyerPocket is not a locked box. Export your buyer list as CSV whenever you want. Use it for backup, analysis, or moving to another tool later."
+              intro="BuyerPocket is not a locked box. Your buyer data belongs to you — export it as a CSV whenever you want, with all fields included. Use it for backup, feed it into a spreadsheet for admin work, or take it with you if you ever move to another tool. No permission required, no hidden data, no exit fee."
               bullets={[
-                "Simple CSV export",
-                "Gives you control",
-                "Good for backup or admin work",
+                "Full CSV export includes all buyer fields and notes",
+                "Download any time from Settings — no need to contact support",
+                "Useful for weekly backups, compliance records, or admin reviews",
+                "Your data is yours — always exportable, never held hostage",
               ]}
               visual={<FeaturesExportCsvMockup />}
               reversed={false}

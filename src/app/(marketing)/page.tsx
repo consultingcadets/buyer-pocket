@@ -15,6 +15,7 @@ import {
   Pencil,
 } from "lucide-react";
 import CTAButton from "@/components/marketing/cta-button";
+import { Testimonials } from "@/components/marketing/testimonials";
 
 export const metadata = {
   title: { absolute: "Capture buyers fast. Follow up on time. — BuyerPocket" },
@@ -36,6 +37,9 @@ export default function MarketingHome() {
       <section className="max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="flex flex-col gap-6">
+            <p className="text-xs font-bold tracking-[0.12em] text-secondary uppercase">
+              For Australian real estate agents
+            </p>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-text-primary leading-tight">
               Capture buyers fast. Follow up on time.
             </h1>
@@ -464,6 +468,19 @@ export default function MarketingHome() {
           </div>
         </div>
       </section>
+
+      {/* ── What is BuyerPocket — definition block for AI citation ── */}
+      <section className="max-w-2xl mx-auto px-6 md:px-12 py-12 text-center" aria-label="What is BuyerPocket">
+        <h2 className="text-xl font-bold text-primary mb-3">What is BuyerPocket?</h2>
+        <p className="text-[16px] text-text-secondary leading-relaxed">
+          BuyerPocket is a buyer list and reminder tool built for independent Australian real estate agents.
+          It lets agents save buyer preferences at open homes, filter their list when new listings arrive,
+          and receive phone reminders before follow-ups go cold — without the complexity of a full agency CRM.
+        </p>
+      </section>
+
+      {/* ── Testimonials ── */}
+      <Testimonials />
 
       {/* ── Final CTA ── */}
       <section className="bg-primary text-on-primary py-24 mt-12 mx-6 md:mx-12 rounded-2xl text-center relative overflow-hidden">

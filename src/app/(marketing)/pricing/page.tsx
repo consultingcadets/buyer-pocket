@@ -3,6 +3,7 @@ import { Check, X } from "lucide-react";
 
 import { getPublicAppUrl } from "@/lib/app-url";
 import CTAButton from "@/components/marketing/cta-button";
+import { Testimonials } from "@/components/marketing/testimonials";
 
 const appUrl = getPublicAppUrl();
 
@@ -86,7 +87,7 @@ export default function PricingPage() {
       <section className="bg-background pt-16 pb-12 md:pt-20 md:pb-16">
         <div className="max-w-[1440px] mx-auto px-6 text-center">
           <h1 className="text-[40px] md:text-[48px] font-bold text-primary tracking-[-0.02em] leading-[1.15] mb-4">
-            Simple pricing. No surprises.
+            Simple pricing for Australian real estate agents.
           </h1>
           <p className="text-[18px] text-text-secondary">
             $19 per month. 7-day free trial. Cancel anytime from settings.
@@ -172,6 +173,8 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      <Testimonials />
 
       {/* FAQ */}
       <section className="bg-white py-16 md:py-20">

@@ -36,6 +36,12 @@ export default function MarketingNav() {
             Pricing
           </Link>
           <Link
+            href="/about"
+            className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+          >
+            About
+          </Link>
+          <Link
             href="/login"
             className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
           >
@@ -71,6 +77,13 @@ export default function MarketingNav() {
             onClick={() => setOpen(false)}
           >
             Pricing
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm font-medium text-primary py-3.5 border-b border-border active:bg-surface-container-low"
+            onClick={() => setOpen(false)}
+          >
+            About
           </Link>
           <Link
             href="/login"
