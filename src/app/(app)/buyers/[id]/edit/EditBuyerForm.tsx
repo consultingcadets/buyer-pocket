@@ -122,7 +122,6 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   const [isPending, startTransition] = useTransition();
 
   const [name, setName] = useState(buyer.name ?? "");
-  const [contactMode, setContactMode] = useState<"phone" | "email">(buyer.email && !buyer.phone ? "email" : "phone");
   const [phone, setPhone] = useState(buyer.phone ?? "");
   const [email, setEmail] = useState(buyer.email ?? "");
   const [suburbs, setSuburbs] = useState<string[]>(buyer.preferred_suburbs ?? []);
@@ -158,8 +157,6 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   function validate() {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs.name = "Enter the buyer's name";
-    if (contactMode === "phone" && !phone.trim()) errs.contact = "Add a phone number or email";
-    if (contactMode === "email" && !email.trim()) errs.contact = "Add a phone number or email";
     if (suburbs.length === 0) errs.suburbs = "Add at least one suburb";
     const min = parseAmount(budgetMin);
     const max = parseAmount(budgetMax);
@@ -183,8 +180,8 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
     startTransition(async () => {
       const res = await updateBuyer(buyer.id, {
         name: name.trim(),
-        phone: contactMode === "phone" ? phone || null : null,
-        email: contactMode === "email" ? email || null : null,
+        phone: phone || null,
+        email: email || null,
         preferred_suburbs: suburbs,
         budget_min: parseAmount(budgetMin),
         budget_max: parseAmount(budgetMax),
@@ -215,7 +212,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
       }
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, contactMode, phone, email, suburbs, budgetMin, budgetMax, bedrooms,
+  }, [name, phone, email, suburbs, budgetMin, budgetMax, bedrooms,
     landSizeMin, note, preferredContactMethod, bestTimeToContact, contactConsent,
     propertyType, houseType, bathrooms, carSpaces, conditionPreference,
     buildingSizeMin, blockPreference, mustHaves, buyingTimeline, buyerTemperature,
@@ -263,26 +260,40 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
               />
             </FieldRow>
 
-            <FieldRow label={contactMode === "phone" ? "Phone" : "Email"} error={errors.contact}>
-              <div className="flex justify-end mb-2">
-                <button
-                  type="button"
-                  onClick={() => setContactMode((m) => (m === "phone" ? "email" : "phone"))}
-                  className="text-[13px] font-semibold text-teal-action"
-                >
-                  {contactMode === "phone" ? "Use email instead" : "Use phone instead"}
-                </button>
-              </div>
-              {contactMode === "phone" ? (
+            <div className="grid grid-cols-2 gap-3">
+              <FieldRow label="Phone">
                 <input type="tel" placeholder="0412 345 678" value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   onBlur={(e) => setPhone(formatPhone(e.target.value))}
-                  className={inputCls(errors.contact)} />
-              ) : (
+                  className={inputCls()} />
+              </FieldRow>
+              <FieldRow label="Email">
                 <input type="email" placeholder="name@email.com" value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={inputCls(errors.contact)} />
-              )}
+                  className={inputCls()} />
+              </FieldRow>
+            </div>
+
+            <FieldRow label="Buyer Temperature">
+              <div className="flex gap-2">
+                {["Hot", "Warm", "Cold"].map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setBuyerTemperature((v) => v === t ? "" : t)}
+                    className={cn(
+                      "flex-1 h-10 rounded-xl border text-sm font-semibold transition-colors",
+                      buyerTemperature === t
+                        ? t === "Hot" ? "bg-secondary border-secondary text-white"
+                          : t === "Warm" ? "bg-accent border-accent text-white"
+                          : "bg-primary border-primary text-white"
+                        : "bg-surface-container-low border-border text-text-secondary hover:border-primary/40"
+                    )}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
             </FieldRow>
           </FieldCard>
 
@@ -321,6 +332,14 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                 </div>
               </div>
             </FieldRow>
+          </FieldCard>
+
+          {/* Buyer Status before notes */}
+          <FieldCard>
+            <SectionLabel>Buyer Status</SectionLabel>
+            <ChipFieldInline label="Timeline" options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]} value={buyingTimeline} onChange={setBuyingTimeline} />
+            <ChipFieldInline label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
+            <ChipFieldInline label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
           </FieldCard>
 
           <FieldCard>
@@ -384,14 +403,6 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                     <MultiChip key={item} label={item} selected={mustHaves.includes(item)} onClick={() => toggleMustHave(item)} />
                   ))}
                 </div>
-              </FieldCard>
-
-              <FieldCard>
-                <SectionLabel>Buyer Status</SectionLabel>
-                <ChipFieldInline label="Timeline" options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]} value={buyingTimeline} onChange={setBuyingTimeline} />
-                <ChipFieldInline label="Temperature" options={["Hot", "Warm", "Cold"]} value={buyerTemperature} onChange={setBuyerTemperature} />
-                <ChipFieldInline label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
-                <ChipFieldInline label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
               </FieldCard>
             </div>
           </AnimatedExpand>

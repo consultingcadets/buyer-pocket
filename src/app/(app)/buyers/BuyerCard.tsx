@@ -151,7 +151,6 @@ export function BuyerCard({
           <span className="font-semibold text-[15px] text-primary truncate">
             {buyer.name}
           </span>
-          <TemperatureChip temp={buyer.buyer_temperature} />
         </div>
         {(buyer.preferred_suburbs?.length ?? 0) > 0 && (
           <div className="flex items-center gap-1 mt-0.5 text-text-secondary">
@@ -160,6 +159,15 @@ export function BuyerCard({
               {formatSuburbs(buyer.preferred_suburbs)}
             </span>
           </div>
+        )}
+      </div>
+
+      {/* Temperature column */}
+      <div className="w-16 shrink-0 flex justify-center ml-4">
+        {buyer.buyer_temperature ? (
+          <TemperatureChip temp={buyer.buyer_temperature} />
+        ) : (
+          <span className="text-[12px] text-outline">—</span>
         )}
       </div>
 
@@ -178,12 +186,6 @@ export function BuyerCard({
           <>
             <span className="text-outline-variant mx-1">·</span>
             <span>{buyer.land_size_min}m²</span>
-          </>
-        )}
-        {buyer.property_type && (
-          <>
-            <span className="text-outline-variant mx-1">·</span>
-            <span>{buyer.property_type}</span>
           </>
         )}
         {buyer.next_reminder_at && (
