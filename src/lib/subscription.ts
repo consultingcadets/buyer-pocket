@@ -100,12 +100,6 @@ export async function startTrialIfNeeded(
 ): Promise<Subscription | null> {
   if (isBillingSkipped()) return null;
 
-  const stripe = getStripeOrNull();
-  if (!stripe) {
-    console.warn("[subscription] STRIPE_SECRET_KEY missing; set SKIP_BILLING=1 to test without Stripe.");
-    return null;
-  }
-
   const { data: existing } = await supabaseAdmin
     .from("subscriptions")
     .select("*")
@@ -113,6 +107,33 @@ export async function startTrialIfNeeded(
     .maybeSingle();
 
   if (existing) return existing as Subscription;
+
+  const stripe = getStripeOrNull();
+  if (!stripe) {
+    // Stripe not configured — create a local trial row so the app stays usable.
+    // Replace with real Stripe keys (and set STRIPE_PRICE_ID) before accepting payments.
+    console.warn("[subscription] STRIPE_SECRET_KEY missing — creating local trial row. Set SKIP_BILLING=1 or add Stripe keys.");
+    const now = new Date();
+    const trialEnd = new Date(now);
+    trialEnd.setDate(trialEnd.getDate() + 7);
+    const { data } = await supabaseAdmin
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: userId,
+          status: "trialing",
+          trial_start: now.toISOString(),
+          trial_end: trialEnd.toISOString(),
+          current_period_start: now.toISOString(),
+          current_period_end: trialEnd.toISOString(),
+          cancel_at_period_end: false,
+        },
+        { onConflict: "user_id" }
+      )
+      .select("*")
+      .single();
+    return (data as Subscription) ?? null;
+  }
 
   const customer = await stripe.customers.create({
     email: userEmail,
