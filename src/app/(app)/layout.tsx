@@ -43,7 +43,9 @@ export default async function AppLayout({
 
   return (
     <BillingGuard accessLevel={accessLevel} bannerType={bannerType}>
-      {children}
+      <div className="lg:pl-56">
+        {children}
+      </div>
     </BillingGuard>
   );
 }
