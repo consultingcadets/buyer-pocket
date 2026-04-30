@@ -145,7 +145,7 @@ export function BuyerCard({
 
   // ── Desktop row ──────────────────────────────────────────────────────────
   const desktopRow = (
-    <div className="hidden lg:flex items-center px-6 py-3.5 border-b border-border hover:bg-surface-container-low group cursor-default">
+    <div className="hidden lg:flex items-center px-6 py-3 border-b border-border hover:bg-surface-container-low/60 group cursor-default transition-colors">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-[15px] text-primary truncate">

@@ -334,21 +334,36 @@ export function BuyerDirectory({
       </header>
 
       {/* ── Desktop Header ─────────────────────────────────────────────── */}
-      <header className="hidden lg:flex items-center gap-4 px-6 py-4 bg-white border-b border-border sticky top-0 z-20">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <h1 className="text-[20px] font-bold text-text-primary">Buyer Directory</h1>
-          {!isLoading && (
-            <span className="text-text-secondary text-[15px]">· {totalCount}</span>
-          )}
+      <header className="hidden lg:block bg-primary sticky top-0 z-20">
+        <div className="flex items-center gap-4 px-6 py-5">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <h1 className="text-[22px] font-bold text-white tracking-tight">Buyer Directory</h1>
+            {!isLoading && (
+              <span className="text-white/40 text-[15px] font-normal">· {totalCount}</span>
+            )}
+          </div>
+          <div className="w-72">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
+                <SearchIcon />
+              </span>
+              <input
+                type="search"
+                placeholder="Search buyers, suburbs…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 w-full rounded-xl border border-white/15 bg-white/10 pl-9 pr-3 text-[14px] text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all"
+              />
+            </div>
+          </div>
+          <Link
+            href="/add"
+            className="flex items-center gap-1.5 h-10 px-4 bg-teal-action text-on-teal-action rounded-xl font-semibold text-[14px] hover:bg-teal-action/90 transition-colors shrink-0"
+          >
+            <PlusIcon />
+            Add Buyer
+          </Link>
         </div>
-        <div className="w-72">{searchInput}</div>
-        <Link
-          href="/add"
-          className="flex items-center gap-1.5 h-10 px-4 bg-teal-action text-on-teal-action rounded-xl font-semibold text-[14px] hover:opacity-90 transition-opacity shrink-0"
-        >
-          <PlusIcon />
-          Add Buyer
-        </Link>
       </header>
 
       {/* ── Body ───────────────────────────────────────────────────────── */}
@@ -447,6 +462,28 @@ export function BuyerDirectory({
               >
                 Clear all filters
               </button>
+            </div>
+          )}
+
+          {/* Desktop column headers */}
+          {!isLoading && buyers.length > 0 && (
+            <div className="hidden lg:flex items-center px-6 py-2.5 border-b border-border bg-surface-container-low/70 sticky top-[105px] z-10">
+              <div className="flex-1 min-w-0">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
+                  Buyer
+                </span>
+              </div>
+              <div className="w-16 shrink-0 text-center ml-4">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
+                  Status
+                </span>
+              </div>
+              <div className="shrink-0 ml-4">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
+                  Details
+                </span>
+              </div>
+              <div className="w-8 ml-3 shrink-0" />
             </div>
           )}
 

@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useTransition, useCallback, useRef, useEffect } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { Phone, MessageSquare, Mail, Bell, Pencil, MoreHorizontal, CheckCircle, Clock, Check, X, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { SegmentedControl } from "@/components/ui/segmented-control";
-import { SuburbCombobox } from "@/components/ui/suburb-combobox";
-import { formatPhone, parseAmount, formatAmount } from "@/lib/format";
 import { getReminderDate, type ReminderChip } from "@/lib/reminder-utils";
 import type { Database } from "@/types/database";
 import {
@@ -18,7 +15,6 @@ import {
   snoozeReminder,
   deleteReminder,
   addReminder,
-  updateBuyer,
   archiveBuyer,
 } from "./actions";
 
@@ -121,17 +117,13 @@ const REMINDER_CHIPS: Array<{ id: Exclude<ReminderChip, null>; label: string }> 
   { id: "custom", label: "Custom…" },
 ];
 
-const MUST_HAVES_OPTIONS = [
-  "Pool", "Double garage", "Study/home office", "Alfresco/outdoor living",
-  "Solar panels", "Granny flat", "Workshop", "Side access",
-  "North-facing", "Large garden", "Street appeal", "Open plan living",
-];
 
 // ─── Shared UI primitives ─────────────────────────────────────────────────────
 
 const inputBase =
   "w-full h-12 px-4 rounded-lg border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:ring-0 focus:border-2 focus:border-teal-action transition-colors";
 
+  
 function Field({
   label,
   value,
@@ -428,390 +420,6 @@ function ModalBackdrop({
         aria-hidden="true"
       />
       <div className="relative z-10 w-full max-w-lg">{children}</div>
-    </div>
-  );
-}
-
-// ─── Edit Buyer Modal ─────────────────────────────────────────────────────────
-
-function EditBuyerModal({
-  buyer,
-  onClose,
-}: {
-  buyer: Buyer;
-  onClose: () => void;
-}) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState("");
-
-  // Form state pre-populated from buyer
-  const [name, setName] = useState(buyer.name);
-  const [phone, setPhone] = useState(buyer.phone ?? "");
-  const [email, setEmail] = useState(buyer.email ?? "");
-  const [suburbs, setSuburbs] = useState<string[]>(buyer.preferred_suburbs ?? []);
-  const [budgetMin, setBudgetMin] = useState(buyer.budget_min ? buyer.budget_min.toLocaleString("en-AU") : "");
-  const [budgetMax, setBudgetMax] = useState(buyer.budget_max ? buyer.budget_max.toLocaleString("en-AU") : "");
-  const [bedrooms, setBedrooms] = useState(buyer.bedrooms ?? "Any");
-  const [bathrooms, setBathrooms] = useState(buyer.bathrooms ?? "Any");
-  const [carSpaces, setCarSpaces] = useState(buyer.car_spaces ?? "Any");
-  const [propertyType, setPropertyType] = useState(buyer.property_type ?? "");
-  const [houseType, setHouseType] = useState(buyer.house_type ?? "");
-  const [conditionPreference, setConditionPreference] = useState(buyer.condition_preference ?? "");
-  const [landSizeMin, setLandSizeMin] = useState(
-    buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any"
-  );
-  const [buildingSizeMin, setBuildingSizeMin] = useState(
-    buyer.building_size_min ? String(buyer.building_size_min) : ""
-  );
-  const [blockPreference, setBlockPreference] = useState(buyer.block_preference ?? "");
-  const [mustHaves, setMustHaves] = useState<string[]>(buyer.must_haves ?? []);
-  const [buyingTimeline, setBuyingTimeline] = useState(buyer.buying_timeline ?? "");
-  const [buyerTemperature, setBuyerTemperature] = useState(
-    buyer.buyer_temperature ? buyer.buyer_temperature.charAt(0).toUpperCase() + buyer.buyer_temperature.slice(1) : ""
-  );
-  const [buyerType, setBuyerType] = useState(buyer.buyer_type ?? "");
-  const [leadStatus, setLeadStatus] = useState(buyer.lead_status ?? "");
-  const [leadSource, setLeadSource] = useState(buyer.lead_source ?? "");
-  const [preferredContactMethod, setPreferredContactMethod] = useState(buyer.preferred_contact_method ?? "");
-  const [bestTimeToContact, setBestTimeToContact] = useState(buyer.best_time_to_contact ?? "");
-  const [contactConsent, setContactConsent] = useState(buyer.contact_consent ?? "");
-  const [notesSummary, setNotesSummary] = useState(buyer.notes_summary ?? "");
-
-  const toggleMustHave = useCallback((item: string) => {
-    setMustHaves((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
-    );
-  }, []);
-
-  function handleSave() {
-    if (!name.trim()) { setError("Name is required"); return; }
-    const min = parseAmount(budgetMin);
-    const max = parseAmount(budgetMax);
-    if (min !== null && max !== null && min > max) {
-      setError("Budget max must be greater than min");
-      return;
-    }
-
-    let landSizeValue: number | null = null;
-    if (landSizeMin !== "Any") {
-      landSizeValue = parseInt(landSizeMin, 10) || null;
-    }
-
-    let tempValue: "hot" | "warm" | "cold" | null = null;
-    const t = buyerTemperature.toLowerCase();
-    if (t === "hot" || t === "warm" || t === "cold") tempValue = t;
-
-    setError("");
-    startTransition(async () => {
-      const res = await updateBuyer(buyer.id, {
-        name: name.trim(),
-        phone: phone || null,
-        email: email || null,
-        preferred_suburbs: suburbs.length > 0 ? suburbs : null,
-        budget_min: min,
-        budget_max: max,
-        bedrooms: bedrooms === "Any" ? null : bedrooms,
-        bathrooms: bathrooms === "Any" ? null : bathrooms,
-        car_spaces: carSpaces === "Any" ? null : carSpaces,
-        property_type: propertyType || null,
-        house_type: houseType || null,
-        condition_preference: conditionPreference || null,
-        land_size_min: landSizeValue,
-        building_size_min: buildingSizeMin ? parseInt(buildingSizeMin, 10) || null : null,
-        block_preference: blockPreference || null,
-        must_haves: mustHaves.length > 0 ? mustHaves : null,
-        buying_timeline: buyingTimeline || null,
-        buyer_temperature: tempValue,
-        buyer_type: buyerType || null,
-        lead_status: leadStatus || null,
-        lead_source: leadSource || null,
-        preferred_contact_method: preferredContactMethod || null,
-        best_time_to_contact: bestTimeToContact || null,
-        contact_consent: contactConsent || null,
-        notes_summary: notesSummary || null,
-      });
-      if (res.error) { setError(res.error); return; }
-      router.refresh();
-      onClose();
-    });
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-background flex flex-col"
-      style={{ overscrollBehavior: "contain" }}
-    >
-      {/* Header */}
-      <header className="sticky top-0 bg-surface z-10 border-b border-border">
-        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-accent text-sm font-medium w-16"
-          >
-            Cancel
-          </button>
-          <h1 className="text-base font-semibold text-text-primary">Edit Buyer</h1>
-          <div className="w-16" />
-        </div>
-      </header>
-
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto pb-32">
-        <div className="max-w-2xl mx-auto px-6 py-6 space-y-6">
-          {error && (
-            <div className="px-4 py-3 rounded-lg bg-error/10 border border-error/20 text-sm text-error">
-              {error}
-            </div>
-          )}
-
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Buyer Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={cn(inputBase, "border-border")}
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Phone</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onBlur={(e) => setPhone(formatPhone(e.target.value))}
-              className={cn(inputBase, "border-border")}
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={cn(inputBase, "border-border")}
-            />
-          </div>
-
-          {/* Suburbs */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Preferred Suburbs</label>
-            <SuburbCombobox
-              value={suburbs}
-              onChange={setSuburbs}
-              placeholder="Search and add suburbs…"
-            />
-          </div>
-
-          {/* Budget */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Budget</label>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">$</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Min"
-                  value={budgetMin}
-                  onChange={(e) => setBudgetMin(e.target.value.replace(/[^0-9]/g, ""))}
-                  onBlur={(e) => setBudgetMin(formatAmount(e.target.value))}
-                  className={cn(inputBase, "pl-8 border-border")}
-                />
-              </div>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">$</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Max"
-                  value={budgetMax}
-                  onChange={(e) => setBudgetMax(e.target.value.replace(/[^0-9]/g, ""))}
-                  onBlur={(e) => setBudgetMax(formatAmount(e.target.value))}
-                  className={cn(inputBase, "pl-8 border-border")}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Bedrooms */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Bedrooms</label>
-            <SegmentedControl
-              options={["Any", "1+", "2+", "3+", "4+", "5+"]}
-              value={bedrooms}
-              onChange={setBedrooms}
-            />
-          </div>
-
-          {/* Bathrooms */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Bathrooms</label>
-            <SegmentedControl
-              options={["Any", "1+", "2+", "3+"]}
-              value={bathrooms}
-              onChange={setBathrooms}
-            />
-          </div>
-
-          {/* Car spaces */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Car spaces</label>
-            <SegmentedControl
-              options={["Any", "1+", "2+", "3+"]}
-              value={carSpaces}
-              onChange={setCarSpaces}
-            />
-          </div>
-
-          {/* Land size */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Land Size (min)</label>
-            <div className="overflow-x-auto -mx-6 px-6">
-              <div className="min-w-max">
-                <SegmentedControl
-                  options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]}
-                  value={landSizeMin}
-                  onChange={setLandSizeMin}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Contact */}
-          <div className="rounded-lg bg-surface-container p-4 space-y-4">
-            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Contact Preferences</p>
-            <ChipField label="Preferred contact method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
-            <ChipField label="Best time to contact" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
-            <ChipField label="Contact consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
-          </div>
-
-          {/* Section: Property */}
-          <div className="rounded-lg bg-surface-container p-4 space-y-4">
-            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Property Preferences</p>
-            <ChipField label="Property type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
-            <ChipField label="House type" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
-            <ChipField label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
-            <ChipField label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
-            <div>
-              <p className="text-sm font-medium text-text-secondary mb-2">Building size min (squares)</p>
-              <div className="relative">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="e.g. 25"
-                  value={buildingSizeMin}
-                  onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
-                  className={cn(inputBase, "border-border pr-12")}
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm pointer-events-none">sq</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Must-haves */}
-          <div className="rounded-lg bg-surface-container p-4 space-y-3">
-            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Must-Haves</p>
-            <div className="flex flex-wrap gap-2">
-              {MUST_HAVES_OPTIONS.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => toggleMustHave(item)}
-                  className={cn(
-                    "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
-                    mustHaves.includes(item)
-                      ? "bg-primary border-primary text-white"
-                      : "bg-white border-border text-text-secondary hover:border-primary/30"
-                  )}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Section: Status */}
-          <div className="rounded-lg bg-surface-container p-4 space-y-4">
-            <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Buyer Status</p>
-            <ChipField label="Buying timeline" options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]} value={buyingTimeline} onChange={setBuyingTimeline} />
-            <ChipField label="Buyer temperature" options={["Hot", "Warm", "Cold"]} value={buyerTemperature} onChange={setBuyerTemperature} />
-            <ChipField label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
-            <ChipField label="Lead status" options={["New lead", "Active", "Inspection booked", "Under offer", "Settled", "Lost"]} value={leadStatus} onChange={setLeadStatus} />
-            <ChipField label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
-          </div>
-
-          {/* Notes summary */}
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Notes summary</label>
-            <textarea
-              value={notesSummary}
-              onChange={(e) => setNotesSummary(e.target.value)}
-              rows={3}
-              placeholder="Any extra details about this buyer…"
-              className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors resize-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Sticky footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border">
-        <div className="max-w-2xl mx-auto px-6 py-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isPending}
-            className="w-full h-14 rounded-lg bg-secondary text-white font-semibold text-base disabled:opacity-60"
-          >
-            {isPending ? "Saving…" : "Save changes"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── ChipField helper (used in EditBuyerModal) ────────────────────────────────
-
-function ChipField({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <p className="text-sm font-medium text-text-secondary mb-2">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => onChange(value === opt ? "" : opt)}
-            className={cn(
-              "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
-              value === opt
-                ? "bg-primary border-primary text-white"
-                : "bg-white border-border text-text-secondary hover:border-primary/30"
-            )}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -1415,7 +1023,6 @@ function MoreMenu({
 export function BuyerProfile({ buyer, notes, reminders }: Props) {
   const [activeTab, setActiveTab] = useState<MobileTab>("looking-for");
   const [showAddReminder, setShowAddReminder] = useState(false);
-  const [showEditBuyer, setShowEditBuyer] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -1735,14 +1342,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
         />
       )}
 
-      {showEditBuyer && (
-        <EditBuyerModal
-          buyer={buyer}
-          onClose={() => setShowEditBuyer(false)}
-        />
-      )}
-
-      {showArchive && (
+{showArchive && (
         <ArchiveConfirm
           buyerName={buyer.name}
           buyerId={buyer.id}

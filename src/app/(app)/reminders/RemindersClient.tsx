@@ -186,9 +186,11 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
 
   return (
     <div className="min-h-screen bg-surface-container-low pb-24">
-      {/* Header */}
-      <div className="bg-surface px-5 pt-12 pb-0 shadow-sm">
-        <h1 className="text-[22px] font-bold text-foreground pb-4">Reminders</h1>
+      {/* Header — mobile has pt-12 for iOS status bar, desktop uses normal spacing */}
+      <div className="bg-white px-5 pt-12 lg:pt-0 pb-0 shadow-sm lg:shadow-none border-b border-border">
+        <div className="lg:px-2 lg:pt-6">
+          <h1 className="text-[22px] lg:text-[20px] font-bold text-text-primary pb-4">Reminders</h1>
+        </div>
         {/* Tabs */}
         <div className="flex gap-0 overflow-x-auto">
           {TABS.map((tab) => (
@@ -198,8 +200,8 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
               className={cn(
                 "shrink-0 flex items-center gap-1.5 px-4 py-3 text-[13px] font-semibold border-b-2 transition-colors",
                 activeTab === tab.id
-                  ? "border-secondary text-secondary"
-                  : "border-transparent text-muted-foreground"
+                  ? "border-teal-action text-teal-action"
+                  : "border-transparent text-text-secondary hover:text-text-primary"
               )}
             >
               {tab.label}
@@ -207,7 +209,9 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
                 <span
                   className={cn(
                     "text-[11px] font-bold rounded-full px-1.5 py-0.5 leading-none",
-                    tab.alert ? "bg-error-bg text-error" : "bg-muted text-muted-foreground"
+                    tab.alert
+                      ? "bg-error/10 text-error"
+                      : "bg-surface-container text-text-secondary"
                   )}
                 >
                   {tab.count}
@@ -219,7 +223,7 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
       </div>
 
       {/* Content */}
-      <div className="px-4 pt-4">{renderList()}</div>
+      <div className="px-4 lg:max-w-2xl lg:mx-auto pt-4">{renderList()}</div>
 
       {snoozeReminderId && (
         <SnoozeModal

@@ -204,6 +204,7 @@ export function AddBuyerForm() {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs.name = "Enter the buyer's name";
     if (suburbs.length === 0) errs.suburbs = "Add at least one suburb";
+    if (!phone.trim() && !email.trim()) errs.phone = "Enter a phone number or email address";
     const min = parseAmount(budgetMin);
     const max = parseAmount(budgetMax);
     if (min !== null && max !== null && min > max)
