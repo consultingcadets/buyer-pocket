@@ -130,7 +130,7 @@ const MUST_HAVES_OPTIONS = [
 // ─── Shared UI primitives ─────────────────────────────────────────────────────
 
 const inputBase =
-  "w-full h-12 px-4 rounded-lg border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:ring-0 focus:border-2 focus:border-accent transition-colors";
+  "w-full h-12 px-4 rounded-lg border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:ring-0 focus:border-2 focus:border-teal-action transition-colors";
 
 function Field({
   label,
@@ -294,7 +294,7 @@ function AddReminderModal({
           value={reminderNote}
           onChange={(e) => setReminderNote(e.target.value)}
           rows={3}
-          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none"
+          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors resize-none"
         />
 
         {error && <p className="text-xs text-error">{error}</p>}
@@ -756,7 +756,7 @@ function EditBuyerModal({
               onChange={(e) => setNotesSummary(e.target.value)}
               rows={3}
               placeholder="Any extra details about this buyer…"
-              className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors resize-none"
             />
           </div>
         </div>
@@ -829,7 +829,7 @@ function LookingForCard({ buyer }: { buyer: Buyer }) {
         {buyer.preferred_suburbs && buyer.preferred_suburbs.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {buyer.preferred_suburbs.map((s) => (
-              <Chip key={s} label={s} className="bg-secondary/10 text-secondary-container font-semibold" />
+              <Chip key={s} label={s} className="bg-teal-action/15 text-teal-action border border-teal-action/30 font-semibold" />
             ))}
           </div>
         ) : (
@@ -844,15 +844,17 @@ function LookingForCard({ buyer }: { buyer: Buyer }) {
       </div>
 
       {/* Property type */}
-      {(buyer.property_type || buyer.house_type || buyer.bedrooms || buyer.bathrooms || buyer.car_spaces) && (
+      {(buyer.property_type || buyer.house_type || buyer.bedrooms || buyer.bathrooms || buyer.car_spaces || buyer.land_size_min) && (
         <div>
           <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Property Criteria</p>
           <p className="text-sm text-text-primary">
-            {[buyer.property_type, buyer.house_type].filter(Boolean).join(" or ")}
-            {buyer.bedrooms && `, ${buyer.bedrooms} bed`}
-            {buyer.bathrooms && `, ${buyer.bathrooms} bath`}
-            {buyer.car_spaces && `, ${buyer.car_spaces} car`}
-            {buyer.land_size_min && `, ${buyer.land_size_min}m²+ land`}
+            {[
+              [buyer.property_type, buyer.house_type].filter(Boolean).join(" or ") || null,
+              buyer.bedrooms ? `${buyer.bedrooms} bed` : null,
+              buyer.bathrooms ? `${buyer.bathrooms} bath` : null,
+              buyer.car_spaces ? `${buyer.car_spaces} car` : null,
+              buyer.land_size_min ? `${buyer.land_size_min}m²+ land` : null,
+            ].filter(Boolean).join(", ")}
           </p>
         </div>
       )}
@@ -981,7 +983,7 @@ function NotesActivity({
           value={noteText}
           onChange={(e) => setNoteText(e.target.value)}
           rows={2}
-          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-accent transition-colors resize-none text-sm"
+          className="w-full px-4 py-3 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors resize-none text-sm"
         />
         <div className="flex items-center gap-2">
           <select
@@ -1022,7 +1024,7 @@ function NotesActivity({
               return (
                 <div key={n.id} className="flex gap-3">
                   {/* Icon */}
-                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     {n.contact_type === "Call" ? <Phone className="w-3.5 h-3.5" /> : n.contact_type === "SMS" ? <MessageSquare className="w-3.5 h-3.5" /> : n.contact_type === "Email" ? <Mail className="w-3.5 h-3.5" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -1222,7 +1224,7 @@ function RemindersCard({
                         type="button"
                         disabled={isPending}
                         onClick={() => handleComplete(r.id)}
-                        className="h-7 px-3 rounded-full bg-secondary/10 text-secondary-container text-xs font-semibold disabled:opacity-60"
+                        className="h-7 px-3 rounded-full bg-teal-action/10 text-teal-action text-xs font-semibold disabled:opacity-60"
                       >
                         Done
                       </button>
@@ -1452,22 +1454,22 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
             <span className="text-text-primary">{buyer.name}</span>
           </nav>
 
-          {/* Header card */}
-          <div className="bg-white rounded-lg border border-border shadow-card p-6">
+          {/* Header card — navy dashboard style */}
+          <div className="bg-primary rounded-xl px-6 py-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-text-primary tracking-tight">
+                <h1 className="text-3xl font-bold text-white tracking-tight">
                   {buyer.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-2 mt-2">
+                <div className="flex flex-wrap items-center gap-2 mt-2.5">
                   {tempConfig && (
                     <Chip label={tempConfig.label} className={tempConfig.chip} />
                   )}
                   {buyer.lead_status && (
-                    <Chip label={buyer.lead_status} className="bg-primary text-white" />
+                    <Chip label={buyer.lead_status} className="bg-white/15 text-white border border-white/20" />
                   )}
                   {buyer.buyer_type && (
-                    <Chip label={buyer.buyer_type} className="bg-surface-container text-text-secondary" />
+                    <Chip label={buyer.buyer_type} className="bg-white/10 text-white/75 border border-white/15" />
                   )}
                 </div>
               </div>
@@ -1477,7 +1479,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="h-9 px-4 rounded-lg bg-secondary text-white text-sm font-semibold flex items-center gap-1.5"
+                    className="h-9 px-4 rounded-lg bg-teal-action text-on-teal-action text-sm font-semibold flex items-center gap-1.5"
                   >
                     <Phone className="w-4 h-4" /> Call
                   </a>
@@ -1485,7 +1487,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 {smsHref && (
                   <a
                     href={smsHref}
-                    className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                    className="h-9 px-4 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium flex items-center gap-1.5 hover:bg-white/20 transition-colors"
                   >
                     <MessageSquare className="w-4 h-4" /> SMS
                   </a>
@@ -1493,7 +1495,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 {emailHref && (
                   <a
                     href={emailHref}
-                    className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                    className="h-9 px-4 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium flex items-center gap-1.5 hover:bg-white/20 transition-colors"
                   >
                     <Mail className="w-4 h-4" /> Email
                   </a>
@@ -1501,22 +1503,21 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 <button
                   type="button"
                   onClick={() => setShowAddReminder(true)}
-                  className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                  className="h-9 px-4 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium flex items-center gap-1.5 hover:bg-white/20 transition-colors"
                 >
-                  <Bell className="w-4 h-4" /> Add reminder
+                  <Bell className="w-4 h-4" /> Reminder
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowEditBuyer(true)}
-                  className="h-9 px-4 rounded-lg border border-border text-sm font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-container"
+                <Link
+                  href={`/buyers/${buyer.id}/edit`}
+                  className="h-9 px-4 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium flex items-center gap-1.5 hover:bg-white/20 transition-colors"
                 >
                   <Pencil className="w-4 h-4" /> Edit
-                </button>
+                </Link>
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowMoreMenu((v) => !v)}
-                    className="h-9 w-9 rounded-lg border border-border text-text-secondary flex items-center justify-center hover:bg-surface-container"
+                    className="h-9 w-9 rounded-lg bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
                     aria-label="More options"
                   >
                     <MoreHorizontal className="w-4 h-4" />
@@ -1644,14 +1645,10 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               <div className={mobileIconBtn}><Bell className="w-5 h-5" /></div>
               <span>Reminder</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setShowEditBuyer(true)}
-              className={mobileActionBtn}
-            >
+            <Link href={`/buyers/${buyer.id}/edit`} className={mobileActionBtn}>
               <div className={mobileIconBtn}><Pencil className="w-5 h-5" /></div>
               <span>Edit</span>
-            </button>
+            </Link>
           </div>
         </div>
 
