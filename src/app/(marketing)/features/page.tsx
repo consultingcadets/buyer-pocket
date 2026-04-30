@@ -91,9 +91,6 @@ export default function FeaturesPage() {
               visual={<FeaturesCaptureFormMockup />}
               reversed={false}
             />
-            <p className="text-center text-[12px] text-text-secondary mt-8 md:mt-6 max-w-md mx-auto">
-              Built to be quick, not bloated.
-            </p>
           </div>
         </section>
       </RevealOnView>
