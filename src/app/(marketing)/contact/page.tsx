@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import ContactForm from "./contact-form";
 import { SUPPORT_EMAIL } from "@/lib/company";
+import { getPublicAppUrl } from "@/lib/app-url";
+
+const appUrl = getPublicAppUrl();
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Send us a message and we'll get back to you within one business day.",
   openGraph: {
     title: "Contact — BuyerPocket",
-    description: "Get in touch with the BuyerPocket team.",
-    url: "https://buyerpocket.com.au/contact",
+    description: "Get in touch with the BuyerPocket team — buyer list and reminder tool for Australian real estate agents.",
+    url: `${appUrl}/contact`,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
   },
 };
 

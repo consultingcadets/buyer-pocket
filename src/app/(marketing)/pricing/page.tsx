@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Check, X } from "lucide-react";
+
+import { getPublicAppUrl } from "@/lib/app-url";
 import CTAButton from "@/components/marketing/cta-button";
+
+const appUrl = getPublicAppUrl();
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -9,7 +13,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pricing — BuyerPocket",
     description: "$19/month. 7-day free trial. No credit card required to start.",
-    url: "https://buyerpocket.com.au/pricing",
+    url: `${appUrl}/pricing`,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
   },
 };
 
@@ -60,9 +65,23 @@ const FAQS = [
   },
 ];
 
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 export default function PricingPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
+      />
       {/* Hero */}
       <section className="bg-background pt-16 pb-12 md:pt-20 md:pb-16">
         <div className="max-w-[1440px] mx-auto px-6 text-center">

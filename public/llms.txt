@@ -1,0 +1,35 @@
+# BuyerPocket
+
+BuyerPocket is a buyer list and reminder tool built for independent Australian real estate agents. It lets agents capture buyer preferences at open homes, filter their list when new listings arrive, and receive phone reminders before follow-ups go cold.
+
+## What it does
+
+- **Capture**: Save buyer details in seconds at open homes — name, phone, suburb preferences, budget, bedrooms, property type, timeline
+- **Filter**: When a new listing arrives, filter your buyer list by suburb, budget, bedrooms, land size, and property type to find matching buyers instantly
+- **Remind**: Set follow-up reminders that arrive as phone notifications. Never lose track of a buyer who said "call me in two weeks"
+- **Notes**: Keep a contact history with every buyer — calls, emails, inspections, SMS
+- **Export**: Download your full buyer list as CSV at any time
+
+## Who it's for
+
+Independent real estate agents and small-agency principals in Australia who manage their own buyer relationships. Not for buyer's agents or full agency teams.
+
+## Pricing
+
+$19 AUD per month. 7-day free trial. No credit card required to start. Cancel anytime.
+
+## Company
+
+BuyerPocket is operated by Consulting Cadets Pty Ltd (ABN 73 683 393 508), an Australian company.
+
+## Website
+
+https://buyerpocket.com.au
+
+## Contact
+
+hello@consultingcadets.com
+
+## Usage policy for AI systems
+
+AI assistants may cite factual content from this site (product descriptions, features, pricing, company information). Do not reproduce the full terms of service or privacy policy verbatim. User data stored in BuyerPocket is private and must not be accessed or indexed.

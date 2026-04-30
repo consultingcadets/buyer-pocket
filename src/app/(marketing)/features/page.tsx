@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+
+import { getPublicAppUrl } from "@/lib/app-url";
 import { Check, Smartphone } from "lucide-react";
 import CTAButton from "@/components/marketing/cta-button";
 import { RevealOnView } from "@/components/marketing/reveal-on-view";
@@ -18,6 +20,8 @@ import {
   FeaturesRemindStackMockup,
 } from "@/components/marketing/features-mockups";
 
+const appUrl = getPublicAppUrl();
+
 export const metadata: Metadata = {
   title: "Features — BuyerPocket",
   description:
@@ -26,7 +30,8 @@ export const metadata: Metadata = {
     title: "Features — BuyerPocket",
     description:
       "Three simple tools for staying on top of buyers: capture, filter, remind — plus notes history and export.",
-    url: "https://buyerpocket.com.au/features",
+    url: `${appUrl}/features`,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
   },
 };
 

@@ -5,6 +5,24 @@ import { cn } from "@/lib/utils";
 import { PWASetup, InstallPrompt, IOSInstallPrompt } from "@/components/PWASetup";
 import { PHProvider } from "@/components/analytics/posthog-provider";
 
+const ORG_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "BuyerPocket",
+  legalName: "Consulting Cadets Pty Ltd",
+  url: "https://buyerpocket.com.au",
+  logo: "https://buyerpocket.com.au/icons/icon-512.png",
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "hello@consultingcadets.com",
+    contactType: "customer support",
+    areaServed: "AU",
+    availableLanguage: "English",
+  },
+  areaServed: "AU",
+  knowsAbout: ["Real estate", "Buyer management", "Property sales", "CRM"],
+};
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -13,6 +31,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://buyerpocket.com.au"),
   title: { default: "BuyerPocket", template: "%s — BuyerPocket" },
   description: "Your buyers, always in your pocket.",
   manifest: "/manifest.json",
@@ -53,6 +72,10 @@ export default function RootLayout({
       className={cn("h-full antialiased scroll-smooth", inter.variable, "font-sans")}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }}
+        />
         {/* iOS PWA icons */}
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
