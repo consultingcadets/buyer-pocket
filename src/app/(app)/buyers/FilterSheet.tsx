@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import { cn } from "@/lib/utils";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { formatAmount, parseAmount } from "@/lib/format";
+import { formatAmount } from "@/lib/format";
 import {
   type BuyerFilters,
   BEDROOMS_OPTIONS,
@@ -27,7 +27,7 @@ function XIcon() {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#44474C] mb-2">
+    <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-text-secondary mb-2.5">
       {children}
     </p>
   );
@@ -45,9 +45,7 @@ function ChipRow({
   onChange: (v: string | string[]) => void;
 }) {
   const isSelected = (opt: string) =>
-    multi
-      ? (selected as string[]).includes(opt)
-      : selected === opt;
+    multi ? (selected as string[]).includes(opt) : selected === opt;
 
   const toggle = (opt: string) => {
     if (multi) {
@@ -59,7 +57,7 @@ function ChipRow({
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {options.map((opt) => (
         <button
           key={opt}
@@ -68,8 +66,8 @@ function ChipRow({
           className={cn(
             "h-8 px-3 rounded-full border text-[13px] font-medium transition-colors",
             isSelected(opt)
-              ? "bg-[#0F1C2C] border-[#0F1C2C] text-white"
-              : "bg-white border-[#E0E1DD] text-[#44474C] hover:border-[#0F1C2C]/30"
+              ? "bg-primary border-primary text-white"
+              : "bg-surface-container-low border-border text-text-secondary hover:border-primary/30 hover:text-text-primary"
           )}
         >
           {opt}
@@ -89,7 +87,7 @@ function RadioChipRow<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -98,8 +96,8 @@ function RadioChipRow<T extends string>({
           className={cn(
             "h-8 px-3 rounded-full border text-[13px] font-medium transition-colors",
             value === opt.value
-              ? "bg-[#0F1C2C] border-[#0F1C2C] text-white"
-              : "bg-white border-[#E0E1DD] text-[#44474C] hover:border-[#0F1C2C]/30"
+              ? "bg-primary border-primary text-white"
+              : "bg-surface-container-low border-border text-text-secondary hover:border-primary/30 hover:text-text-primary"
           )}
         >
           {opt.label}
@@ -110,9 +108,7 @@ function RadioChipRow<T extends string>({
 }
 
 const inputCls =
-  "h-10 w-full rounded-lg border border-[#E0E1DD] bg-white px-3 text-[14px] text-[#1B1B1D] placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-[#3A86FF] transition-colors";
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
+  "h-10 w-full rounded-lg border border-border bg-surface-container-low px-3 text-[14px] text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors";
 
 export function FilterSheet({
   filters,
@@ -131,12 +127,8 @@ export function FilterSheet({
   const [count, setCount] = useState<number | null>(null);
   const [, startTransition] = useTransition();
 
-  // Sync pending when parent filters change (e.g. chip removal)
-  useEffect(() => {
-    setPending(filters);
-  }, [filters]);
+  useEffect(() => { setPending(filters); }, [filters]);
 
-  // Live count on pending filter changes (debounced)
   useEffect(() => {
     const t = setTimeout(() => {
       startTransition(async () => {
@@ -147,16 +139,8 @@ export function FilterSheet({
     return () => clearTimeout(t);
   }, [pending]);
 
-  function handleApply() {
-    onFiltersChange(pending);
-    onClose();
-  }
-
-  function handleClear() {
-    setPending({});
-    onClear();
-    onClose();
-  }
+  function handleApply() { onFiltersChange(pending); onClose(); }
+  function handleClear() { setPending({}); onClear(); onClose(); }
 
   const budgetMinStr = pending.budgetMin != null ? String(pending.budgetMin) : "";
   const budgetMaxStr = pending.budgetMax != null ? String(pending.budgetMax) : "";
@@ -165,26 +149,25 @@ export function FilterSheet({
     <div className="flex flex-col h-full">
       {/* Mobile drag handle */}
       <div className="lg:hidden flex justify-center pt-3 pb-1">
-        <div className="w-10 h-1 rounded-full bg-[#E0E1DD]" />
+        <div className="w-10 h-1 rounded-full bg-border" />
       </div>
 
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between px-5 py-3 border-b border-[#E0E1DD]">
-        <h2 className="text-[16px] font-semibold text-[#0F1C2C]">Filters</h2>
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-[#44474C]">
+      <div className="lg:hidden flex items-center justify-between px-5 py-3 border-b border-border">
+        <h2 className="text-[16px] font-semibold text-text-primary">Filters</h2>
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-text-secondary">
           <XIcon />
         </button>
       </div>
 
       {/* Desktop title */}
-      <div className="hidden lg:block px-5 pt-5 pb-3 border-b border-[#E0E1DD]">
-        <h2 className="text-[13px] font-semibold text-[#0F1C2C] uppercase tracking-wide">Filters</h2>
+      <div className="hidden lg:flex items-center px-5 pt-5 pb-3 border-b border-border">
+        <h2 className="text-[13px] font-bold text-primary uppercase tracking-[0.1em] flex-1">Filters</h2>
       </div>
 
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
 
-        {/* Suburb */}
         <div>
           <SectionTitle>Suburb</SectionTitle>
           <SuburbCombobox
@@ -194,16 +177,13 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Budget */}
         <div>
           <SectionTitle>Budget range</SectionTitle>
           <div className="grid grid-cols-2 gap-2">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#44474C] text-[13px]">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[13px]">$</span>
               <input
-                type="text"
-                inputMode="numeric"
-                placeholder="Min"
+                type="text" inputMode="numeric" placeholder="Min"
                 className={cn(inputCls, "pl-6")}
                 value={budgetMinStr ? formatAmount(budgetMinStr) : ""}
                 onChange={(e) => {
@@ -213,11 +193,9 @@ export function FilterSheet({
               />
             </div>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#44474C] text-[13px]">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[13px]">$</span>
               <input
-                type="text"
-                inputMode="numeric"
-                placeholder="Max"
+                type="text" inputMode="numeric" placeholder="Max"
                 className={cn(inputCls, "pl-6")}
                 value={budgetMaxStr ? formatAmount(budgetMaxStr) : ""}
                 onChange={(e) => {
@@ -229,7 +207,6 @@ export function FilterSheet({
           </div>
         </div>
 
-        {/* Bedrooms */}
         <div>
           <SectionTitle>Bedrooms</SectionTitle>
           <SegmentedControl
@@ -239,21 +216,16 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Land size */}
+        {/* Land size — chips so they wrap, no overflow */}
         <div>
           <SectionTitle>Land size minimum</SectionTitle>
-          <div className="overflow-x-auto -mx-1 px-1">
-            <div className="min-w-max">
-              <SegmentedControl
-                options={LAND_SIZE_OPTIONS}
-                value={pending.landSizeMin ?? "Any"}
-                onChange={(v) => setPending((f) => ({ ...f, landSizeMin: v }))}
-              />
-            </div>
-          </div>
+          <ChipRow
+            options={LAND_SIZE_OPTIONS}
+            selected={pending.landSizeMin ?? "Any"}
+            onChange={(v) => setPending((f) => ({ ...f, landSizeMin: v as string }))}
+          />
         </div>
 
-        {/* Property type */}
         <div>
           <SectionTitle>Property type</SectionTitle>
           <ChipRow
@@ -264,25 +236,16 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Temperature */}
         <div>
           <SectionTitle>Buyer temperature</SectionTitle>
           <ChipRow
             options={["Hot", "Warm", "Cold"]}
-            selected={(pending.temperatures ?? []).map((t) =>
-              t.charAt(0).toUpperCase() + t.slice(1)
-            )}
+            selected={(pending.temperatures ?? []).map((t) => t.charAt(0).toUpperCase() + t.slice(1))}
             multi
-            onChange={(v) =>
-              setPending((f) => ({
-                ...f,
-                temperatures: (v as string[]).map((t) => t.toLowerCase()),
-              }))
-            }
+            onChange={(v) => setPending((f) => ({ ...f, temperatures: (v as string[]).map((t) => t.toLowerCase()) }))}
           />
         </div>
 
-        {/* Buying timeline */}
         <div>
           <SectionTitle>Buying timeline</SectionTitle>
           <ChipRow
@@ -292,7 +255,6 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Lead status */}
         <div>
           <SectionTitle>Lead status</SectionTitle>
           <ChipRow
@@ -302,7 +264,6 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Reminder due */}
         <div>
           <SectionTitle>Reminder due</SectionTitle>
           <RadioChipRow
@@ -312,7 +273,6 @@ export function FilterSheet({
           />
         </div>
 
-        {/* Last contacted */}
         <div>
           <SectionTitle>Last contacted</SectionTitle>
           <RadioChipRow
@@ -322,22 +282,22 @@ export function FilterSheet({
           />
         </div>
 
-        <div className="h-4" />
+        <div className="h-2" />
       </div>
 
-      {/* Sticky footer */}
-      <div className="sticky bottom-0 bg-white border-t border-[#E0E1DD] p-4 flex gap-3">
+      {/* Footer */}
+      <div className="border-t border-border bg-white p-4 flex gap-3">
         <button
           onClick={handleClear}
-          className="flex-1 h-11 text-[#3A86FF] font-medium text-[14px] rounded-lg hover:bg-blue-50 transition-colors"
+          className="flex-1 h-11 text-teal-action font-semibold text-[14px] rounded-xl border border-teal-action/30 hover:bg-teal-action/5 transition-colors"
         >
-          Clear filters
+          Clear
         </button>
         <button
           onClick={handleApply}
-          className="flex-1 h-11 bg-[#2EC4B6] text-white rounded-lg font-semibold text-[14px] hover:bg-[#27b0a4] transition-colors"
+          className="flex-1 h-11 bg-teal-action text-on-teal-action rounded-xl font-bold text-[14px] hover:opacity-90 transition-opacity"
         >
-          Apply{count !== null ? ` (${count})` : ""}
+          Show{count !== null ? ` ${count}` : ""}
         </button>
       </div>
     </div>
@@ -346,7 +306,7 @@ export function FilterSheet({
   return (
     <>
       {/* Desktop: persistent right panel */}
-      <aside className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-[#E0E1DD] bg-white sticky top-0 h-screen overflow-hidden">
+      <aside className="hidden lg:flex flex-col w-[260px] shrink-0 border-l border-border bg-surface-container-low/40 sticky top-0 h-screen">
         {content}
       </aside>
 
@@ -357,15 +317,13 @@ export function FilterSheet({
           isOpen ? "visible" : "invisible pointer-events-none"
         )}
       >
-        {/* Backdrop */}
         <div
           className={cn(
-            "absolute inset-0 bg-black/40 transition-opacity duration-300",
+            "absolute inset-0 bg-primary/40 transition-opacity duration-300",
             isOpen ? "opacity-100" : "opacity-0"
           )}
           onClick={onClose}
         />
-        {/* Sheet */}
         <div
           className={cn(
             "relative bg-white rounded-t-2xl max-h-[88vh] flex flex-col transition-transform duration-300",

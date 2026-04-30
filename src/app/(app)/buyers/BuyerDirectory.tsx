@@ -82,7 +82,7 @@ function SortDropdown({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-[#E0E1DD] bg-white text-[13px] font-medium text-[#1B1B1D] hover:bg-[#F5F3F4]"
+        className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-white text-[13px] font-medium text-text-primary hover:bg-surface-container-low"
       >
         {label}
         <ChevronDownIcon />
@@ -90,7 +90,7 @@ function SortDropdown({
       {open && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 mt-1 z-30 w-48 bg-white rounded-lg border border-[#E0E1DD] shadow-lg py-1">
+          <div className="absolute top-full left-0 mt-1 z-30 w-48 bg-white rounded-xl border border-border shadow-dropdown py-1">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.field}
@@ -99,10 +99,10 @@ function SortDropdown({
                   setOpen(false);
                 }}
                 className={cn(
-                  "w-full text-left px-4 py-2.5 text-[13px] hover:bg-[#F0EDEE]",
+                  "w-full text-left px-4 py-2.5 text-[13px] hover:bg-surface-container",
                   sort === opt.field
-                    ? "font-semibold text-[#0F1C2C]"
-                    : "text-[#44474C]"
+                    ? "font-semibold text-text-primary"
+                    : "text-text-secondary"
                 )}
               >
                 {opt.label}
@@ -127,13 +127,13 @@ function LoadingSkeleton() {
           style={{ boxShadow: "0px 4px 20px rgba(13,27,42,0.05)" }}
         >
           <div className="flex justify-between mb-2">
-            <div className="h-5 w-40 bg-[#F0EDEE] rounded animate-pulse" />
-            <div className="h-5 w-14 bg-[#F0EDEE] rounded-full animate-pulse" />
+            <div className="h-5 w-40 bg-surface-container rounded animate-pulse" />
+            <div className="h-5 w-14 bg-surface-container rounded-full animate-pulse" />
           </div>
-          <div className="h-3 w-56 bg-[#F0EDEE] rounded animate-pulse mb-3" />
+          <div className="h-3 w-56 bg-surface-container rounded animate-pulse mb-3" />
           <div className="flex gap-2">
             {[1, 2, 3].map((j) => (
-              <div key={j} className="flex-1 h-11 bg-[#F0EDEE] rounded-md animate-pulse" />
+              <div key={j} className="flex-1 h-11 bg-surface-container rounded-md animate-pulse" />
             ))}
           </div>
         </div>
@@ -269,21 +269,21 @@ export function BuyerDirectory({
         placeholder="Search buyers, suburbs…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="h-10 w-full rounded-lg border border-[#E0E1DD] bg-[#F5F3F4] pl-9 pr-3 text-[14px] text-[#1B1B1D] placeholder:text-[#A0A3AB] focus:outline-none focus:border-2 focus:border-[#3A86FF] focus:bg-white transition-all"
+        className="h-10 w-full rounded-lg border border-border bg-surface-container-low pl-9 pr-3 text-[14px] text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action focus:bg-white transition-all"
       />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#FBF9FA] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
 
       {/* ── Mobile Header ──────────────────────────────────────────────── */}
-      <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-[#E0E1DD]">
+      <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-border">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-[18px] font-bold text-[#0F1C2C]">
+          <h1 className="text-[18px] font-bold text-text-primary">
             Buyer Directory
             {!isLoading && (
-              <span className="ml-1.5 text-[#44474C] font-normal text-[15px]">
+              <span className="ml-1.5 text-text-secondary font-normal text-[15px]">
                 · {totalCount}
               </span>
             )}
@@ -294,17 +294,17 @@ export function BuyerDirectory({
                 setShowSearchBar((v) => !v);
                 setTimeout(() => searchRef.current?.focus(), 50);
               }}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0EDEE] text-[#44474C]"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
             >
               <SearchIcon />
             </button>
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F0EDEE] text-[#44474C]"
+              className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
             >
               <FilterIcon />
               {filterCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[#2EC4B6] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 bg-teal-action text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                   {filterCount}
                 </span>
               )}
@@ -323,7 +323,7 @@ export function BuyerDirectory({
               <button
                 key={chip.id}
                 onClick={() => handleRemoveChip(chip.remove(filters))}
-                className="flex items-center gap-1.5 shrink-0 h-7 px-3 bg-[#EAE7E9] rounded-full text-[12px] font-medium text-[#1B1B1D]"
+                className="flex items-center gap-1.5 shrink-0 h-7 px-3 bg-surface-container-high rounded-full text-[12px] font-medium text-text-primary"
               >
                 {chip.label}
                 <XIcon />
@@ -334,17 +334,17 @@ export function BuyerDirectory({
       </header>
 
       {/* ── Desktop Header ─────────────────────────────────────────────── */}
-      <header className="hidden lg:flex items-center gap-4 px-6 py-4 bg-white border-b border-[#E0E1DD] sticky top-0 z-20">
+      <header className="hidden lg:flex items-center gap-4 px-6 py-4 bg-white border-b border-border sticky top-0 z-20">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <h1 className="text-[20px] font-bold text-[#0F1C2C]">Buyer Directory</h1>
+          <h1 className="text-[20px] font-bold text-text-primary">Buyer Directory</h1>
           {!isLoading && (
-            <span className="text-[#44474C] text-[15px]">· {totalCount}</span>
+            <span className="text-text-secondary text-[15px]">· {totalCount}</span>
           )}
         </div>
         <div className="w-72">{searchInput}</div>
         <Link
           href="/add"
-          className="flex items-center gap-1.5 h-10 px-4 bg-[#2EC4B6] text-white rounded-lg font-semibold text-[14px] hover:bg-[#27b0a4] transition-colors shrink-0"
+          className="flex items-center gap-1.5 h-10 px-4 bg-teal-action text-on-teal-action rounded-xl font-semibold text-[14px] hover:opacity-90 transition-opacity shrink-0"
         >
           <PlusIcon />
           Add Buyer
@@ -358,25 +358,7 @@ export function BuyerDirectory({
         <main className="flex-1 min-w-0 pb-20 lg:pb-0">
 
           {/* Desktop toolbar */}
-          <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white border-b border-[#E0E1DD]">
-            <button
-              onClick={() => setIsFilterOpen((v) => !v)}
-              className={cn(
-                "flex items-center gap-1.5 h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors",
-                filterCount > 0
-                  ? "border-[#2EC4B6] text-[#2EC4B6] bg-[#2EC4B6]/5"
-                  : "border-[#E0E1DD] text-[#1B1B1D] hover:bg-[#F5F3F4]"
-              )}
-            >
-              <FilterIcon />
-              Filter
-              {filterCount > 0 && (
-                <span className="w-5 h-5 bg-[#2EC4B6] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {filterCount}
-                </span>
-              )}
-            </button>
-
+          <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white border-b border-border">
             <SortDropdown sort={sort} onChange={setSort} />
 
             {/* Active chips — desktop */}
@@ -386,7 +368,7 @@ export function BuyerDirectory({
                   <button
                     key={chip.id}
                     onClick={() => handleRemoveChip(chip.remove(filters))}
-                    className="flex items-center gap-1.5 h-7 px-3 bg-[#EAE7E9] rounded-full text-[12px] font-medium text-[#1B1B1D] hover:bg-[#E0E1DD]"
+                    className="flex items-center gap-1.5 h-7 px-3 bg-surface-container-high rounded-full text-[12px] font-medium text-text-primary hover:bg-surface-container-highest"
                   >
                     {chip.label}
                     <XIcon />
@@ -395,7 +377,7 @@ export function BuyerDirectory({
                 {activeChips.length > 1 && (
                   <button
                     onClick={handleClearFilters}
-                    className="h-7 px-2 text-[12px] text-[#3A86FF] font-medium"
+                    className="h-7 px-2 text-[12px] text-teal-action font-semibold"
                   >
                     Clear all
                   </button>
@@ -410,18 +392,18 @@ export function BuyerDirectory({
           {/* Empty: no buyers at all */}
           {!isLoading && totalCount === 0 && !hasFiltersOrSearch && (
             <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#F0EDEE] flex items-center justify-center mb-4">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#44474C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </div>
-              <h2 className="text-[18px] font-semibold text-[#0F1C2C] mb-2">No buyers yet</h2>
-              <p className="text-[14px] text-[#44474C] mb-6">
+              <h2 className="text-[18px] font-semibold text-text-primary mb-2">No buyers yet</h2>
+              <p className="text-[14px] text-text-secondary mb-6">
                 Add your first buyer to get started tracking leads.
               </p>
               <Link
                 href="/add"
-                className="flex items-center gap-1.5 h-11 px-6 bg-[#2EC4B6] text-white rounded-lg font-semibold text-[14px]"
+                className="flex items-center gap-1.5 h-11 px-6 bg-teal-action text-on-teal-action rounded-xl font-semibold text-[14px]"
               >
                 <PlusIcon />
                 Add your first buyer
@@ -432,21 +414,18 @@ export function BuyerDirectory({
           {/* Empty: filtered */}
           {!isLoading && buyers.length === 0 && hasFiltersOrSearch && (
             <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#F0EDEE] flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 text-text-secondary">
                 <SearchIcon />
               </div>
-              <h2 className="text-[18px] font-semibold text-[#0F1C2C] mb-2">
+              <h2 className="text-[18px] font-semibold text-text-primary mb-2">
                 No buyers match this
               </h2>
-              <p className="text-[14px] text-[#44474C] mb-6">
+              <p className="text-[14px] text-text-secondary mb-6">
                 Try a different search or clear your filters.
               </p>
               <button
-                onClick={() => {
-                  setFilters({});
-                  setSearch("");
-                }}
-                className="h-10 px-5 border border-[#E0E1DD] rounded-lg text-[14px] font-medium text-[#1B1B1D] hover:bg-[#F0EDEE]"
+                onClick={() => { setFilters({}); setSearch(""); }}
+                className="h-10 px-5 border border-border rounded-xl text-[14px] font-medium text-text-primary hover:bg-surface-container"
               >
                 Clear all filters
               </button>
@@ -466,7 +445,7 @@ export function BuyerDirectory({
           <div ref={sentinelRef} className="h-1" />
           {isLoadingMore && (
             <div className="flex justify-center py-6">
-              <div className="w-6 h-6 border-2 border-[#2EC4B6] border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-teal-action border-t-transparent rounded-full animate-spin" />
             </div>
           )}
         </main>
@@ -484,7 +463,7 @@ export function BuyerDirectory({
       {/* Mobile FAB */}
       <Link
         href="/add"
-        className="lg:hidden fixed bottom-20 right-4 w-14 h-14 bg-[#2EC4B6] rounded-full flex items-center justify-center shadow-lg z-20 hover:bg-[#27b0a4] text-white"
+        className="lg:hidden fixed bottom-20 right-4 w-14 h-14 bg-teal-action rounded-full flex items-center justify-center shadow-lg z-20 hover:opacity-90 text-white"
         aria-label="Add buyer"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
