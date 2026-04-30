@@ -1,6 +1,8 @@
 import { MetadataRoute } from "next";
 
-const BASE = "https://buyerpocket.com.au";
+import { getPublicAppUrl } from "@/lib/app-url";
+
+const BASE = getPublicAppUrl();
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

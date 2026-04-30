@@ -2,7 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe";
+import { getStripeOrNull } from "@/lib/stripe";
+import { isBillingSkipped } from "@/lib/billing-flags";
+import { getPublicAppUrl } from "@/lib/app-url";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -89,6 +91,15 @@ export async function getStripePortalUrl(): Promise<{
   url?: string;
   error?: string;
 }> {
+  if (isBillingSkipped()) {
+    return { error: "Billing is disabled while SKIP_BILLING is set." };
+  }
+
+  const stripe = getStripeOrNull();
+  if (!stripe) {
+    return { error: "Stripe is not configured (missing STRIPE_SECRET_KEY)." };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -99,11 +110,11 @@ export async function getStripePortalUrl(): Promise<{
     .from("subscriptions")
     .select("stripe_customer_id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!sub?.stripe_customer_id) return { error: "No billing account found" };
 
-  const origin = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.buyerpocket.com.au";
+  const origin = getPublicAppUrl();
 
   try {
     const session = await stripe.billingPortal.sessions.create({

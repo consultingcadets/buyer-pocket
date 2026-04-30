@@ -6,6 +6,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatPhone } from "@/lib/format";
 import {
+  AU_TIMEZONE_OPTIONS,
+  DEFAULT_TIMEZONE_BY_STATE,
+} from "@/lib/australia-profile";
+import {
   updateProfile,
   updateNotificationPrefs,
   deactivatePushToken,
@@ -33,6 +37,8 @@ interface Props {
   };
   subscription: Subscription | null;
   accessLevel: AccessLevel;
+  /** True when env SKIP_BILLING=1 — Stripe not used */
+  billingSkipped: boolean;
 }
 
 // ── Shared input style ────────────────────────────────────────────────────────
@@ -120,16 +126,6 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
   const [error, setError] = useState("");
 
   const AU_STATES = ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"];
-  const TIMEZONES = [
-    { label: "Sydney / Melbourne (AEST/AEDT)", value: "Australia/Sydney" },
-    { label: "Brisbane (AEST)", value: "Australia/Brisbane" },
-    { label: "Adelaide (ACST/ACDT)", value: "Australia/Adelaide" },
-    { label: "Perth (AWST)", value: "Australia/Perth" },
-    { label: "Darwin (ACST)", value: "Australia/Darwin" },
-    { label: "Hobart (AEST/AEDT)", value: "Australia/Hobart" },
-    { label: "Canberra (AEST/AEDT)", value: "Australia/Canberra" },
-    { label: "Lord Howe Island", value: "Australia/Lord_Howe" },
-  ];
 
   function handleSave() {
     setError("");
@@ -178,7 +174,16 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
         </div>
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1.5">State</label>
-          <select value={state} onChange={(e) => setState(e.target.value)} className={selectCls}>
+          <select
+            value={state}
+            onChange={(e) => {
+              const v = e.target.value;
+              setState(v);
+              const tz = DEFAULT_TIMEZONE_BY_STATE[v];
+              if (tz) setTimezone(tz);
+            }}
+            className={selectCls}
+          >
             <option value="">Select state…</option>
             {AU_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -187,7 +192,11 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
           <label className="block text-sm font-medium text-text-secondary mb-1.5">Timezone</label>
           <select value={timezone} onChange={(e) => setTimezone(e.target.value)} className={selectCls}>
             <option value="">Select timezone…</option>
-            {TIMEZONES.map((tz) => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
+            {AU_TIMEZONE_OPTIONS.map((tz) => (
+              <option key={tz.value} value={tz.value}>
+                {tz.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -527,9 +536,11 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
 function BillingSection({
   subscription,
   accessLevel,
+  billingSkipped,
 }: {
   subscription: Subscription | null;
   accessLevel: AccessLevel;
+  billingSkipped: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -582,7 +593,22 @@ function BillingSection({
       })
     : null;
 
-  const needsPayment = accessLevel !== "full" || status === "past_due" || status === "unpaid";
+  const needsPayment =
+    !billingSkipped &&
+    (accessLevel !== "full" || status === "past_due" || status === "unpaid");
+
+  if (billingSkipped) {
+    return (
+      <Section id="billing" title="Billing">
+        <p className="text-sm text-text-secondary leading-relaxed">
+          Payment collection is turned off for testing (
+          <span className="font-mono text-xs">SKIP_BILLING=1</span>). All app
+          features stay available. Configure Stripe and unset this when you are
+          ready to go live.
+        </p>
+      </Section>
+    );
+  }
 
   return (
     <Section id="billing" title="Billing">
@@ -734,7 +760,15 @@ function MobileLanding({ onSelect, onSignOut }: { onSelect: (id: string) => void
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
-export function SettingsClient({ profile, email, pushTokens, notifPrefs, subscription, accessLevel }: Props) {
+export function SettingsClient({
+  profile,
+  email,
+  pushTokens,
+  notifPrefs,
+  subscription,
+  accessLevel,
+  billingSkipped,
+}: Props) {
   const [isPending, startTransition] = useTransition();
   const [mobileView, setMobileView] = useState<"landing" | string>("landing");
 
@@ -757,7 +791,11 @@ export function SettingsClient({ profile, email, pushTokens, notifPrefs, subscri
       <NotificationsSection initialPrefs={notifPrefs} />
       <DevicesSection tokens={pushTokens} />
       <DataSection />
-      <BillingSection subscription={subscription} accessLevel={accessLevel} />
+      <BillingSection
+        subscription={subscription}
+        accessLevel={accessLevel}
+        billingSkipped={billingSkipped}
+      />
       <HelpSection />
 
       {/* Sign out */}
@@ -841,7 +879,13 @@ export function SettingsClient({ profile, email, pushTokens, notifPrefs, subscri
               {mobileView === "notifications" && <NotificationsSection initialPrefs={notifPrefs} />}
               {mobileView === "devices" && <DevicesSection tokens={pushTokens} />}
               {mobileView === "data" && <DataSection />}
-              {mobileView === "billing" && <BillingSection subscription={subscription} accessLevel={accessLevel} />}
+              {mobileView === "billing" && (
+                <BillingSection
+                  subscription={subscription}
+                  accessLevel={accessLevel}
+                  billingSkipped={billingSkipped}
+                />
+              )}
               {mobileView === "help" && <HelpSection />}
             </>
           )}

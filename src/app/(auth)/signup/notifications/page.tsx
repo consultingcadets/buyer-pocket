@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
@@ -7,8 +8,31 @@ import { savePushToken } from "@/app/(app)/reminders/actions";
 
 const DOTS = [false, false, false, true];
 
+function useNotifyDeviceHints() {
+  const [hints, setHints] = useState<{
+    isMobile: boolean;
+    /** iPad / iPhone — Add to Home Screen helps web push on Safari */
+    isIos: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobi/i.test(
+        ua
+      );
+    const isIosDevice =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    setHints({ isMobile, isIos: isIosDevice });
+  }, []);
+
+  return hints;
+}
+
 export default function NotificationsPage() {
   const router = useRouter();
+  const notifyDevice = useNotifyDeviceHints();
 
   async function handleEnableNotifications() {
     const permission = await requestPushPermission();
@@ -20,8 +44,10 @@ export default function NotificationsPage() {
           : navigator.userAgent.includes("Firefox")
           ? "firefox"
           : "chrome";
-        const device = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
-        await savePushToken(token, device, browser);
+        const deviceKind = /Mobi|Android/i.test(navigator.userAgent)
+          ? "mobile"
+          : "desktop";
+        await savePushToken(token, deviceKind, browser);
       }
     }
     router.push("/today");
@@ -61,14 +87,34 @@ export default function NotificationsPage() {
             ))}
           </div>
 
-          {/* Header */}
+          {/* Header — desktop users get browser notifications; mobile keeps “phone” wording */}
           <div className="flex flex-col items-center text-center gap-1">
             <h2 className="text-[32px] font-bold tracking-tight text-brand-navy">
-              Turn on phone reminders.
+              {!notifyDevice ? (
+                "Turn on reminders"
+              ) : notifyDevice.isMobile ? (
+                "Turn on phone reminders"
+              ) : (
+                "Turn on browser reminders"
+              )}
             </h2>
             <p className="text-[16px] text-on-surface-variant">
-              Stay ahead of the market. Get instant alerts for hot new listings
-              and messages from potential buyers.
+              {!notifyDevice ? (
+                "Allow notifications when prompted, or skip — you can enable them later in Settings."
+              ) : notifyDevice.isMobile ? (
+                <>
+                  Allow notifications on{" "}
+                  <span className="text-on-surface">this phone or tablet</span>{" "}
+                  so BuyerPocket can alert you when a buyer follow-up is due.
+                </>
+              ) : (
+                <>
+                  Allow notifications in{" "}
+                  <span className="text-on-surface">this browser</span> (Chrome,
+                  Edge, or Firefox). You&apos;ll get reminder alerts on this
+                  computer while you&apos;re signed in.
+                </>
+              )}
             </p>
           </div>
 
@@ -93,11 +139,10 @@ export default function NotificationsPage() {
                   <span className="text-[12px] text-outline">Now</span>
                 </div>
                 <p className="text-[14px] font-semibold text-brand-navy leading-tight mb-1">
-                  New Message from Sarah Jenkins
+                  Follow up: Sarah Jenkins
                 </p>
                 <p className="text-[13px] text-on-surface-variant leading-snug line-clamp-2">
-                  &ldquo;Hi, I&apos;m very interested in the property at 24 Oak
-                  Street. Is it available for viewing this Saturday?&rdquo;
+                  Reminder — call before Saturday open · Wollert
                 </p>
               </div>
             </div>
@@ -109,7 +154,7 @@ export default function NotificationsPage() {
               onClick={handleEnableNotifications}
               className="w-full bg-teal-action text-on-teal-action rounded min-h-[48px] px-6 text-[16px] font-semibold flex items-center justify-center hover:opacity-90 transition-colors"
             >
-              Enable notifications
+              {!notifyDevice?.isMobile ? "Allow notifications" : "Enable notifications"}
             </button>
             <button
               onClick={() => router.push("/today")}
@@ -119,32 +164,39 @@ export default function NotificationsPage() {
             </button>
           </div>
 
-          {/* iOS helper card */}
-          <div className="bg-surface-container border border-surface-variant rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <PhoneIcon />
-              <h3 className="text-[14px] font-semibold tracking-wider text-brand-navy uppercase">
-                Add to Home Screen (iOS)
-              </h3>
+          {/* iOS Safari: web push / installability — not needed on desktop */}
+          {notifyDevice?.isIos ? (
+            <div className="bg-surface-container border border-surface-variant rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <PhoneIcon />
+                <h3 className="text-[14px] font-semibold tracking-wider text-brand-navy uppercase">
+                  Add to Home Screen (iOS)
+                </h3>
+              </div>
+              <p className="text-[13px] text-on-surface-variant mb-3">
+                On iPhone, adding BuyerPocket to your Home Screen helps reminders
+                arrive reliably. You can do this now or later — we&apos;ll also
+                remind you from Settings.
+              </p>
+              <ol className="flex flex-col gap-2 text-[14px] text-on-surface-variant pl-5 list-decimal marker:text-outline marker:font-semibold">
+                <li className="pl-1">
+                  Tap the{" "}
+                  <span className="inline-flex items-center justify-center bg-surface-container-highest rounded px-1 py-0.5 mx-0.5">
+                    <ShareIcon />
+                  </span>{" "}
+                  Share icon at the bottom of your browser.
+                </li>
+                <li className="pl-1">Scroll down the menu options.</li>
+                <li className="pl-1">
+                  Tap <strong>&ldquo;Add to Home Screen&rdquo;</strong>.
+                </li>
+                <li className="pl-1">Confirm the app name and icon.</li>
+                <li className="pl-1">
+                  Tap <strong>&ldquo;Add&rdquo;</strong> in the top right corner.
+                </li>
+              </ol>
             </div>
-            <ol className="flex flex-col gap-2 text-[14px] text-on-surface-variant pl-5 list-decimal marker:text-outline marker:font-semibold">
-              <li className="pl-1">
-                Tap the{" "}
-                <span className="inline-flex items-center justify-center bg-surface-container-highest rounded px-1 py-0.5 mx-0.5">
-                  <ShareIcon />
-                </span>{" "}
-                Share icon at the bottom of your browser.
-              </li>
-              <li className="pl-1">Scroll down the menu options.</li>
-              <li className="pl-1">
-                Tap <strong>&ldquo;Add to Home Screen&rdquo;</strong>.
-              </li>
-              <li className="pl-1">Confirm the app name and icon.</li>
-              <li className="pl-1">
-                Tap <strong>&ldquo;Add&rdquo;</strong> in the top right corner.
-              </li>
-            </ol>
-          </div>
+          ) : null}
         </div>
       </div>
 

@@ -1,7 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { startTrialIfNeeded } from "@/lib/subscription";
+import {
+  getAccessLevel,
+  getBannerType,
+  startTrialIfNeeded,
+} from "@/lib/subscription";
 import { BillingGuard } from "@/components/billing/BillingGuard";
+import { isBillingSkipped } from "@/lib/billing-flags";
 import type { Subscription } from "@/types/database";
 
 export default async function AppLayout({
@@ -20,13 +25,25 @@ export default async function AppLayout({
     .from("subscriptions")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   let subscription = rawSub as Subscription | null;
 
-  if (!subscription) {
-    subscription = await startTrialIfNeeded(user.id, user.email ?? "");
+  if (!subscription && !isBillingSkipped()) {
+    try {
+      subscription = await startTrialIfNeeded(user.id, user.email ?? "");
+    } catch (e) {
+      console.error("[app layout] startTrialIfNeeded failed:", e);
+      subscription = null;
+    }
   }
 
-  return <BillingGuard subscription={subscription}>{children}</BillingGuard>;
+  const accessLevel = getAccessLevel(subscription);
+  const bannerType = getBannerType(subscription);
+
+  return (
+    <BillingGuard accessLevel={accessLevel} bannerType={bannerType}>
+      {children}
+    </BillingGuard>
+  );
 }

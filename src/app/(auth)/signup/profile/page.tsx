@@ -1,7 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import {
+  AU_TIMEZONE_OPTIONS,
+  DEFAULT_TIMEZONE_BY_STATE,
+} from "@/lib/australia-profile";
 import { saveProfile, type ProfileState } from "./actions";
 
 const DOTS = [false, false, true, false];
@@ -17,23 +22,24 @@ const STATES = [
   { value: "NT", label: "Northern Territory (NT)" },
 ];
 
-const TIMEZONES = [
-  { value: "Australia/Sydney", label: "Australian Eastern Standard Time (AEST)" },
-  { value: "Australia/Sydney_DST", label: "Australian Eastern Daylight Time (AEDT)" },
-  { value: "Australia/Darwin", label: "Australian Central Standard Time (ACST)" },
-  { value: "Australia/Adelaide", label: "Australian Central Daylight Time (ACDT)" },
-  { value: "Australia/Perth", label: "Australian Western Standard Time (AWST)" },
-];
-
 const selectClass =
   "w-full h-12 px-4 appearance-none bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-teal-action focus:ring-1 focus:ring-teal-action transition-colors text-[16px] text-on-surface";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [stateVal, setStateVal] = useState("");
+  const [timezoneVal, setTimezoneVal] = useState("");
   const [state, formAction, pending] = useActionState<ProfileState, FormData>(
     saveProfile,
     null
   );
+
+  function handleStateChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const v = e.target.value;
+    setStateVal(v);
+    const tz = DEFAULT_TIMEZONE_BY_STATE[v];
+    if (tz) setTimezoneVal(tz);
+  }
 
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8 antialiased">
@@ -107,7 +113,13 @@ export default function ProfilePage() {
               State
             </label>
             <div className="relative">
-              <select id="state" name="state" defaultValue="" className={selectClass}>
+              <select
+                id="state"
+                name="state"
+                value={stateVal}
+                onChange={handleStateChange}
+                className={selectClass}
+              >
                 <option value="" disabled>
                   Select a State
                 </option>
@@ -131,17 +143,21 @@ export default function ProfilePage() {
             >
               Timezone
             </label>
+            <p className="text-[13px] text-on-surface-variant -mt-1 mb-1">
+              Suggested automatically from your state — change if you prefer.
+            </p>
             <div className="relative">
               <select
                 id="timezone"
                 name="timezone"
-                defaultValue=""
+                value={timezoneVal}
+                onChange={(e) => setTimezoneVal(e.target.value)}
                 className={selectClass}
               >
                 <option value="" disabled>
                   Select a Timezone
                 </option>
-                {TIMEZONES.map((tz) => (
+                {AU_TIMEZONE_OPTIONS.map((tz) => (
                   <option key={tz.value} value={tz.value}>
                     {tz.label}
                   </option>

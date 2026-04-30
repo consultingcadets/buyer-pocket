@@ -1,22 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripeOrNull } from "@/lib/stripe";
 import { upsertSubscription } from "@/lib/subscription";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const stripe = getStripeOrNull();
+  if (!stripe) {
+    return NextResponse.json({ error: "Stripe is not configured" }, { status: 503 });
+  }
+
   const body = await request.text();
   const sig = request.headers.get("stripe-signature");
 
   if (!sig) return NextResponse.json({ error: "No signature" }, { status: 400 });
 
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+  if (!webhookSecret) {
+    return NextResponse.json({ error: "Stripe webhook secret not configured" }, { status: 503 });
+  }
+
   let event: import("stripe").Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Invalid signature";
     return NextResponse.json({ error: message }, { status: 400 });

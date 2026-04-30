@@ -1,37 +1,37 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { getAccessLevel, getBannerType } from "@/lib/subscription";
 import { SubscriptionBanner } from "./SubscriptionBanner";
 import { TrialEndedModal } from "./TrialEndedModal";
 import { CancelledModal } from "./CancelledModal";
-import type { Subscription } from "@/types/database";
-import type { BannerType } from "@/lib/subscription";
+import type { BannerType, AccessLevel } from "@/lib/subscription";
 import { useState } from "react";
 
 interface Props {
-  subscription: Subscription | null;
+  accessLevel: AccessLevel;
+  bannerType: BannerType;
   children: React.ReactNode;
 }
 
 async function startCheckout(router: ReturnType<typeof useRouter>) {
   const res = await fetch("/api/billing/checkout", { method: "POST" });
-  const { url } = await res.json();
-  if (url) router.push(url);
+  const data = await res.json();
+  if (data.url) router.push(data.url);
 }
 
 async function startPortal(router: ReturnType<typeof useRouter>) {
   const res = await fetch("/api/billing/portal", { method: "POST" });
-  const { url } = await res.json();
-  if (url) router.push(url);
+  const data = await res.json();
+  if (data.url) router.push(data.url);
 }
 
-export function BillingGuard({ subscription, children }: Props) {
+export function BillingGuard({
+  accessLevel,
+  bannerType,
+  children,
+}: Props) {
   const router = useRouter();
   const [readOnlyDismissed, setReadOnlyDismissed] = useState(false);
-
-  const accessLevel = getAccessLevel(subscription);
-  const bannerType = getBannerType(subscription);
 
   const handleAddPayment = () => startCheckout(router);
   const handleExport = () => router.push("/buyers?export=true");

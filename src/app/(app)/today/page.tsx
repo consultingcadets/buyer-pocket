@@ -4,10 +4,23 @@ import { TodayDashboard } from "./TodayDashboard";
 import type { ReminderWithBuyer } from "@/types/reminders";
 import type { Buyer } from "@/types/database";
 
+/** PostgREST can return null nested buyer if the row is orphaned — skip to avoid SSR crash */
+function remindersWithBuyer(rows: unknown[] | null | undefined): ReminderWithBuyer[] {
+  if (!rows?.length) return [];
+  return rows.filter((r): r is ReminderWithBuyer => {
+    const buyer = (r as { buyer?: unknown }).buyer;
+    return buyer != null && typeof buyer === "object";
+  }) as ReminderWithBuyer[];
+}
+
 export const metadata = { title: "Today — BuyerPocket" };
 
 const BUYER_FIELDS =
   "id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs";
+/** Hot / recent rows — explicit columns only (avoids tsvector + generated columns that break RSC payloads) */
+const TODAY_BUYER_LIST =
+  "id, user_id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs, archived_at, created_at, updated_at";
+
 const REMINDER_FIELDS = `id, user_id, buyer_id, reminder_type, reminder_note, reminder_at, timezone, priority, status, sent_at, completed_at, snoozed_until, created_at, updated_at, buyer:buyers!buyer_id(${BUYER_FIELDS})`;
 
 export default async function TodayPage() {
@@ -62,7 +75,7 @@ export default async function TodayPage() {
       .limit(10),
     supabase
       .from("buyers")
-      .select("*")
+      .select(TODAY_BUYER_LIST)
       .eq("user_id", user.id)
       .is("archived_at", null)
       .eq("buyer_temperature", "hot")
@@ -70,7 +83,7 @@ export default async function TodayPage() {
       .limit(10),
     supabase
       .from("buyers")
-      .select("*")
+      .select(TODAY_BUYER_LIST)
       .eq("user_id", user.id)
       .is("archived_at", null)
       .order("created_at", { ascending: false })
@@ -99,8 +112,8 @@ export default async function TodayPage() {
   return (
     <TodayDashboard
       profileName={profile.name}
-      todayReminders={(todayRes.data ?? []) as unknown as ReminderWithBuyer[]}
-      overdueReminders={(overdueRes.data ?? []) as unknown as ReminderWithBuyer[]}
+      todayReminders={remindersWithBuyer(todayRes.data)}
+      overdueReminders={remindersWithBuyer(overdueRes.data)}
       hotBuyers={(hotRes.data ?? []) as Buyer[]}
       recentlyAdded={(recentRes.data ?? []) as Buyer[]}
       todayCount={todayCountRes.count ?? 0}

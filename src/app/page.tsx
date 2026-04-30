@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-
+import { getPublicAppUrl } from "@/lib/app-url";
 import { Check, ClipboardList, Timer, Home, X } from "lucide-react";
 import MarketingNav from "@/components/marketing/marketing-nav";
 import MarketingFooter from "@/components/marketing/marketing-footer";
@@ -19,6 +19,8 @@ import {
   ReminderNotificationCard,
 } from "@/components/marketing/landing-preview-cards";
 
+const appUrl = getPublicAppUrl();
+
 export const metadata: Metadata = {
   title: "BuyerPocket — Capture buyers fast. Follow up on time.",
   description:
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
     description:
       "A simple buyer list and reminder tool for Australian agents: save buyers quickly, filter when listings land, stay on follow-ups.",
     type: "website",
-    url: "https://buyerpocket.com.au",
+    url: appUrl,
   },
 };
 
@@ -45,7 +47,7 @@ const jsonLd = {
   operatingSystem: "Web, iOS, Android",
   description:
     "A simple buyer list and reminder tool for Australian real estate agents who keep their own buyer relationships organised.",
-  url: "https://buyerpocket.com.au",
+  url: appUrl,
   offers: {
     "@type": "Offer",
     price: "19",

@@ -7,7 +7,9 @@ import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { ReminderWithBuyer } from "@/types/reminders";
 
 function initials(name: string): string {
-  return name
+  const trimmed = name.trim();
+  if (!trimmed) return "?";
+  return trimmed
     .split(/\s+/)
     .map((w) => w[0])
     .slice(0, 2)

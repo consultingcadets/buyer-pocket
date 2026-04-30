@@ -1,4 +1,5 @@
 import { DEFAULT_RESEND_FROM_EMAIL } from "@/lib/company";
+import { getPublicAppUrl } from "@/lib/app-url";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendPushNotification, isInvalidTokenError } from "@/lib/fcm/server";
 import { Resend } from "resend";
@@ -7,6 +8,10 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+function reminderEmailBuyerLink(buyerId: string) {
+  return `${getPublicAppUrl()}/buyers/${buyerId}`;
+}
 
 export async function POST(request: Request) {
   // Auth: Supabase pg_cron sends Authorization: Bearer <secret>
@@ -145,7 +150,7 @@ export async function POST(request: Request) {
               <p>Hi there,</p>
               <p>You have a reminder for <strong>${buyer.name}</strong>.</p>
               <p>${body}</p>
-              <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/buyers/${buyer.id}">Open buyer profile →</a></p>
+              <p><a href="${reminderEmailBuyerLink(buyer.id)}">Open buyer profile →</a></p>
             `,
           });
         }

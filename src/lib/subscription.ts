@@ -1,11 +1,14 @@
-import { stripe } from "./stripe";
+import { getStripeOrNull } from "./stripe";
 import { supabaseAdmin } from "./supabase/admin";
+import { isBillingSkipped } from "./billing-flags";
 import type { Subscription } from "@/types/database";
 
 export type AccessLevel = "full" | "read_only" | "export_only" | "expired";
 export type BannerType = "none" | "trial_warning" | "trial_urgent" | "past_due" | "trial_ended";
 
 export function getAccessLevel(sub: Subscription | null): AccessLevel {
+  if (isBillingSkipped()) return "full";
+
   if (!sub || !sub.status) return "expired";
 
   if (sub.status === "trialing" || sub.status === "active") return "full";
@@ -28,6 +31,8 @@ export function getAccessLevel(sub: Subscription | null): AccessLevel {
 }
 
 export function getBannerType(sub: Subscription | null): BannerType {
+  if (isBillingSkipped()) return "none";
+
   if (!sub || !sub.status) return "trial_ended";
 
   if (sub.status === "trialing" && sub.trial_end) {
@@ -93,11 +98,19 @@ export async function startTrialIfNeeded(
   userId: string,
   userEmail: string
 ): Promise<Subscription | null> {
+  if (isBillingSkipped()) return null;
+
+  const stripe = getStripeOrNull();
+  if (!stripe) {
+    console.warn("[subscription] STRIPE_SECRET_KEY missing; set SKIP_BILLING=1 to test without Stripe.");
+    return null;
+  }
+
   const { data: existing } = await supabaseAdmin
     .from("subscriptions")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (existing) return existing as Subscription;
 

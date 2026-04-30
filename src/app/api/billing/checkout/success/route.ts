@@ -1,8 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripeOrNull } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(request: NextRequest) {
+  const stripe = getStripeOrNull();
+  if (!stripe) {
+    return NextResponse.redirect(new URL("/settings?billing=unavailable", request.url));
+  }
+
   const sessionId = request.nextUrl.searchParams.get("session_id");
   if (!sessionId) return NextResponse.redirect(new URL("/settings", request.url));
 

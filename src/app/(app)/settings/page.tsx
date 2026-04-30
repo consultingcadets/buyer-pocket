@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getAccessLevel } from "@/lib/subscription";
+import { isBillingSkipped } from "@/lib/billing-flags";
 import { SettingsClient } from "./SettingsClient";
-import type { Subscription } from "@/types/database";
 
 export const metadata = { title: "Settings — BuyerPocket" };
 
@@ -20,7 +20,7 @@ export default async function SettingsPage() {
       .select("*")
       .eq("user_id", user.id)
       .order("last_used_at", { ascending: false }),
-    supabase.from("subscriptions").select("*").eq("user_id", user.id).single(),
+    supabase.from("subscriptions").select("*").eq("user_id", user.id).maybeSingle(),
   ]);
 
   if (!profileRes.data) redirect("/signup/profile");
@@ -33,7 +33,8 @@ export default async function SettingsPage() {
     weekly_summary: meta.notif_weekly_summary ?? false,
   };
 
-  const subscription = subRes.data as Subscription | null;
+  const subscription = subRes.data;
+  const billingSkipped = isBillingSkipped();
   const accessLevel = getAccessLevel(subscription);
 
   return (
@@ -44,6 +45,7 @@ export default async function SettingsPage() {
       notifPrefs={notifPrefs}
       subscription={subscription}
       accessLevel={accessLevel}
+      billingSkipped={billingSkipped}
     />
   );
 }

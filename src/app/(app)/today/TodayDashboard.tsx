@@ -32,7 +32,8 @@ function MetricCard({
 }
 
 function BuyerPill({ buyer }: { buyer: Buyer }) {
-  const initials = buyer.name
+  const displayName = (buyer.name ?? "").trim() || "Buyer";
+  const initials = displayName
     .split(/\s+/)
     .map((w) => w[0])
     .slice(0, 2)
@@ -58,25 +59,29 @@ function BuyerPill({ buyer }: { buyer: Buyer }) {
           <span className={cn("text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-full", tempColor)}>{temp}</span>
         )}
       </div>
-      <span className="text-[13px] font-semibold text-text-primary leading-tight line-clamp-1">{buyer.name}</span>
+      <span className="text-[13px] font-semibold text-text-primary leading-tight line-clamp-1">{displayName}</span>
       {budgetLabel && <span className="text-[11px] text-text-secondary">{budgetLabel}</span>}
     </Link>
   );
 }
 
 function RecentBuyerAvatar({ buyer }: { buyer: Buyer }) {
-  const initials = buyer.name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const raw = (buyer.name ?? "").trim();
+  const firstWord = raw.split(/\s+/)[0] || "—";
+  const initials = raw
+    ? raw
+        .split(/\s+/)
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "?";
   return (
     <Link href={`/buyers/${buyer.id}`} className="shrink-0 flex flex-col items-center gap-1 w-14">
       <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center">
         <span className="text-text-secondary text-[13px] font-bold">{initials}</span>
       </div>
-      <span className="text-[10px] text-text-secondary text-center leading-tight line-clamp-1">{buyer.name.split(" ")[0]}</span>
+      <span className="text-[10px] text-text-secondary text-center leading-tight line-clamp-1">{firstWord}</span>
     </Link>
   );
 }

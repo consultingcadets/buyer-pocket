@@ -14,7 +14,7 @@ export function HeroBackdrop() {
         <circle cx="200" cy="200" r="140" stroke="currentColor" strokeWidth="1" opacity="0.6" />
         <path d="M40 340 Q200 260 360 340" stroke="currentColor" strokeWidth="1" opacity="0.4" fill="none" />
       </svg>
-      <div className="absolute bottom-10 left-[5%] h-28 w-28 rounded-[2rem] border border-primary/[0.08] bg-white/40 backdrop-blur-sm motion-safe:animate-float-slow-reverse" />
+      {/* <div className="absolute bottom-10 left-[5%] h-28 w-28 rounded-[2rem] border border-primary/[0.08] bg-white/40 backdrop-blur-sm motion-safe:animate-float-slow-reverse" /> */}
     </div>
   );
 }
