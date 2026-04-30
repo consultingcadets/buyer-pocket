@@ -4,6 +4,8 @@ import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
+import { savePushToken } from "@/app/(app)/reminders/actions";
 import { formatPhone } from "@/lib/format";
 import {
   AU_TIMEZONE_OPTIONS,
@@ -310,6 +312,16 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [deactivating, setDeactivating] = useState<string | null>(null);
+  const [registerState, setRegisterState] = useState<"idle" | "loading" | "done" | "denied" | "unsupported">("idle");
+
+  // Detect current device permission state on mount
+  useEffect(() => {
+    if (typeof Notification === "undefined") {
+      setRegisterState("unsupported");
+    } else if (Notification.permission === "denied") {
+      setRegisterState("denied");
+    }
+  }, []);
 
   function handleDeactivate(id: string) {
     setDeactivating(id);
@@ -318,6 +330,25 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
       setDeactivating(null);
       router.refresh();
     });
+  }
+
+  async function handleRegisterDevice() {
+    setRegisterState("loading");
+    const permission = await requestPushPermission();
+    if (permission !== "granted") {
+      setRegisterState("denied");
+      return;
+    }
+    const token = await getFCMToken();
+    if (token) {
+      const ua = navigator.userAgent;
+      const browser = ua.includes("Safari") && !ua.includes("Chrome") ? "safari"
+        : ua.includes("Firefox") ? "firefox" : "chrome";
+      const deviceKind = /Mobi|Android/i.test(ua) ? "mobile" : "desktop";
+      await savePushToken(token, deviceKind, browser);
+      router.refresh();
+    }
+    setRegisterState("done");
   }
 
   function fmtDate(iso: string | null) {
@@ -332,8 +363,31 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
       <p className="text-sm text-text-secondary">
         Devices registered to receive push notifications.
       </p>
+
+      {/* Register this device */}
+      {registerState === "denied" && (
+        <p className="text-sm text-warning-text bg-warning-bg rounded-lg px-3 py-2">
+          Notifications are blocked in your browser settings. To enable, click the lock icon in the address bar and allow notifications for this site.
+        </p>
+      )}
+      {registerState === "unsupported" && (
+        <p className="text-sm text-text-secondary italic">
+          Push notifications are not supported on this browser. Use Chrome, Edge, or Firefox, or install BuyerPocket to your home screen.
+        </p>
+      )}
+      {(registerState === "idle" || registerState === "loading" || registerState === "done") && (
+        <button
+          type="button"
+          disabled={registerState === "loading" || registerState === "done"}
+          onClick={handleRegisterDevice}
+          className="w-full min-h-[44px] rounded-lg border border-teal-action text-teal-action text-sm font-semibold hover:bg-teal-action/5 transition-colors disabled:opacity-60"
+        >
+          {registerState === "loading" ? "Enabling…" : registerState === "done" ? "Notifications enabled on this device ✓" : "Enable notifications on this device"}
+        </button>
+      )}
+
       {active.length === 0 ? (
-        <p className="text-sm text-text-secondary italic">No devices registered.</p>
+        <p className="text-sm text-text-secondary italic">No devices registered yet.</p>
       ) : (
         <div className="space-y-2">
           {active.map((token) => (
@@ -354,7 +408,7 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
                 type="button"
                 disabled={isPending && deactivating === token.id}
                 onClick={() => handleDeactivate(token.id)}
-                className="text-xs font-medium text-error disabled:opacity-60 flex-shrink-0"
+                className="text-xs font-medium text-error disabled:opacity-60 shrink-0"
               >
                 {deactivating === token.id ? "Removing…" : "Remove"}
               </button>
