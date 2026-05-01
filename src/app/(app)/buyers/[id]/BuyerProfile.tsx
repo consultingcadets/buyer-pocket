@@ -726,8 +726,10 @@ function NotesActivity({
 // ─── Contact Card ─────────────────────────────────────────────────────────────
 
 function ContactCard({ buyer }: { buyer: Buyer }) {
-  const hasPhone = Boolean(buyer.phone);
-  const hasEmail = Boolean(buyer.email);
+  const phone = buyer.phone ?? "";
+  const email = buyer.email ?? "";
+  const hasPhone = phone.length > 0;
+  const hasEmail = email.length > 0;
   const hasPreferredOrBest = Boolean(buyer.preferred_contact_method || buyer.best_time_to_contact);
 
   return (
@@ -736,19 +738,19 @@ function ContactCard({ buyer }: { buyer: Buyer }) {
         {hasPhone ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Phone</p>
-            <a href={`tel:${buyer.phone.replace(/\s/g, "")}`} className="text-sm text-accent font-medium">
-              {buyer.phone}
+            <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-sm text-accent font-medium">
+              {phone}
             </a>
           </div>
-        )}
+        ) : null}
         {hasEmail ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Email</p>
-            <a href={`mailto:${buyer.email}`} className="text-sm text-accent font-medium break-all">
-              {buyer.email}
+            <a href={`mailto:${email}`} className="text-sm text-accent font-medium break-all">
+              {email}
             </a>
           </div>
-        )}
+        ) : null}
         {!hasPhone && !hasEmail && (
           <p className="text-sm text-warning-text">No contact info — Edit buyer to add</p>
         )}
