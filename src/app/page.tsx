@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { getPublicAppUrl } from "@/lib/app-url";
 import { Check, ClipboardList, Timer, Home, X } from "lucide-react";
 import MarketingNav from "@/components/marketing/marketing-nav";
@@ -68,7 +70,11 @@ const MAX = "max-w-6xl mx-auto px-4 sm:px-6";
 const CARD_HOVER =
   "rounded-2xl border border-border/90 bg-white shadow-card transition-[box-shadow,transform] duration-300 motion-safe:hover:shadow-dropdown motion-safe:hover:-translate-y-0.5";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect("/today");
+
   return (
     <>
       <script

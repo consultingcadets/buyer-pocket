@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { BottomNav } from "@/components/BottomNav";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
 import { savePushToken } from "@/app/(app)/reminders/actions";
 import { formatPhone } from "@/lib/format";
@@ -874,6 +875,7 @@ export function SettingsClient({
           <h1 className="text-3xl font-bold text-text-primary mb-8">Settings</h1>
           {allSections}
         </div>
+        <BottomNav />
       </div>
 
       {/* ── Mobile ── */}
@@ -945,30 +947,7 @@ export function SettingsClient({
           )}
         </div>
 
-        {/* Mobile bottom nav */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-10">
-          <div className="flex">
-            {[
-              { href: "/today", label: "Today", icon: "📅" },
-              { href: "/buyers", label: "Buyers", icon: "👥" },
-              { href: "/reminders", label: "Reminders", icon: "🔔" },
-              { href: "/settings", label: "Settings", icon: "⚙️", active: true },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-xs",
-                  item.active ? "text-secondary" : "text-text-secondary"
-                )}
-              >
-                <span className="text-xl">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-        <div className="h-16" />
+        <BottomNav />
       </div>
     </div>
   );
