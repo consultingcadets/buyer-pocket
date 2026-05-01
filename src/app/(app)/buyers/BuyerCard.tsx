@@ -35,19 +35,66 @@ function formatRelativeTime(iso: string): string {
 
 function TemperatureChip({ temp }: { temp: string | null }) {
   if (!temp) return null;
-  const styles: Record<string, string> = {
-    hot: "bg-secondary text-white",
-    warm: "bg-accent text-white",
-    cold: "bg-white text-primary border border-primary",
+  const styles: Record<string, { bg: string; text: string; dot: string }> = {
+    hot:  { bg: "bg-red-50",    text: "text-red-600",    dot: "bg-red-500" },
+    warm: { bg: "bg-amber-50",  text: "text-amber-600",  dot: "bg-amber-500" },
+    cold: { bg: "bg-blue-50",   text: "text-blue-600",   dot: "bg-blue-500" },
   };
+  const s = styles[temp] ?? { bg: "bg-surface-container", text: "text-text-secondary", dot: "bg-text-secondary" };
   return (
-    <span
-      className={cn(
-        "shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase",
-        styles[temp] ?? "bg-surface-container text-text-secondary"
-      )}
-    >
+    <span className={cn("shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase", s.bg, s.text)}>
+      <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />
       {temp}
+    </span>
+  );
+}
+
+function ReminderBadge({ iso }: { iso: string | null }) {
+  if (!iso) return null;
+  const now = Date.now();
+  const at = new Date(iso).getTime();
+  const diffMs = now - at;
+
+  if (diffMs > 0) {
+    // overdue
+    const hrs = Math.floor(diffMs / 3_600_000);
+    if (hrs >= 24) {
+      return (
+        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-error/10 text-error rounded-full text-[11px] font-bold">
+          DUE NOW
+        </span>
+      );
+    }
+    return (
+      <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
+        {hrs >= 1 ? `${hrs}H AGO` : "DUE NOW"}
+      </span>
+    );
+  }
+
+  // future
+  const d = new Date(iso);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  if (d.toDateString() === today.toDateString()) {
+    return (
+      <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
+        TODAY
+      </span>
+    );
+  }
+  if (d.toDateString() === tomorrow.toDateString()) {
+    return (
+      <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
+        TMR
+      </span>
+    );
+  }
+  const day = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase().slice(0, 3);
+  return (
+    <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
+      {day}
     </span>
   );
 }
@@ -188,11 +235,7 @@ export function BuyerCard({
             <span>{buyer.land_size_min}m²</span>
           </>
         )}
-        {buyer.next_reminder_at && (
-          <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-medium">
-            {formatRelativeTime(buyer.next_reminder_at)}
-          </span>
-        )}
+        <ReminderBadge iso={buyer.next_reminder_at} />
       </div>
 
       <ThreeDotMenu
@@ -252,7 +295,7 @@ export function BuyerCard({
         </span>
         <a
           href={buyer.phone ? `tel:${buyer.phone}` : undefined}
-          className="text-[13px] font-medium text-accent flex items-center gap-1"
+          className="text-[13px] font-medium text-teal-action flex items-center gap-1"
         >
           <Phone className="w-3 h-3" />
           Log Call

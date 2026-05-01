@@ -9,6 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { User, BarChart2, Search, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
@@ -118,6 +119,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <p className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] mb-2">
       {children}
     </p>
+  );
+}
+
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-1">
+      <span className="text-teal-action">{icon}</span>
+      <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wider">{title}</p>
+    </div>
   );
 }
 
@@ -331,6 +341,7 @@ export function AddBuyerForm() {
             {/* Left column: identity + status + notes */}
             <div className="space-y-4">
               <FieldCard>
+                <SectionHeader icon={<User size={14} />} title="Identity" />
                 <FieldRow label="Buyer Name" error={errors.name}>
                   <input
                     autoFocus
@@ -388,6 +399,7 @@ export function AddBuyerForm() {
               </FieldCard>
 
               <FieldCard>
+                <SectionHeader icon={<BarChart2 size={14} />} title="Status" />
                 <SectionLabel>Buyer Status</SectionLabel>
                 <ChipFieldInline
                   label="Timeline"
@@ -410,6 +422,7 @@ export function AddBuyerForm() {
               </FieldCard>
 
               <FieldCard>
+                <SectionHeader icon={<FileText size={14} />} title="Agent Notes" />
                 <FieldRow label="Notes">
                   <textarea
                     placeholder="Any extra details about this buyer…"
@@ -425,6 +438,7 @@ export function AddBuyerForm() {
             {/* Right column: property criteria + expanded */}
             <div className="space-y-4">
               <FieldCard>
+                <SectionHeader icon={<Search size={14} />} title="Requirements" />
                 <FieldRow label="Preferred Suburbs" error={errors.suburbs}>
                   <SuburbCombobox
                     value={suburbs}

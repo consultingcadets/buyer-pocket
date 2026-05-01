@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Clock, MoreVertical } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { ReminderWithBuyer } from "@/types/reminders";
@@ -79,47 +78,50 @@ export function ReminderCard({
   isCompleting,
 }: Props) {
   const { buyer } = reminder;
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const budgetLabel = formatBudgetLabel(buyer.budget_min, buyer.budget_max);
   const suburbDisplay = buyer.preferred_suburbs?.[0]?.split(",")[0] ?? "";
 
+  const isOverdue = new Date(reminder.reminder_at).getTime() < Date.now();
+
   return (
     <div className="bg-white rounded-xl border border-border shadow-card p-4 flex gap-3">
       {/* Avatar */}
-      <div className="shrink-0 w-9 h-9 rounded-full bg-secondary/15 flex items-center justify-center mt-0.5">
-        <span className="text-secondary text-[12px] font-bold">{initials(buyer.name)}</span>
+      <div className="shrink-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center mt-0.5">
+        <span className="text-white text-[12px] font-bold">{initials(buyer.name)}</span>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Name + badge */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[14px] font-semibold text-text-primary leading-tight">
-            {buyer.name}
-          </span>
-          <TempBadge temp={buyer.buyer_temperature} />
+        {/* Name + badge + type label */}
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+            <span className="text-[14px] font-semibold text-text-primary leading-tight">
+              {buyer.name}
+            </span>
+            <TempBadge temp={buyer.buyer_temperature} />
+          </div>
+          {reminder.reminder_type && (
+            <span className="shrink-0 text-[10px] font-semibold text-text-secondary uppercase tracking-wide">
+              {reminder.reminder_type}
+            </span>
+          )}
         </div>
 
-        {/* Time + type */}
+        {/* Time */}
         <div className="flex items-center gap-1 mt-0.5">
-          <span className="text-[12px] text-text-secondary">
+          <Clock size={11} className={cn("shrink-0", isOverdue ? "text-error" : "text-text-secondary")} />
+          <span className={cn("text-[12px]", isOverdue ? "text-error font-medium" : "text-text-secondary")}>
             {showDate ? formatReminderDate(reminder.reminder_at) + " · " : ""}
             {formatReminderTime(reminder.reminder_at)}
           </span>
-          {reminder.reminder_type && (
-            <>
-              <span className="text-outline-variant">·</span>
-              <span className="text-[12px] text-text-secondary">{reminder.reminder_type}</span>
-            </>
-          )}
         </div>
 
         {/* Note */}
         {reminder.reminder_note && (
-          <p className="text-[12px] text-text-secondary mt-1 line-clamp-2">
-            {reminder.reminder_note}
-          </p>
+          <blockquote className="mt-2 border-l-2 border-border pl-3 text-[12px] text-text-secondary italic line-clamp-2">
+            &ldquo;{reminder.reminder_note}&rdquo;
+          </blockquote>
         )}
 
         {/* Buyer tags */}
@@ -143,7 +145,7 @@ export function ReminderCard({
           {buyer.phone && (
             <a
               href={`tel:${buyer.phone}`}
-              className="flex items-center text-[12px] font-semibold text-white bg-secondary rounded-full px-3 py-1.5 leading-none hover:bg-secondary/90 transition-colors"
+              className="flex items-center text-[12px] font-semibold text-white bg-teal-action rounded-full px-3 py-1.5 leading-none hover:bg-teal-action/90 transition-colors"
             >
               Call
             </a>
@@ -151,7 +153,7 @@ export function ReminderCard({
           {buyer.phone && (
             <a
               href={`sms:${buyer.phone}`}
-              className="flex items-center text-[12px] font-semibold text-secondary border border-secondary/40 rounded-full px-3 py-1.5 leading-none hover:bg-secondary/5 transition-colors"
+              className="flex items-center text-[12px] font-semibold text-teal-action border border-teal-action/40 rounded-full px-3 py-1.5 leading-none hover:bg-teal-action/5 transition-colors"
             >
               SMS
             </a>
@@ -175,40 +177,6 @@ export function ReminderCard({
           >
             <Clock size={15} />
           </button>
-
-          {/* More */}
-          <div className="relative">
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
-              aria-label="More options"
-            >
-              <MoreVertical size={15} />
-            </button>
-            {menuOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-10 z-20 bg-white rounded-xl shadow-dropdown border border-border py-1 min-w-[140px]">
-                  <a
-                    href={`/buyers/${buyer.id}`}
-                    className="block px-4 py-2.5 text-[13px] text-text-primary hover:bg-surface-container-low"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Open profile
-                  </a>
-                  {buyer.email && (
-                    <a
-                      href={`mailto:${buyer.email}`}
-                      className="block px-4 py-2.5 text-[13px] text-text-primary hover:bg-surface-container-low"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Email
-                    </a>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
         </div>
       </div>
     </div>

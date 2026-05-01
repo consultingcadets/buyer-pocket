@@ -1282,7 +1282,101 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
 
         {/* Mobile tab content */}
         <div className="px-4 pt-4 space-y-4">
-          {activeTab === "looking-for" && <LookingForCard buyer={buyer} />}
+          {activeTab === "looking-for" && (
+            <>
+              {/* Budget range — hero display */}
+              {(buyer.budget_min || buyer.budget_max) && (
+                <div className="bg-white rounded-xl border border-border p-4 mb-3">
+                  <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-1">Budget Range</p>
+                  <p className="text-[26px] font-bold text-text-primary leading-tight">
+                    {fmtBudget(buyer.budget_min, buyer.budget_max)}{" "}
+                    <span className="text-[14px] font-normal text-text-secondary">AUD</span>
+                  </p>
+                  {buyer.budget_min && buyer.budget_max && (
+                    <div className="mt-2 h-1.5 rounded-full bg-surface-container overflow-hidden">
+                      <div className="h-full bg-teal-action rounded-full" style={{ width: "65%" }} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Suburbs */}
+              {(buyer.preferred_suburbs?.length ?? 0) > 0 && (
+                <div className="bg-white rounded-xl border border-border p-4 mb-3">
+                  <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">Preferred Suburbs</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {buyer.preferred_suburbs!.map((s) => (
+                      <span key={s} className="px-3 py-1 rounded-full text-[13px] font-medium bg-teal-action/10 text-teal-action border border-teal-action/30">
+                        {s.split(",")[0].trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Property criteria cards 2x2 */}
+              {(buyer.property_type || buyer.bedrooms || buyer.bathrooms || buyer.car_spaces) && (
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {buyer.property_type && (
+                    <div className="bg-white rounded-xl border border-border p-3">
+                      <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1">Type</p>
+                      <p className="text-[14px] font-semibold text-text-primary">
+                        {[buyer.property_type, buyer.house_type].filter(Boolean).join(" or ")}
+                      </p>
+                    </div>
+                  )}
+                  {buyer.bedrooms && buyer.bedrooms !== "Any" && (
+                    <div className="bg-white rounded-xl border border-border p-3">
+                      <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1">Bedrooms</p>
+                      <p className="text-[14px] font-semibold text-text-primary">{buyer.bedrooms} Bed</p>
+                    </div>
+                  )}
+                  {buyer.bathrooms && buyer.bathrooms !== "Any" && (
+                    <div className="bg-white rounded-xl border border-border p-3">
+                      <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1">Bathrooms</p>
+                      <p className="text-[14px] font-semibold text-text-primary">{buyer.bathrooms} Bath</p>
+                    </div>
+                  )}
+                  {buyer.car_spaces && buyer.car_spaces !== "Any" && (
+                    <div className="bg-white rounded-xl border border-border p-3">
+                      <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1">Parking</p>
+                      <p className="text-[14px] font-semibold text-text-primary">{buyer.car_spaces}+ Garage</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Must-haves */}
+              {buyer.must_haves && buyer.must_haves.length > 0 && (
+                <div className="bg-surface-container-low rounded-xl border border-dashed border-border p-4 mb-3">
+                  <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">Critical Must-Haves</p>
+                  <div className="flex flex-col gap-2">
+                    {buyer.must_haves.map((m) => (
+                      <div key={m} className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full border-2 border-teal-action flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 text-teal-action" />
+                        </div>
+                        <span className="text-[14px] text-text-primary">{m}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Other criteria */}
+              {(buyer.buying_timeline || buyer.finance_status || buyer.condition_preference || buyer.land_size_min) && (
+                <div className="bg-white rounded-xl border border-border p-4">
+                  <p className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Other Criteria</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {buyer.buying_timeline && <Field label="Timeline" value={buyer.buying_timeline} />}
+                    {buyer.finance_status && <Field label="Finance" value={buyer.finance_status} />}
+                    {buyer.condition_preference && <Field label="Condition" value={buyer.condition_preference} />}
+                    {buyer.land_size_min && <Field label="Land size" value={`${buyer.land_size_min}m²+`} />}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
           {activeTab === "notes" && (
             <NotesActivity buyer={buyer} notes={notes} reminders={reminders} />
           )}

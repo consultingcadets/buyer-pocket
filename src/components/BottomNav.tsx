@@ -135,7 +135,10 @@ export function BottomNav() {
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
-          <span className="font-bold text-[16px] text-white tracking-tight">BuyerPocket</span>
+          <div className="flex flex-col">
+            <span className="font-bold text-[15px] text-white tracking-tight leading-tight">BuyerPocket</span>
+            <span className="text-[10px] text-white/40 leading-none">Agent Portal</span>
+          </div>
         </Link>
 
         <div className="flex flex-col gap-0.5">

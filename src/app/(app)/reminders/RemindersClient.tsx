@@ -187,21 +187,21 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
   return (
     <div className="min-h-screen bg-surface-container-low pb-24">
       {/* Header — mobile has pt-12 for iOS status bar, desktop uses normal spacing */}
-      <div className="bg-white px-5 pt-12 lg:pt-0 pb-0 shadow-sm lg:shadow-none border-b border-border">
-        <div className="lg:px-2 lg:pt-6">
+      <div className="bg-white pt-12 lg:pt-0 pb-0 shadow-sm lg:shadow-none border-b border-border">
+        <div className="px-5 lg:px-7 lg:pt-6">
           <h1 className="text-[22px] lg:text-[20px] font-bold text-text-primary pb-4">Reminders</h1>
         </div>
         {/* Tabs */}
-        <div className="flex gap-0 overflow-x-auto">
+        <div className="flex gap-2 px-5 pb-4 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => loadTab(tab.id)}
               className={cn(
-                "shrink-0 flex items-center gap-1.5 px-4 py-3 text-[13px] font-semibold border-b-2 transition-colors",
+                "shrink-0 flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold rounded-full transition-colors",
                 activeTab === tab.id
-                  ? "border-teal-action text-teal-action"
-                  : "border-transparent text-text-secondary hover:text-text-primary"
+                  ? "bg-teal-action text-white"
+                  : "bg-surface-container text-text-secondary hover:text-text-primary"
               )}
             >
               {tab.label}
@@ -209,9 +209,11 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
                 <span
                   className={cn(
                     "text-[11px] font-bold rounded-full px-1.5 py-0.5 leading-none",
-                    tab.alert
-                      ? "bg-error/10 text-error"
-                      : "bg-surface-container text-text-secondary"
+                    activeTab === tab.id
+                      ? "bg-white/20 text-white"
+                      : tab.alert
+                        ? "bg-error/10 text-error"
+                        : "bg-surface-container-high text-text-secondary"
                   )}
                 >
                   {tab.count}

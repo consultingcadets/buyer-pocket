@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Bell, User, Flame, CalendarDays, AlertTriangle, Users } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ReminderCard } from "@/components/ReminderCard";
 import { SnoozeModal } from "@/components/SnoozeModal";
@@ -58,36 +59,35 @@ function MetricCard({
   value,
   label,
   alert,
+  icon,
 }: {
   value: number;
   label: string;
   alert?: boolean;
+  icon: React.ReactNode;
 }) {
   return (
     <div
       className={cn(
-        "flex-1 rounded-2xl p-4 flex flex-col gap-1",
+        "flex-1 rounded-2xl p-4 flex flex-col gap-2",
         alert
           ? "bg-error/8 border border-error/20"
           : "bg-white shadow-card border border-border/40"
       )}
     >
-      <span
-        className={cn(
-          "text-[26px] font-bold leading-none",
-          alert ? "text-error" : "text-text-primary"
-        )}
-      >
-        {value}
-      </span>
-      <span
-        className={cn(
-          "text-[11px] font-medium leading-tight",
-          alert ? "text-error/75" : "text-text-secondary"
-        )}
-      >
-        {label}
-      </span>
+      <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center",
+        alert ? "bg-error/15" : "bg-surface-container"
+      )}>
+        <span className={alert ? "text-error" : "text-text-secondary"}>{icon}</span>
+      </div>
+      <div>
+        <span className={cn("text-[28px] font-bold leading-none block", alert ? "text-error" : "text-text-primary")}>
+          {value}
+        </span>
+        <span className={cn("text-[11px] font-medium leading-tight uppercase tracking-wide", alert ? "text-error/75" : "text-text-secondary")}>
+          {label}
+        </span>
+      </div>
     </div>
   );
 }
@@ -164,8 +164,8 @@ function SectionHeading({
     <div className="flex items-center justify-between mb-3">
       <h2 className="text-[15px] font-semibold text-text-primary">{children}</h2>
       {href && (
-        <Link href={href} className="text-[13px] text-teal-action font-medium">
-          See all
+        <Link href={href} className="text-[12px] text-teal-action font-bold uppercase tracking-wide">
+          View all
         </Link>
       )}
     </div>
@@ -481,16 +481,29 @@ export function TodayDashboard({
 
         {/* Mobile header */}
         <div className="bg-white px-5 pt-12 pb-5 shadow-sm">
-          <p className="text-[22px] font-bold text-text-primary">{greeting(profileName)}</p>
-          <p className="text-[13px] text-text-secondary mt-0.5">{todayDateLabel()}</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[22px] font-bold text-text-primary">{greeting(profileName)}</p>
+              <p className="text-[13px] text-text-secondary mt-0.5">{todayDateLabel()}</p>
+            </div>
+            <div className="flex items-center gap-3 mt-1">
+              <Link href="/reminders" className="w-9 h-9 flex items-center justify-center text-text-secondary">
+                <Bell size={22} />
+              </Link>
+              <Link href="/settings" className="w-9 h-9 flex items-center justify-center text-text-secondary">
+                <User size={22} />
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="px-4 pt-4 flex flex-col gap-5">
           {/* Metric cards */}
-          <div className="flex gap-3">
-            <MetricCard value={todayCount} label="Reminders today" />
-            <MetricCard value={overdueCount} label="Overdue" alert={overdueCount > 0} />
-            <MetricCard value={buyersThisWeek} label="Added this week" />
+          <div className="grid grid-cols-2 gap-3">
+            <MetricCard value={hotBuyers.length} label="Hot buyers" icon={<Flame size={16} />} />
+            <MetricCard value={todayCount} label="Today" icon={<CalendarDays size={16} />} />
+            <MetricCard value={overdueCount} label="Overdue" alert={overdueCount > 0} icon={<AlertTriangle size={16} />} />
+            <MetricCard value={buyersThisWeek} label="Added this week" icon={<Users size={16} />} />
           </div>
 
           {/* Empty state */}
@@ -519,11 +532,14 @@ export function TodayDashboard({
           {/* Overdue */}
           {overdueReminders.length > 0 && (
             <section>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-2 h-2 rounded-full bg-error" />
-                <h2 className="text-[13px] font-semibold text-error uppercase tracking-wide">
-                  Overdue
-                </h2>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-1 h-5 rounded-full bg-error shrink-0" />
+                  <h2 className="text-[15px] font-semibold text-error">Overdue reminders</h2>
+                  <span className="w-5 h-5 rounded-full bg-error/15 text-error text-[11px] font-bold flex items-center justify-center">
+                    {overdueReminders.length}
+                  </span>
+                </div>
               </div>
               <div className="flex flex-col gap-3">
                 {overdueReminders.map((r) => (
