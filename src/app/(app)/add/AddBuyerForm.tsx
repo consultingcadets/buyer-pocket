@@ -9,7 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, BarChart2, Search, FileText } from "lucide-react";
+import { User, BarChart2, Search, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
@@ -76,10 +76,10 @@ function SelectChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
+        "h-8 px-4 rounded-full border text-[13px] font-medium transition-colors whitespace-nowrap",
         selected
-          ? "bg-primary border-primary text-white"
-          : "bg-surface-container-low border-border text-text-secondary hover:border-primary/40 hover:text-text-primary"
+          ? "bg-teal-action border-teal-action text-on-teal-action"
+          : "bg-white border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
       )}
     >
       {label}
@@ -101,12 +101,34 @@ function MultiChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
+        "h-8 px-4 rounded-full border text-[13px] font-medium transition-colors whitespace-nowrap",
         selected
           ? "bg-teal-action border-teal-action text-on-teal-action"
-          : "bg-surface-container-low border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
+          : "bg-white border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
       )}
     >
+      {label}
+    </button>
+  );
+}
+
+function TempButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  const styles: Record<string, { ring: string; text: string; bg: string; dot: string }> = {
+    Hot:  { ring: "border-red-400",   text: "text-red-500",   bg: "bg-red-50",   dot: "bg-red-500" },
+    Warm: { ring: "border-amber-400", text: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
+    Cold: { ring: "border-blue-400",  text: "text-blue-500",  bg: "bg-blue-50",  dot: "bg-blue-500" },
+  };
+  const s = styles[label] ?? { ring: "border-border", text: "text-text-secondary", bg: "bg-surface-container", dot: "bg-outline" };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex-1 h-10 rounded-full border text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5",
+        active ? `${s.ring} ${s.text} ${s.bg}` : "border-border text-text-secondary bg-surface-container-low hover:border-primary/30 hover:text-text-primary"
+      )}
+    >
+      {active && <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />}
       {label}
     </button>
   );
@@ -336,7 +358,7 @@ export function AddBuyerForm() {
           )}
 
           {/* ── 2-column on desktop, single column on mobile ── */}
-          <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-4 lg:space-y-0">
+          <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
 
             {/* Left column: identity + status + notes */}
             <div className="space-y-4">
@@ -378,21 +400,12 @@ export function AddBuyerForm() {
                 <FieldRow label="Buyer Temperature">
                   <div className="flex gap-2">
                     {["Hot", "Warm", "Cold"].map((t) => (
-                      <button
+                      <TempButton
                         key={t}
-                        type="button"
+                        label={t}
+                        active={buyerTemperature === t}
                         onClick={() => setBuyerTemperature((v) => v === t ? "" : t)}
-                        className={cn(
-                          "flex-1 h-10 rounded-xl border text-sm font-semibold transition-colors",
-                          buyerTemperature === t
-                            ? t === "Hot" ? "bg-secondary border-secondary text-white"
-                              : t === "Warm" ? "bg-accent border-accent text-white"
-                              : "bg-primary border-primary text-white"
-                            : "bg-surface-container-low border-border text-text-secondary hover:border-primary/40"
-                        )}
-                      >
-                        {t}
-                      </button>
+                      />
                     ))}
                   </div>
                 </FieldRow>
@@ -435,8 +448,8 @@ export function AddBuyerForm() {
               </FieldCard>
             </div>
 
-            {/* Right column: property criteria + expanded */}
-            <div className="space-y-4">
+            {/* Right column: property criteria + expanded (sticky on desktop) */}
+            <div className="lg:sticky lg:top-[4.5rem] space-y-4">
               <FieldCard>
                 <SectionHeader icon={<Search size={14} />} title="Requirements" />
                 <FieldRow label="Preferred Suburbs" error={errors.suburbs}>
@@ -502,9 +515,10 @@ export function AddBuyerForm() {
               <button
                 type="button"
                 onClick={() => setShowMore((v) => !v)}
-                className="w-full text-center text-sm font-semibold text-teal-action py-1"
+                className="w-full flex items-center justify-center gap-1.5 text-sm font-semibold text-teal-action py-1"
               >
-                {showMore ? "− Hide details" : "+ Add more details"}
+                {showMore ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {showMore ? "Hide details" : "Show more details"}
               </button>
 
               <AnimatedExpand open={showMore}>

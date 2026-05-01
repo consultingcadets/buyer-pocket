@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, User, BarChart2, Search, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
@@ -19,10 +20,19 @@ function inputCls(hasError?: string) {
   return cn(inputBase, hasError ? "border-error" : "border-border");
 }
 
-function FieldCard({ children }: { children: React.ReactNode }) {
+function SectionCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-border shadow-card px-5 py-4 space-y-4">
+    <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
       {children}
+    </div>
+  );
+}
+
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 pb-1">
+      <span className="text-teal-action">{icon}</span>
+      <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wider">{title}</p>
     </div>
   );
 }
@@ -30,42 +40,45 @@ function FieldCard({ children }: { children: React.ReactNode }) {
 function FieldRow({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[13px] font-semibold text-text-secondary uppercase tracking-wide mb-2">
-        {label}
-      </label>
+      <label className="block text-[13px] font-medium text-text-primary mb-1.5">{label}</label>
       {children}
       {error && <p className="mt-1.5 text-xs text-error">{error}</p>}
     </div>
   );
 }
 
-function SelectChip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+function TempButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  const styles: Record<string, { ring: string; text: string; bg: string; dot: string }> = {
+    Hot:  { ring: "border-red-400",   text: "text-red-500",   bg: "bg-red-50",   dot: "bg-red-500" },
+    Warm: { ring: "border-amber-400", text: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
+    Cold: { ring: "border-blue-400",  text: "text-blue-500",  bg: "bg-blue-50",  dot: "bg-blue-500" },
+  };
+  const s = styles[label] ?? { ring: "border-border", text: "text-text-secondary", bg: "bg-surface-container", dot: "bg-outline" };
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
-        selected
-          ? "bg-primary border-primary text-white"
-          : "bg-surface-container-low border-border text-text-secondary hover:border-primary/40 hover:text-text-primary"
+        "flex-1 h-10 rounded-full border text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5",
+        active ? `${s.ring} ${s.text} ${s.bg}` : "border-border text-text-secondary bg-surface-container-low hover:border-primary/30 hover:text-text-primary"
       )}
     >
+      {active && <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />}
       {label}
     </button>
   );
 }
 
-function MultiChip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+function PillChip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "h-9 px-4 rounded-full border text-sm font-medium transition-colors",
+        "h-8 px-4 rounded-full border text-[13px] font-medium transition-colors whitespace-nowrap",
         selected
           ? "bg-teal-action border-teal-action text-on-teal-action"
-          : "bg-surface-container-low border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
+          : "bg-white border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
       )}
     >
       {label}
@@ -73,11 +86,21 @@ function MultiChip({ label, selected, onClick }: { label: string; selected: bool
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function ChipGroup({ label, options, value, onChange }: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
-    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] mb-2">
-      {children}
-    </p>
+    <div>
+      <p className="text-[13px] font-medium text-text-secondary mb-2">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <PillChip key={opt} label={opt} selected={value === opt} onClick={() => onChange(value === opt ? "" : opt)} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -94,19 +117,6 @@ function AnimatedExpand({ open, children }: { open: boolean; children: React.Rea
   return (
     <div style={{ height, overflow: "hidden", transition: "height 300ms ease" }}>
       <div ref={ref}>{children}</div>
-    </div>
-  );
-}
-
-function ChipFieldInline({ label, options, value, onChange }: { label: string; options: string[]; value: string; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <p className="text-sm font-medium text-text-secondary mb-2">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <SelectChip key={opt} label={opt} selected={value === opt} onClick={() => onChange(value === opt ? "" : opt)} />
-        ))}
-      </div>
     </div>
   );
 }
@@ -128,9 +138,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   const [budgetMin, setBudgetMin] = useState(buyer.budget_min ? formatAmount(String(buyer.budget_min)) : "");
   const [budgetMax, setBudgetMax] = useState(buyer.budget_max ? formatAmount(String(buyer.budget_max)) : "");
   const [bedrooms, setBedrooms] = useState(buyer.bedrooms ?? "Any");
-  const [landSizeMin, setLandSizeMin] = useState(
-    buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any"
-  );
+  const [landSizeMin, setLandSizeMin] = useState(buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any");
   const [note, setNote] = useState(buyer.notes_summary ?? "");
   const [showMore, setShowMore] = useState(false);
 
@@ -225,20 +233,22 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
 
-      {/* Navy header */}
+      {/* ── Header ── */}
       <header className="sticky top-0 bg-primary z-20 border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 lg:px-6 h-14 flex items-center justify-between">
           <Link
             href={`/buyers/${buyer.id}`}
-            className="text-white/70 hover:text-white text-sm font-medium w-16 transition-colors"
+            className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-colors"
           >
-            Cancel
+            <ArrowLeft size={16} />
+            <span>Back</span>
           </Link>
           <h1 className="text-base font-semibold text-white tracking-tight">Edit Buyer</h1>
           <div className="w-16" />
         </div>
       </header>
 
+      {/* ── Scrollable content ── */}
       <div className="flex-1 overflow-y-auto pb-28">
         <div className="max-w-5xl mx-auto px-4 lg:px-6 py-5">
 
@@ -248,17 +258,21 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
             </div>
           )}
 
-          {/* 2-column on desktop, single column on mobile */}
-          <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-4 lg:space-y-0">
+          {/* Desktop 2-col, mobile single-col */}
+          <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
 
-            {/* Left column: identity + status + notes */}
+            {/* ── Left: Identity + Status + Notes ── */}
             <div className="space-y-4">
-              <FieldCard>
-                <FieldRow label="Buyer Name" error={errors.name}>
+
+              {/* Identity */}
+              <SectionCard>
+                <SectionHeader icon={<User size={14} />} title="Buyer Identity" />
+
+                <FieldRow label="Full Name" error={errors.name}>
                   <input
                     autoFocus
                     type="text"
-                    placeholder="First and last name"
+                    placeholder="e.g. Cameron Knight"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className={inputCls(errors.name)}
@@ -266,151 +280,207 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                 </FieldRow>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Phone">
-                    <input type="tel" placeholder="0412 345 678" value={phone}
+                  <FieldRow label="Phone Number">
+                    <input
+                      type="tel"
+                      placeholder="+61 400 000 000"
+                      value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       onBlur={(e) => setPhone(formatPhone(e.target.value))}
-                      className={inputCls()} />
+                      className={inputCls()}
+                    />
                   </FieldRow>
-                  <FieldRow label="Email">
-                    <input type="email" placeholder="name@email.com" value={email}
+                  <FieldRow label="Email Address">
+                    <input
+                      type="email"
+                      placeholder="name@email.com.au"
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className={inputCls()} />
+                      className={inputCls()}
+                    />
                   </FieldRow>
                 </div>
 
                 <FieldRow label="Buyer Temperature">
                   <div className="flex gap-2">
                     {["Hot", "Warm", "Cold"].map((t) => (
-                      <button
+                      <TempButton
                         key={t}
-                        type="button"
+                        label={t}
+                        active={buyerTemperature === t}
                         onClick={() => setBuyerTemperature((v) => v === t ? "" : t)}
-                        className={cn(
-                          "flex-1 h-10 rounded-xl border text-sm font-semibold transition-colors",
-                          buyerTemperature === t
-                            ? t === "Hot" ? "bg-secondary border-secondary text-white"
-                              : t === "Warm" ? "bg-accent border-accent text-white"
-                              : "bg-primary border-primary text-white"
-                            : "bg-surface-container-low border-border text-text-secondary hover:border-primary/40"
-                        )}
-                      >
-                        {t}
-                      </button>
+                      />
                     ))}
                   </div>
                 </FieldRow>
-              </FieldCard>
+              </SectionCard>
 
-              <FieldCard>
-                <SectionLabel>Buyer Status</SectionLabel>
-                <ChipFieldInline label="Timeline" options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]} value={buyingTimeline} onChange={setBuyingTimeline} />
-                <ChipFieldInline label="Buyer type" options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]} value={buyerType} onChange={setBuyerType} />
-                <ChipFieldInline label="Lead source" options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]} value={leadSource} onChange={setLeadSource} />
-              </FieldCard>
+              {/* Engagement Status */}
+              <SectionCard>
+                <SectionHeader icon={<BarChart2 size={14} />} title="Engagement Status" />
+                <ChipGroup
+                  label="Buying Timeline"
+                  options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
+                  value={buyingTimeline}
+                  onChange={setBuyingTimeline}
+                />
+                <ChipGroup
+                  label="Buyer type"
+                  options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
+                  value={buyerType}
+                  onChange={setBuyerType}
+                />
+                <ChipGroup
+                  label="Lead source"
+                  options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]}
+                  value={leadSource}
+                  onChange={setLeadSource}
+                />
+              </SectionCard>
 
-              <FieldCard>
-                <FieldRow label="Notes">
-                  <textarea placeholder="Any extra details about this buyer…" value={note}
-                    onChange={(e) => setNote(e.target.value)} rows={4}
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-surface-container-low text-text-primary placeholder:text-outline focus:outline-none focus:ring-0 focus:border-2 focus:border-teal-action transition-colors resize-none text-[15px]" />
-                </FieldRow>
-              </FieldCard>
+              {/* Internal Notes */}
+              <SectionCard>
+                <SectionHeader icon={<FileText size={14} />} title="Internal Notes" />
+                <textarea
+                  placeholder="Mention specific requirements, family situation, or urgency factors…"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface-container-low text-text-primary placeholder:text-outline focus:outline-none focus:ring-0 focus:border-2 focus:border-teal-action transition-colors resize-none text-[15px]"
+                />
+              </SectionCard>
             </div>
 
-            {/* Right column: property criteria + expanded */}
-            <div className="space-y-4">
-              <FieldCard>
-                <FieldRow label="Preferred Suburbs" error={errors.suburbs}>
-                  <SuburbCombobox value={suburbs} onChange={setSuburbs} placeholder="Search and add suburbs…" error={errors.suburbs} />
+            {/* ── Right: Search Criteria (sticky on desktop) ── */}
+            <div className="lg:sticky lg:top-[4.5rem] space-y-4">
+
+              <SectionCard>
+                <SectionHeader icon={<Search size={14} />} title="Search Criteria" />
+
+                <FieldRow label="Target Suburbs" error={errors.suburbs}>
+                  <SuburbCombobox
+                    value={suburbs}
+                    onChange={setSuburbs}
+                    placeholder="e.g. Paddington, Woollahra"
+                    error={errors.suburbs}
+                  />
                 </FieldRow>
 
-                <FieldRow label="Budget" error={errors.budgetMax}>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Min Budget" error={errors.budgetMax}>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input type="text" inputMode="numeric" placeholder="Min" value={budgetMin}
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="1,200,000"
+                        value={budgetMin}
                         onChange={(e) => setBudgetMin(e.target.value.replace(/[^0-9]/g, ""))}
                         onBlur={(e) => setBudgetMin(formatAmount(e.target.value))}
-                        className={cn(inputCls(), "pl-8")} />
+                        className={cn(inputCls(), "pl-8")}
+                      />
                     </div>
+                  </FieldRow>
+                  <FieldRow label="Max Budget" error={errors.budgetMax}>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input type="text" inputMode="numeric" placeholder="Max" value={budgetMax}
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="2,500,000"
+                        value={budgetMax}
                         onChange={(e) => setBudgetMax(e.target.value.replace(/[^0-9]/g, ""))}
                         onBlur={(e) => setBudgetMax(formatAmount(e.target.value))}
-                        className={cn(inputCls(errors.budgetMax), "pl-8")} />
+                        className={cn(inputCls(errors.budgetMax), "pl-8")}
+                      />
                     </div>
-                  </div>
-                </FieldRow>
+                  </FieldRow>
+                </div>
+                {errors.budgetMax && <p className="text-xs text-error -mt-2">{errors.budgetMax}</p>}
 
-                <FieldRow label="Bedrooms">
-                  <SegmentedControl options={["Any", "1+", "2+", "3+", "4+", "5+"]} value={bedrooms} onChange={setBedrooms} />
+                <FieldRow label="Minimum Bedrooms">
+                  <SegmentedControl options={["Any", "2+", "3+", "4+", "5+"]} value={bedrooms} onChange={setBedrooms} />
                 </FieldRow>
 
                 <FieldRow label="Land Size (min)">
                   <div className="overflow-x-auto -mx-5 px-5">
                     <div className="min-w-max">
-                      <SegmentedControl options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]} value={landSizeMin} onChange={setLandSizeMin} />
+                      <SegmentedControl
+                        options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]}
+                        value={landSizeMin}
+                        onChange={setLandSizeMin}
+                      />
                     </div>
                   </div>
                 </FieldRow>
-              </FieldCard>
+              </SectionCard>
 
+              {/* Show more toggle */}
               <button
                 type="button"
                 onClick={() => setShowMore((v) => !v)}
-                className="w-full text-center text-sm font-semibold text-teal-action py-1"
+                className="w-full flex items-center justify-center gap-1.5 text-sm font-semibold text-teal-action py-1"
               >
-                {showMore ? "− Hide details" : "+ Add more details"}
+                {showMore ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {showMore ? "Hide details" : "Show more details"}
               </button>
 
               <AnimatedExpand open={showMore}>
-                <div className="space-y-4 pt-2">
-                  <FieldCard>
-                    <SectionLabel>Contact Preferences</SectionLabel>
-                    <ChipFieldInline label="Preferred method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
-                    <ChipFieldInline label="Best time" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
-                    <ChipFieldInline label="Consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
-                  </FieldCard>
+                <div className="space-y-4 pt-1">
+                  <SectionCard>
+                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Contact Preferences</p>
+                    <ChipGroup label="Preferred method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
+                    <ChipGroup label="Best time" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
+                    <ChipGroup label="Consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
+                  </SectionCard>
 
-                  <FieldCard>
-                    <SectionLabel>Property Preferences</SectionLabel>
-                    <ChipFieldInline label="Type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
-                    <ChipFieldInline label="House style" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
+                  <SectionCard>
+                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Property Preferences</p>
+                    <ChipGroup label="Type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
+                    <ChipGroup label="House style" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
                     <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Bathrooms</p>
+                      <p className="text-[13px] font-medium text-text-secondary mb-2">Bathrooms</p>
                       <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Car spaces</p>
+                      <p className="text-[13px] font-medium text-text-secondary mb-2">Car spaces</p>
                       <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
                     </div>
-                    <ChipFieldInline label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
-                  </FieldCard>
+                    <ChipGroup label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
+                  </SectionCard>
 
-                  <FieldCard>
-                    <SectionLabel>Size Requirements</SectionLabel>
+                  <SectionCard>
+                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Size Requirements</p>
                     <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Building size min (squares)</p>
+                      <p className="text-[13px] font-medium text-text-secondary mb-2">Building size min (squares)</p>
                       <div className="relative">
-                        <input type="text" inputMode="numeric" placeholder="e.g. 25" value={buildingSizeMin}
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="e.g. 25"
+                          value={buildingSizeMin}
                           onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
-                          className={cn(inputCls(), "pr-12")} />
+                          className={cn(inputCls(), "pr-12")}
+                        />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">sq</span>
                       </div>
                     </div>
-                    <ChipFieldInline label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
-                  </FieldCard>
+                    <ChipGroup label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
+                  </SectionCard>
 
-                  <FieldCard>
-                    <SectionLabel>Must-Haves</SectionLabel>
+                  <SectionCard>
+                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-3">Must-Haves</p>
                     <div className="flex flex-wrap gap-2">
                       {MUST_HAVES_OPTIONS.map((item) => (
-                        <MultiChip key={item} label={item} selected={mustHaves.includes(item)} onClick={() => toggleMustHave(item)} />
+                        <PillChip
+                          key={item}
+                          label={item}
+                          selected={mustHaves.includes(item)}
+                          onClick={() => toggleMustHave(item)}
+                        />
                       ))}
                     </div>
-                  </FieldCard>
+                  </SectionCard>
                 </div>
               </AnimatedExpand>
             </div>
@@ -419,16 +489,22 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
         </div>
       </div>
 
-      {/* Save footer */}
+      {/* ── Save footer ── */}
       <div className="fixed bottom-0 left-0 right-0 lg:left-56 bg-white border-t border-border shadow-[0_-4px_16px_rgba(15,28,44,0.06)]">
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-4">
+        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-4 flex items-center gap-3">
+          <Link
+            href={`/buyers/${buyer.id}`}
+            className="shrink-0 h-14 px-6 flex items-center justify-center text-sm font-semibold text-text-secondary rounded-2xl border border-border hover:bg-surface-container transition-colors"
+          >
+            Discard
+          </Link>
           <button
             type="button"
             onClick={handleSubmit}
             disabled={isPending}
-            className="w-full h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-60 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
+            className="flex-1 h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-60 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
           >
-            {isPending ? "Saving…" : "Save changes"}
+            {isPending ? "Saving…" : "Save Buyer Profile"}
           </button>
         </div>
       </div>
