@@ -16,16 +16,19 @@ export default function SignupPage() {
 
   if (state && "checkEmail" in state) {
     return (
-      <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8 antialiased">
-        <div className="w-full max-w-[480px] bg-surface-container-lowest rounded-lg shadow-[var(--shadow-card-resting)] p-8 flex flex-col gap-6 text-center">
+      <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+        <div className="mb-8">
+          <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
+        </div>
+        <div className="w-full max-w-[480px] bg-white rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 text-center border border-border">
           <h2 className="text-[32px] font-bold text-brand-navy">Check your email.</h2>
-          <p className="text-[16px] text-on-surface-variant">
+          <p className="text-[16px] text-text-secondary">
             We&apos;ve sent a confirmation link to your email address. Click it
             to continue setting up your account.
           </p>
-          <p className="text-[14px] text-on-surface-variant">
+          <p className="text-[14px] text-text-secondary">
             Already confirmed?{" "}
-            <Link href="/login" className="text-brand-teal font-medium hover:underline">
+            <Link href="/login" className="text-teal-action font-medium hover:underline">
               Sign in
             </Link>
           </p>
@@ -37,182 +40,157 @@ export default function SignupPage() {
   const strength = getPasswordStrength(password);
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8 antialiased">
-      <div className="w-full max-w-[480px] bg-surface-container-lowest rounded-lg shadow-[var(--shadow-card-resting)] p-8 flex flex-col gap-6">
-        {/* Header */}
-        <div className="flex flex-col items-center gap-4">
-          <h1 className="text-[32px] font-bold tracking-tight text-brand-navy">
-            BuyerPocket
-          </h1>
-          {/* Progress dots */}
-          <div className="flex items-center gap-2">
-            {DOTS.map((active, i) => (
-              <div
-                key={i}
-                className={`rounded-full transition-all ${
-                  active ? "w-2 h-2 bg-brand-navy" : "w-2 h-2 bg-surface-variant"
-                }`}
-              />
-            ))}
-          </div>
+    <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+      <div className="w-full max-w-[480px] flex flex-col items-center">
+        <div className="mb-6">
+          <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
+        </div>
+        <div className="flex items-center gap-2 mb-6">
+          {DOTS.map((active, i) => (
+            <span
+              key={i}
+              className={active ? "w-2 h-2 rounded-full bg-primary" : "w-2 h-2 rounded-full border border-border bg-transparent"}
+            />
+          ))}
+        </div>
+
+        <div className="w-full bg-white rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 border border-border">
           <div className="text-center flex flex-col gap-1">
-            <h2 className="text-[32px] font-bold tracking-tight text-brand-navy">
+            <h2 className="text-[32px] font-bold tracking-tight text-primary">
               Start your 7-day free trial.
             </h2>
-            <p className="text-[16px] text-on-surface-variant">
+            <p className="text-[16px] text-text-secondary">
               No credit card needed.
             </p>
           </div>
-        </div>
 
-        {/* Google OAuth */}
-        <form>
-          <button
-            type="submit"
-            formAction={signUpWithGoogle}
-            className="w-full h-12 flex items-center justify-center gap-2 bg-surface-container-lowest border border-brand-navy rounded text-brand-navy text-[16px] font-semibold hover:bg-surface-container-low transition-colors"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-        </form>
+          <form>
+            <button
+              type="submit"
+              formAction={signUpWithGoogle}
+              className="w-full min-h-12 flex items-center justify-center gap-2 bg-white border border-primary rounded-lg text-primary text-[16px] font-semibold hover:bg-surface-container-low transition-colors"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </button>
+          </form>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-px bg-surface-variant" />
-          <span className="text-[14px] font-semibold tracking-widest text-on-surface-variant uppercase">
-            or
-          </span>
-          <div className="flex-1 h-px bg-surface-variant" />
-        </div>
-
-        {/* Email/password form */}
-        <form action={formAction} className="flex flex-col gap-6">
-          {state?.error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
-              {(state as { error: string }).error}
-            </div>
-          )}
-
-          {/* Full name */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[14px] font-semibold tracking-wider text-on-surface-variant uppercase">
-              Full name
-            </label>
-            <input
-              name="name"
-              type="text"
-              required
-              autoComplete="name"
-              placeholder="Jane Doe"
-              className="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded text-[16px] text-on-surface focus:outline-none focus:border-teal-action focus:ring-1 focus:ring-teal-action transition-colors"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-[14px] font-semibold tracking-widest text-text-secondary uppercase">
+              or
+            </span>
+            <div className="flex-1 h-px bg-border" />
           </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[14px] font-semibold tracking-wider text-on-surface-variant uppercase">
-              Email address
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="jane@example.com"
-              className="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded text-[16px] text-on-surface focus:outline-none focus:border-teal-action focus:ring-1 focus:ring-teal-action transition-colors"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[14px] font-semibold tracking-wider text-on-surface-variant uppercase">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                autoComplete="new-password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 px-4 pr-12 bg-surface-container-lowest border border-outline-variant rounded text-[16px] text-on-surface focus:outline-none focus:border-teal-action focus:ring-1 focus:ring-teal-action transition-colors"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-[14px] text-on-surface-variant hover:text-brand-navy"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
-            {/* Password strength indicator */}
-            {password.length > 0 && (
-              <div className="flex gap-1 mt-1">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className={`h-1 flex-1 rounded-full transition-colors ${
-                      i < strength
-                        ? strength === 1
-                          ? "bg-error"
-                          : strength === 2
-                          ? "bg-warning-strong"
-                          : "bg-secondary"
-                        : "bg-surface-variant"
-                    }`}
-                  />
-                ))}
+          <form action={formAction} className="flex flex-col gap-6">
+            {state?.error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
+                {(state as { error: string }).error}
               </div>
             )}
-          </div>
 
-          {/* Mobile (optional) */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[14px] font-semibold tracking-wider text-on-surface-variant uppercase">
-              Mobile number{" "}
-              <span className="text-on-surface-variant font-normal normal-case">
-                (optional)
-              </span>
-            </label>
-            <div className="flex border border-outline-variant rounded focus-within:border-teal-action focus-within:ring-1 focus-within:ring-teal-action transition-colors overflow-hidden">
-              <div className="h-12 px-4 flex items-center bg-surface-container border-r border-outline-variant shrink-0">
-                <span className="text-[16px] text-on-surface-variant">+61</span>
-              </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[14px] font-semibold tracking-wider text-text-secondary uppercase">
+                Full name
+              </label>
               <input
-                name="mobile"
-                type="tel"
-                autoComplete="tel"
-                placeholder="400 000 000"
-                className="w-full h-12 px-4 bg-surface-container-lowest border-none focus:outline-none focus:ring-0 text-[16px] text-on-surface"
+                name="name"
+                type="text"
+                required
+                autoComplete="name"
+                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
               />
             </div>
-          </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={pending}
-            className="w-full h-12 mt-2 bg-teal-action text-on-teal-action text-[16px] font-semibold rounded hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-60"
-          >
-            {pending ? "Creating account…" : "Continue"}
-          </button>
-        </form>
+            <div className="flex flex-col gap-1">
+              <label className="text-[14px] font-semibold tracking-wider text-text-secondary uppercase">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+              />
+            </div>
 
-        {/* Terms */}
-        <p className="text-[14px] text-on-surface-variant text-center">
-          By continuing, you agree to our{" "}
-          <a href="#" className="text-brand-navy underline hover:text-teal-action transition-colors">
-            Terms of Service
-          </a>{" "}
-          and{" "}
-          <a href="#" className="text-brand-navy underline hover:text-teal-action transition-colors">
-            Privacy Policy
-          </a>
-          .
-        </p>
+            <div className="flex flex-col gap-1">
+              <label className="text-[14px] font-semibold tracking-wider text-text-secondary uppercase">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full min-h-12 px-4 pr-12 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[14px] text-text-secondary hover:text-primary"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {password.length > 0 && (
+                <div className="flex gap-1 mt-1">
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1 flex-1 rounded-full transition-colors ${
+                        i < strength
+                          ? strength === 1
+                            ? "bg-error"
+                            : strength === 2
+                              ? "bg-warning-strong"
+                              : "bg-secondary"
+                          : "bg-border"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[14px] font-semibold tracking-wider text-text-secondary uppercase">
+                Mobile number{" "}
+                <span className="text-text-secondary font-normal normal-case">
+                  (optional)
+                </span>
+              </label>
+              <div className="flex border border-border rounded-lg focus-within:border-2 focus-within:border-accent transition-colors overflow-hidden">
+                <div className="min-h-12 px-4 flex items-center bg-surface-container border-r border-border shrink-0">
+                  <span className="text-[16px] text-text-secondary">+61</span>
+                </div>
+                <input
+                  name="mobile"
+                  type="tel"
+                  autoComplete="tel"
+                  className="w-full min-h-12 px-4 bg-white border-none focus:outline-none focus:ring-0 text-[16px] text-text-primary"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={pending}
+              className="w-full min-h-12 mt-2 bg-teal-action text-on-teal-action text-[16px] font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-60"
+            >
+              {pending ? "Creating account…" : "Continue"}
+            </button>
+          </form>
+
+          <p className="text-[14px] text-text-secondary text-center">
+            By continuing, you agree to our Terms and Privacy Policy.
+          </p>
+        </div>
       </div>
     </main>
   );

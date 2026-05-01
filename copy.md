@@ -423,6 +423,30 @@ H3: Nothing for today.
 Body: No follow-ups due. Take a breath.  
 (No CTA)
 
+#### Today dashboard — new user welcome card
+
+Welcome card heading: Welcome to BuyerPocket.
+
+Welcome card body: Three things to get you started.
+
+Step 1 label: Add your first buyer
+
+Step 1 helper: It takes about 30 seconds.
+
+Step 1 button: Add buyer
+
+Step 2 label: Set a follow-up reminder
+
+Step 2 helper: Pick when to call them next.
+
+Step 2 button: (none — disabled until step 1 done)
+
+Step 3 label: Enable phone notifications
+
+Step 3 helper: So your reminders actually reach you.
+
+Step 3 button: Enable
+
 ---
 
 ### Add Buyer screen
@@ -795,7 +819,7 @@ Cancel link (red): Cancel subscription
 
 H3: Help
 
-Email support: Email support — link: hello@consultingcadets.com  
+Email support: Email support — link: support@buyerpocket.com.au  
 Privacy policy link: Privacy policy  
 Terms link: Terms of service  
 Version line: Version [number]

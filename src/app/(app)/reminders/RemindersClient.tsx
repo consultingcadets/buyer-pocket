@@ -22,7 +22,10 @@ function groupByDay(reminders: ReminderWithBuyer[]): { label: string; items: Rem
   const map = new Map<string, ReminderWithBuyer[]>();
   for (const r of reminders) {
     const d = new Date(r.reminder_at);
-    const key = d.toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" });
+    const weekday = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase();
+    const day = d.toLocaleDateString("en-AU", { day: "numeric" });
+    const month = d.toLocaleDateString("en-AU", { month: "short" }).toUpperCase();
+    const key = `${weekday}, ${day} ${month}`;
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(r);
   }
@@ -135,10 +138,10 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
     if (activeTab === "upcoming") {
       const groups = groupByDay(reminders);
       return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           {groups.map((g) => (
-            <div key={g.label}>
-              <p className="text-[11px] font-semibold text-foreground-subtle uppercase tracking-wide mb-2">{g.label}</p>
+            <div key={g.label} className="mt-4 first:mt-0">
+              <p className="text-[12px] font-semibold text-primary uppercase tracking-wide mb-2">{g.label}</p>
               <div className="flex flex-col gap-3">
                 {g.items.map((r) => (
                   <ReminderCard key={r.id} reminder={r} onComplete={handleComplete} onSnooze={setSnoozeReminderId} isCompleting={completingId === r.id} />
@@ -153,10 +156,10 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
     if (activeTab === "completed") {
       const groups = groupByWeek(reminders);
       return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           {groups.map((g) => (
-            <div key={g.label}>
-              <p className="text-[11px] font-semibold text-foreground-subtle uppercase tracking-wide mb-2">{g.label}</p>
+            <div key={g.label} className="mt-4 first:mt-0">
+              <p className="text-[12px] font-semibold text-primary uppercase tracking-wide mb-2">{g.label}</p>
               <div className="flex flex-col gap-3">
                 {g.items.map((r) => (
                   <ReminderCard key={r.id} reminder={r} showDate onComplete={handleComplete} onSnooze={setSnoozeReminderId} isCompleting={completingId === r.id} />
@@ -187,9 +190,9 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
   return (
     <div className="min-h-screen bg-surface-container-low pb-24">
       {/* Header — mobile has pt-12 for iOS status bar, desktop uses normal spacing */}
-      <div className="bg-white pt-12 lg:pt-0 pb-0 shadow-sm lg:shadow-none border-b border-border">
+      <div className="bg-white pt-12 lg:pt-0 pb-0 border-b border-border">
         <div className="px-5 lg:px-7 lg:pt-6">
-          <h1 className="text-[22px] lg:text-[20px] font-bold text-text-primary pb-4">Reminders</h1>
+          <h1 className="text-[22px] lg:text-[32px] lg:leading-[1.2] lg:tracking-[-0.01em] font-bold text-primary pb-4">Reminders</h1>
         </div>
         {/* Tabs */}
         <div className="flex gap-2 px-5 pb-4 overflow-x-auto">

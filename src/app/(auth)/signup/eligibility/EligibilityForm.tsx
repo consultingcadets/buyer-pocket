@@ -7,24 +7,24 @@ import { useRouter } from "next/navigation";
 const OPTIONS = [
   {
     value: "independent",
-    label: "Independent agent or Principal",
-    description: "I own my buyer relationships and operate independently.",
+    label: "I'm an independent agent or principal",
+    description: "I run my own agency, work as a sole trader, or otherwise own my buyer relationships.",
   },
   {
     value: "agency_permitted",
-    label: "Agency work with permission",
+    label: "I work at an agency and have permission",
     description:
-      "I work for an agency but have explicit permission to use external tools.",
+      "My agency knows about and permits the use of personal capture tools alongside the agency CRM.",
   },
   {
     value: "unconfirmed",
-    label: "Agency work — not sure",
-    description: "I work for an agency and am unsure about tool policies.",
+    label: "I work at an agency and I'm not sure",
+    description: "I haven't checked with my principal or read my contract.",
   },
   {
     value: "something_else",
     label: "Something else",
-    description: null,
+    description: "I want to learn more before signing up.",
   },
 ] as const;
 
@@ -38,7 +38,6 @@ export function EligibilityForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
-      {/* Hidden field carries the selected value */}
       <input type="hidden" name="eligibility" value={selected} />
 
       {state?.error && (
@@ -47,26 +46,23 @@ export function EligibilityForm() {
         </div>
       )}
 
-      {/* Radio options */}
       <div className="flex flex-col gap-4">
         {OPTIONS.map((option) => {
           const isSelected = selected === option.value;
           return (
             <label
               key={option.value}
-              className={`flex items-start gap-4 p-4 rounded border cursor-pointer transition-colors ${
+              className={`flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${
                 isSelected
                   ? "border-teal-action bg-surface-container-low"
-                  : "border-surface-variant hover:border-outline-variant"
+                  : "border-border hover:border-border-strong"
               }`}
               onClick={() => setSelected(option.value)}
             >
               <div className="mt-0.5 flex items-center justify-center shrink-0">
                 <div
                   className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    isSelected
-                      ? "border-teal-action"
-                      : "border-outline-variant"
+                    isSelected ? "border-teal-action" : "border-border"
                   }`}
                 >
                   {isSelected && (
@@ -75,11 +71,11 @@ export function EligibilityForm() {
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-[16px] font-semibold text-brand-navy">
+                <span className="text-[16px] font-semibold text-primary">
                   {option.label}
                 </span>
                 {option.description && (
-                  <span className="text-[14px] text-on-surface-variant mt-0.5">
+                  <span className="text-[14px] text-text-secondary mt-0.5">
                     {option.description}
                   </span>
                 )}
@@ -89,7 +85,6 @@ export function EligibilityForm() {
         })}
       </div>
 
-      {/* Warning card for "unconfirmed" */}
       {selected === "unconfirmed" && (
         <div className="bg-warning-bg border border-warning-text/20 rounded-lg p-4 flex flex-col gap-2">
           <p className="text-[14px] font-semibold text-warning-text">
@@ -101,22 +96,23 @@ export function EligibilityForm() {
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex justify-between items-center mt-2">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="text-[16px] font-semibold text-on-surface-variant hover:text-brand-navy transition-colors py-2 px-4 rounded"
-        >
-          Back
-        </button>
+      <div className="flex flex-col gap-3 mt-2">
         <button
           type="submit"
           disabled={pending || !selected}
-          className="bg-teal-action text-on-teal-action text-[16px] font-semibold h-12 px-6 rounded hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-40"
+          className="w-full min-h-12 bg-teal-action text-on-teal-action text-[16px] font-semibold rounded-lg hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-40"
         >
-          {pending ? "Saving…" : "Continue"}
+          {pending ? "Saving…" : selected === "unconfirmed" ? "I've confirmed, continue" : "Continue"}
         </button>
+        {selected === "unconfirmed" && (
+          <button
+            type="button"
+            onClick={() => router.push("/login")}
+            className="w-full min-h-12 text-[16px] font-semibold text-text-secondary hover:text-primary transition-colors rounded-lg"
+          >
+            I&apos;ll come back later
+          </button>
+        )}
       </div>
     </form>
   );

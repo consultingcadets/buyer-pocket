@@ -656,10 +656,7 @@ function BillingSection({
     return (
       <Section id="billing" title="Billing">
         <p className="text-sm text-text-secondary leading-relaxed">
-          Payment collection is turned off for testing (
-          <span className="font-mono text-xs">SKIP_BILLING=1</span>). All app
-          features stay available. Configure Stripe and unset this when you are
-          ready to go live.
+          Billing is not yet active. You&apos;re using BuyerPocket in trial mode.
         </p>
       </Section>
     );
@@ -872,7 +869,7 @@ export function SettingsClient({
       {/* ── Desktop ── */}
       <div className="hidden md:block">
         <div className="max-w-2xl mx-auto px-6 py-10">
-          <h1 className="text-3xl font-bold text-text-primary mb-8">Settings</h1>
+          <h1 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary mb-8">Settings</h1>
           {allSections}
         </div>
         <BottomNav />

@@ -72,7 +72,7 @@ CREATE INDEX IF NOT EXISTS idx_buyers_bedrooms ON public.buyers (user_id, bedroo
 -- ============================================================
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM public.profiles WHERE id = '00000000-0000-0000-0000-000000000001'::uuid)
-     AND NOT EXISTS (SELECT 1 FROM public.buyers WHERE name = 'Sarah & Tom Jenkins') THEN
+     AND NOT EXISTS (SELECT 1 FROM public.buyers WHERE name = 'Sarah Jenkins') THEN
 
     INSERT INTO public.buyers (
       user_id, name, phone, email,
@@ -86,7 +86,7 @@ DO $$ BEGIN
     -- HOT BUYERS (15)
     (
       '00000000-0000-0000-0000-000000000001'::uuid,
-      'Sarah & Tom Jenkins', '0412 345 678', 'sarah.jenkins@email.com',
+      'Sarah Jenkins', '0412 345 678', 'sarah.jenkins@email.com',
       ARRAY['Surry Hills, NSW', 'Paddington, NSW', 'Darlinghurst, NSW'],
       1500000, 2000000, '3+', 'Terrace', NULL,
       'hot', 'Active', 'Ready now',
@@ -96,7 +96,7 @@ DO $$ BEGIN
     ),
     (
       '00000000-0000-0000-0000-000000000001'::uuid,
-      'Marcus Webb', '0423 456 789', 'marcus.webb@email.com',
+      'Mark & Lisa Thompson', '0423 456 789', 'mark.thompson@email.com',
       ARRAY['Toorak, VIC', 'South Yarra, VIC', 'Armadale, VIC'],
       2500000, 4000000, '4+', 'House', 600,
       'hot', 'Active', 'Ready now',
@@ -116,7 +116,7 @@ DO $$ BEGIN
     ),
     (
       '00000000-0000-0000-0000-000000000001'::uuid,
-      'David & Lisa Chen', '0445 678 901', 'david.chen@outlook.com',
+      'David Chen', '0445 678 901', 'david.chen@outlook.com',
       ARRAY['Chatswood, NSW', 'Lane Cove, NSW', 'Willoughby, NSW'],
       1800000, 2500000, '4+', 'House', 500,
       'hot', 'Follow-up', 'Ready now',
@@ -216,7 +216,7 @@ DO $$ BEGIN
     ),
     (
       '00000000-0000-0000-0000-000000000001'::uuid,
-      'James Whitfield', '0446 678 901', 'j.whitfield@email.com',
+      'James Carter', '0446 678 901', 'james.carter@email.com',
       ARRAY['New Farm, QLD', 'Teneriffe, QLD', 'Newstead, QLD'],
       1300000, 1800000, '3+', 'Townhouse', NULL,
       'hot', 'Active', 'Ready now',
@@ -226,7 +226,7 @@ DO $$ BEGIN
     ),
     (
       '00000000-0000-0000-0000-000000000001'::uuid,
-      'Mei & Liang Zhou', '0457 789 012', 'mei.zhou@gmail.com',
+      'Emily Davis', '0457 789 012', 'emily.davis@gmail.com',
       ARRAY['Box Hill, VIC', 'Glen Waverley, VIC', 'Doncaster East, VIC'],
       1050000, 1400000, '4+', 'House', 400,
       'hot', 'Follow-up', 'Ready now',

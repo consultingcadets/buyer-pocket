@@ -9,6 +9,8 @@ export type ReminderBuyerSnippet = {
   budget_min: number | null;
   budget_max: number | null;
   preferred_suburbs: string[] | null;
+  bedrooms: string | null;
+  land_size_min: number | null;
 };
 
 export type ReminderWithBuyer = Omit<Reminder, never> & {

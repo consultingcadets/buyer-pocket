@@ -428,42 +428,47 @@ function ModalBackdrop({
 
 function LookingForCard({ buyer }: { buyer: Buyer }) {
   const budget = fmtBudget(buyer.budget_min, buyer.budget_max);
+  const hasBudget = buyer.budget_min != null || buyer.budget_max != null;
+  const hasSuburbs = (buyer.preferred_suburbs?.length ?? 0) > 0;
+  const propertyCriteria = [
+    buyer.bedrooms ? `${buyer.bedrooms} bed` : null,
+    buyer.bathrooms ? `${buyer.bathrooms} bath` : null,
+    buyer.car_spaces ? `${buyer.car_spaces} parking` : null,
+    buyer.land_size_min ? `${buyer.land_size_min}m²+ land` : null,
+  ].filter(Boolean).join(", ");
 
   return (
     <Card title="Looking for">
       {/* Suburbs */}
       <div>
         <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Suburbs</p>
-        {buyer.preferred_suburbs && buyer.preferred_suburbs.length > 0 ? (
+        {hasSuburbs ? (
           <div className="flex flex-wrap gap-1.5">
-            {buyer.preferred_suburbs.map((s) => (
-              <Chip key={s} label={s} className="bg-teal-action/15 text-teal-action border border-teal-action/30 font-semibold" />
+            {buyer.preferred_suburbs!.map((s) => (
+              <Chip key={s} label={s.split(",")[0].trim()} className="bg-teal-action/15 text-teal-action border border-teal-action/30 font-semibold" />
             ))}
           </div>
         ) : (
-          <p className="text-sm text-text-primary">—</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-text-secondary">—</p>
+            <Link href={`/buyers/${buyer.id}/edit`} className="text-sm text-accent font-medium">
+              Add suburbs
+            </Link>
+          </div>
         )}
       </div>
 
-      {/* Budget */}
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Budget" value={budget} />
-        <Field label="Finance" value={buyer.finance_status} />
-      </div>
+      {(hasBudget || buyer.finance_status) && (
+        <div className="grid grid-cols-2 gap-4">
+          {hasBudget && <Field label="Budget" value={budget} />}
+          {buyer.finance_status && <Field label="Finance" value={buyer.finance_status} />}
+        </div>
+      )}
 
-      {/* Property type */}
-      {(buyer.property_type || buyer.house_type || buyer.bedrooms || buyer.bathrooms || buyer.car_spaces || buyer.land_size_min) && (
+      {propertyCriteria && (
         <div>
           <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Property Criteria</p>
-          <p className="text-sm text-text-primary">
-            {[
-              [buyer.property_type, buyer.house_type].filter(Boolean).join(" or ") || null,
-              buyer.bedrooms ? `${buyer.bedrooms} bed` : null,
-              buyer.bathrooms ? `${buyer.bathrooms} bath` : null,
-              buyer.car_spaces ? `${buyer.car_spaces} car` : null,
-              buyer.land_size_min ? `${buyer.land_size_min}m²+ land` : null,
-            ].filter(Boolean).join(", ")}
-          </p>
+          <p className="text-sm text-text-primary">{propertyCriteria}</p>
         </div>
       )}
 
@@ -479,15 +484,16 @@ function LookingForCard({ buyer }: { buyer: Buyer }) {
         </div>
       )}
 
-      {/* Other fields */}
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Timeline" value={buyer.buying_timeline} />
-        <Field label="Condition" value={buyer.condition_preference} />
-        {buyer.block_preference && <Field label="Block" value={buyer.block_preference} />}
-        {buyer.building_size_min && <Field label="Building size" value={`${buyer.building_size_min} sq min`} />}
-        {buyer.deposit_ready && <Field label="Deposit" value={buyer.deposit_ready} />}
-        {buyer.school_zone_required && <Field label="School zone" value={buyer.school_zone_required} />}
-      </div>
+      {(buyer.buying_timeline || buyer.condition_preference || buyer.block_preference || buyer.building_size_min || buyer.deposit_ready || buyer.school_zone_required) && (
+        <div className="grid grid-cols-2 gap-4">
+          {buyer.buying_timeline && <Field label="Timeline" value={buyer.buying_timeline} />}
+          {buyer.condition_preference && <Field label="Condition" value={buyer.condition_preference} />}
+          {buyer.block_preference && <Field label="Block" value={buyer.block_preference} />}
+          {buyer.building_size_min && <Field label="Building size" value={`${buyer.building_size_min} sq min`} />}
+          {buyer.deposit_ready && <Field label="Deposit" value={buyer.deposit_ready} />}
+          {buyer.school_zone_required && <Field label="School zone" value={buyer.school_zone_required} />}
+        </div>
+      )}
 
       {buyer.deal_breakers && (
         <Field label="Deal breakers" value={buyer.deal_breakers} />
@@ -720,31 +726,42 @@ function NotesActivity({
 // ─── Contact Card ─────────────────────────────────────────────────────────────
 
 function ContactCard({ buyer }: { buyer: Buyer }) {
+  const hasPhone = Boolean(buyer.phone);
+  const hasEmail = Boolean(buyer.email);
+  const hasPreferredOrBest = Boolean(buyer.preferred_contact_method || buyer.best_time_to_contact);
+
   return (
     <Card title="Contact">
       <div className="space-y-3">
-        {buyer.phone ? (
+        {hasPhone ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Phone</p>
             <a href={`tel:${buyer.phone.replace(/\s/g, "")}`} className="text-sm text-accent font-medium">
               {buyer.phone}
             </a>
           </div>
-        ) : (
-          <Field label="Phone" value={null} />
         )}
-        {buyer.email ? (
+        {hasEmail ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Email</p>
             <a href={`mailto:${buyer.email}`} className="text-sm text-accent font-medium break-all">
               {buyer.email}
             </a>
           </div>
-        ) : (
-          <Field label="Email" value={null} />
         )}
-        <Field label="Preferred contact" value={buyer.preferred_contact_method} />
-        <Field label="Best time" value={buyer.best_time_to_contact} />
+        {!hasPhone && !hasEmail && (
+          <p className="text-sm text-warning-text">No contact info — Edit buyer to add</p>
+        )}
+        {hasPreferredOrBest && (
+          <div className="grid grid-cols-2 gap-4">
+            {buyer.preferred_contact_method && (
+              <Field label="Preferred contact" value={buyer.preferred_contact_method} />
+            )}
+            {buyer.best_time_to_contact && (
+              <Field label="Best time" value={buyer.best_time_to_contact} />
+            )}
+          </div>
+        )}
         {buyer.contact_consent && <Field label="Consent" value={buyer.contact_consent} />}
       </div>
     </Card>
@@ -802,10 +819,19 @@ function RemindersCard({
           </button>
         }
       >
-        {upcoming.length === 0 && past.length === 0 ? (
-          <p className="text-sm text-text-secondary">No reminders set.</p>
-        ) : (
-          <div className="space-y-3">
+        <div className="space-y-3">
+          {upcoming.length === 0 && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-text-secondary">No upcoming reminder</p>
+              <button
+                type="button"
+                onClick={onAddReminder}
+                className="text-sm font-semibold text-accent"
+              >
+                + Add
+              </button>
+            </div>
+          )}
             {upcoming.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Next</p>
@@ -881,8 +907,7 @@ function RemindersCard({
                 ))}
               </div>
             )}
-          </div>
-        )}
+        </div>
       </Card>
 
       {snoozeTarget && (
@@ -918,11 +943,15 @@ function StatsCard({
             year: "numeric",
           })}
         />
-        <Field
-          label="Last contacted"
-          value={buyer.last_contacted_at ? fmtRelative(buyer.last_contacted_at) : null}
-        />
-        <Field label="Lead source" value={buyer.lead_source} />
+        <div>
+          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">
+            Last contacted
+          </p>
+          <p className={cn("text-sm", buyer.last_contacted_at ? "text-text-primary" : "text-text-secondary")}>
+            {buyer.last_contacted_at ? fmtRelative(buyer.last_contacted_at) : "Never contacted"}
+          </p>
+        </div>
+        {buyer.lead_source && <Field label="Lead source" value={buyer.lead_source} />}
         <Field
           label="Engagement"
           value={`${notes.length} note${notes.length !== 1 ? "s" : ""} · ${reminders.length} reminder${reminders.length !== 1 ? "s" : ""}`}

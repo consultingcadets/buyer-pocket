@@ -117,7 +117,7 @@ export function BottomNav() {
       </nav>
 
       {/* ── Desktop left sidebar ── */}
-      <nav className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-56 bg-primary z-30 py-6 px-3">
+      <nav className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-60 bg-primary z-30 py-6 px-3">
         {/* Brand */}
         <Link href="/today" className="flex items-center gap-2.5 px-3 py-2 mb-6">
           <div className="w-8 h-8 rounded-xl bg-teal-action flex items-center justify-center shrink-0">

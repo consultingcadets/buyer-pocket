@@ -11,90 +11,78 @@ export default function ForgotPasswordPage() {
   >(sendResetLink, null);
 
   return (
-    <main className="min-h-screen bg-background flex flex-col antialiased">
-      <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 w-full">
-        <div className="w-full max-w-[480px]">
-          <div className="bg-surface-container-lowest rounded-lg shadow-[0_2px_8px_-2px_rgba(15,28,44,0.08),0_4px_16px_-4px_rgba(15,28,44,0.04)] p-8 w-full flex flex-col gap-6">
-            {/* Logo */}
-            <div className="flex justify-center pb-2">
-              <span className="text-[32px] font-bold tracking-tight text-brand-navy">
-                BuyerPocket
-              </span>
-            </div>
-
-            {/* Header */}
-            <div className="flex flex-col gap-1 text-center">
-              <h1 className="text-[24px] font-semibold text-on-surface">
-                Forgot your password?
-              </h1>
-              <p className="text-[16px] text-on-surface-variant">
-                Enter the email address associated with your account and
-                we&apos;ll send you a link to reset your password.
-              </p>
-            </div>
-
-            {state && "success" in state ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-4 text-center">
-                <p className="text-[16px] font-semibold text-green-800 mb-1">
-                  Check your inbox.
-                </p>
-                <p className="text-[14px] text-green-700">
-                  We&apos;ve sent a password reset link to your email address.
-                </p>
-              </div>
-            ) : (
-              <form action={formAction} className="flex flex-col gap-6 mt-2">
-                {state?.error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
-                    {(state as { error: string }).error}
-                  </div>
-                )}
-
-                {/* Email */}
-                <div className="flex flex-col gap-1">
-                  <label
-                    htmlFor="email"
-                    className="text-[14px] text-on-surface-variant mb-1"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="e.g. james@eliterealty.com.au"
-                    className="w-full bg-surface-container-lowest border border-outline-variant rounded p-3 text-[16px] text-on-surface focus:outline-none focus:border-brand-electric focus:ring-1 focus:ring-brand-electric transition-colors h-12"
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-4 pt-2">
-                  <button
-                    type="submit"
-                    disabled={pending}
-                    className="w-full bg-brand-teal hover:opacity-90 text-white text-[14px] font-semibold tracking-wider py-3.5 px-4 rounded transition-colors flex justify-center items-center h-12 disabled:opacity-60"
-                  >
-                    {pending ? "Sending…" : "Send reset link"}
-                  </button>
-                  <Link
-                    href="/login"
-                    className="w-full text-center text-brand-navy hover:text-brand-electric text-[16px] transition-colors py-2 inline-block"
-                  >
-                    Back to login
-                  </Link>
-                </div>
-              </form>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 text-center">
-            <p className="text-[14px] text-on-surface-variant opacity-70">
-              © 2026 BuyerPocket. Built in Australia.
+    <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+      <div className="w-full max-w-[480px] flex flex-col items-center">
+        <div className="mb-8">
+          <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
+        </div>
+        <div className="w-full bg-white rounded-lg shadow-card p-6 md:p-8 border border-border flex flex-col gap-6">
+          <div className="flex flex-col gap-1 text-center">
+            <h1 className="text-[32px] font-bold text-primary">
+              Forgot your password?
+            </h1>
+            <p className="text-[16px] text-text-secondary">
+              Enter your account email and we&apos;ll send you a reset link.
             </p>
           </div>
+
+          {state && "success" in state ? (
+            <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-4 text-center">
+              <h2 className="text-[24px] font-semibold text-primary mb-1">
+                Check your email.
+              </h2>
+              <p className="text-[14px] text-text-secondary">
+                If that email is registered with BuyerPocket, you&apos;ll get a reset link in the next minute. Check your spam folder if you don&apos;t see it.
+              </p>
+              <Link
+                href="/login"
+                className="inline-block mt-4 text-[16px] text-accent hover:underline"
+              >
+                Back to login
+              </Link>
+            </div>
+          ) : (
+            <form action={formAction} className="flex flex-col gap-6 mt-2">
+              {state?.error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
+                  {(state as { error: string }).error}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="email"
+                  className="text-[14px] text-text-secondary mb-1"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  className="w-full min-h-12 bg-white border border-border rounded-lg p-3 text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-4 pt-2">
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className="w-full min-h-12 bg-teal-action hover:opacity-90 text-white text-[16px] font-semibold rounded-lg transition-colors flex justify-center items-center disabled:opacity-60"
+                >
+                  {pending ? "Sending…" : "Send reset link"}
+                </button>
+                <Link
+                  href="/login"
+                  className="w-full text-center text-text-secondary hover:text-primary text-[16px] transition-colors py-2 inline-block"
+                >
+                  Back to login
+                </Link>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </main>

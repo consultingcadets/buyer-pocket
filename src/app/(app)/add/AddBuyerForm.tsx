@@ -331,16 +331,16 @@ export function AddBuyerForm() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
 
-      {/* ── Navy sticky header ── */}
-      <header className="sticky top-0 bg-primary z-20 border-b border-white/10">
+      {/* ── Standard white app header ── */}
+      <header className="sticky top-0 bg-white z-20 border-b border-border">
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
           <Link
             href="/buyers"
-            className="text-white/70 hover:text-white text-sm font-medium w-16 transition-colors"
+            className="text-accent hover:text-accent/90 text-sm font-medium w-16 transition-colors"
           >
             Cancel
           </Link>
-          <h1 className="text-base font-semibold text-white tracking-tight">
+          <h1 className="text-base font-semibold text-text-primary tracking-tight">
             Add Buyer
           </h1>
           <div className="w-16" />
@@ -576,7 +576,7 @@ export function AddBuyerForm() {
       </div>
 
       {/* ── Sticky footer ── */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-56 bg-white border-t border-border shadow-[0_-4px_16px_rgba(15,28,44,0.06)]">
+      <div className="fixed bottom-0 left-0 right-0 lg:left-60 bg-white border-t border-border shadow-[0_-4px_16px_rgba(15,28,44,0.06)]">
         <div className="max-w-5xl mx-auto px-4 lg:px-6 pt-3 pb-5 space-y-3">
           {/* Reminder section */}
           <div>

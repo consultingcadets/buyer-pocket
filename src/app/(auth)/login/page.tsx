@@ -12,49 +12,41 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <main className="min-h-screen bg-background flex flex-col justify-center items-center px-4 py-8 antialiased">
+    <main className="min-h-screen bg-surface-container-low flex flex-col justify-center items-center px-4 py-8 antialiased">
       <div className="w-full max-w-[480px] flex flex-col items-center">
-        {/* Logo */}
-        <div className="mb-6">
-          <span className="text-[24px] font-bold tracking-tighter text-brand-navy">
-            BuyerPocket
-          </span>
+        <div className="mb-8">
+          <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
         </div>
 
-        {/* Card */}
-        <div className="bg-surface-container-lowest w-full rounded-lg shadow-[var(--shadow-card-resting)] p-8 flex flex-col gap-6 border border-surface-container">
-          {/* Header */}
+        <div className="bg-white w-full rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 border border-border">
           <div className="flex flex-col gap-1 text-center">
-            <h1 className="text-[32px] font-bold leading-tight tracking-tight text-brand-navy">
+            <h1 className="text-[32px] font-bold leading-tight tracking-tight text-primary">
               Welcome back.
             </h1>
-            <p className="text-[16px] leading-relaxed text-on-surface-variant">
+            <p className="text-[16px] leading-relaxed text-text-secondary">
               Sign in to your buyer list.
             </p>
           </div>
 
-          {/* Google OAuth */}
           <form>
             <button
               type="submit"
               formAction={loginWithGoogle}
-              className="w-full flex items-center justify-center gap-2 bg-surface-container-lowest text-brand-navy text-[14px] font-semibold tracking-wider py-4 px-4 rounded-lg border border-brand-navy hover:bg-surface-container-low transition-colors duration-200"
+              className="w-full min-h-12 flex items-center justify-center gap-2 bg-white text-primary text-[14px] font-semibold py-3 px-4 rounded-lg border border-primary hover:bg-surface-container-low transition-colors duration-200"
             >
               <GoogleIcon />
               Continue with Google
             </button>
           </form>
 
-          {/* Divider */}
           <div className="relative flex items-center">
-            <div className="flex-grow border-t border-surface-container" />
-            <span className="flex-shrink-0 mx-4 text-[14px] text-on-surface-variant bg-surface-container-lowest">
+            <div className="flex-grow border-t border-border" />
+            <span className="shrink-0 mx-4 text-[14px] text-text-secondary bg-white">
               or
             </span>
-            <div className="flex-grow border-t border-surface-container" />
+            <div className="flex-grow border-t border-border" />
           </div>
 
-          {/* Email/password form */}
           <form action={formAction} className="flex flex-col gap-4">
             {state?.error && (
               <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
@@ -62,11 +54,10 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email */}
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="email"
-                className="text-[14px] text-on-surface-variant font-medium"
+                className="text-[14px] text-text-secondary font-medium"
               >
                 Email
               </label>
@@ -77,15 +68,14 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 placeholder="Enter your email"
-                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 px-4 text-[16px] text-on-surface focus:outline-none focus:border-2 focus:border-brand-electric transition-all"
+                className="w-full min-h-12 bg-white border border-border rounded-lg py-2 px-4 text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-all"
               />
             </div>
 
-            {/* Password */}
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="password"
-                className="text-[14px] text-on-surface-variant font-medium"
+                className="text-[14px] text-text-secondary font-medium"
               >
                 Password
               </label>
@@ -97,45 +87,42 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 pl-4 pr-12 text-[16px] text-on-surface focus:outline-none focus:border-2 focus:border-brand-electric transition-all"
+                  className="w-full min-h-12 bg-white border border-border rounded-lg py-2 pl-4 pr-12 text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[14px] text-on-surface-variant hover:text-brand-navy"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[14px] text-text-secondary hover:text-primary"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
 
-            {/* Forgot password */}
             <div className="flex justify-end mt-1">
               <Link
                 href="/forgot-password"
-                className="text-[14px] text-brand-electric hover:underline transition-all"
+                className="text-[14px] text-accent hover:underline transition-all"
               >
                 Forgot password?
               </Link>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={pending}
-              className="w-full bg-brand-teal text-white text-[14px] font-semibold tracking-wider py-4 px-4 rounded-lg hover:opacity-90 transition-opacity duration-200 mt-1 disabled:opacity-60"
+              className="w-full min-h-12 bg-teal-action text-white text-[14px] font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity duration-200 mt-1 disabled:opacity-60"
             >
               {pending ? "Signing in…" : "Sign in"}
             </button>
           </form>
 
-          {/* Sign-up prompt */}
           <div className="text-center">
-            <p className="text-[14px] text-on-surface-variant">
+            <p className="text-[14px] text-text-secondary">
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
-                className="text-brand-teal font-medium hover:underline"
+                className="text-teal-action font-medium hover:underline"
               >
                 Start free trial
               </Link>
@@ -143,9 +130,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Terms footer */}
         <div className="mt-6 text-center px-4">
-          <p className="text-[12px] text-on-surface-variant">
+          <p className="text-[12px] text-text-secondary">
             By continuing, you agree to our Terms and Privacy Policy.
           </p>
         </div>

@@ -16,7 +16,7 @@ function remindersWithBuyer(rows: unknown[] | null | undefined): ReminderWithBuy
 export const metadata = { title: "Today — BuyerPocket" };
 
 const BUYER_FIELDS =
-  "id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs";
+  "id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs, bedrooms, land_size_min";
 /** Hot / recent rows — explicit columns only (avoids tsvector + generated columns that break RSC payloads) */
 const TODAY_BUYER_LIST =
   "id, user_id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs, archived_at, created_at, updated_at";

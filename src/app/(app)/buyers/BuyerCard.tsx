@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Clock, Phone, MapPin, Bed, MoreVertical } from "lucide-react";
+import { Clock, Phone, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { Buyer } from "@/types/database";
@@ -45,6 +45,15 @@ function TemperatureChip({ temp }: { temp: string | null }) {
     <span className={cn("shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase", s.bg, s.text)}>
       <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />
       {temp}
+    </span>
+  );
+}
+
+function StatusChip({ status }: { status: string | null }) {
+  if (!status) return null;
+  return (
+    <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-text-secondary">
+      {status}
     </span>
   );
 }
@@ -194,48 +203,53 @@ export function BuyerCard({
   const desktopRow = (
     <div className="hidden lg:flex items-center px-6 py-3 border-b border-border hover:bg-surface-container-low/60 group cursor-default transition-colors">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-[15px] text-primary truncate">
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="font-semibold text-[18px] text-primary truncate">
             {buyer.name}
-          </span>
+          </h4>
+          <div className="shrink-0 flex items-center gap-1.5">
+            <TemperatureChip temp={buyer.buyer_temperature} />
+            <StatusChip status={buyer.lead_status} />
+          </div>
         </div>
-        {(buyer.preferred_suburbs?.length ?? 0) > 0 && (
-          <div className="flex items-center gap-1 mt-0.5 text-text-secondary">
-            <MapPin className="w-3 h-3" />
-            <span className="text-[13px]">
+
+        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap text-[13px] text-text-secondary">
+          {(buyer.preferred_suburbs?.length ?? 0) > 0 && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-low">
               {formatSuburbs(buyer.preferred_suburbs)}
             </span>
-          </div>
-        )}
-      </div>
-
-      {/* Temperature column */}
-      <div className="w-16 shrink-0 flex justify-center ml-4">
-        {buyer.buyer_temperature ? (
-          <TemperatureChip temp={buyer.buyer_temperature} />
-        ) : (
-          <span className="text-[12px] text-outline">—</span>
-        )}
-      </div>
-
-      <div className="flex items-center gap-1 text-[13px] text-text-secondary shrink-0 ml-4">
-        {budgetLabel && <span className="font-medium">{budgetLabel}</span>}
-        {buyer.bedrooms && buyer.bedrooms !== "Any" && (
-          <>
-            <span className="text-outline-variant mx-1">·</span>
-            <span className="flex items-center gap-1">
-              <Bed className="w-3 h-3" />
-              {buyer.bedrooms.replace("+", "")} bed
-            </span>
-          </>
-        )}
-        {buyer.land_size_min && (
-          <>
-            <span className="text-outline-variant mx-1">·</span>
-            <span>{buyer.land_size_min}m²</span>
-          </>
-        )}
-        <ReminderBadge iso={buyer.next_reminder_at} />
+          )}
+          {budgetLabel && (
+            <>
+              <span>·</span>
+              <span>{budgetLabel}</span>
+            </>
+          )}
+          {buyer.bedrooms && buyer.bedrooms !== "Any" && (
+            <>
+              <span>·</span>
+              <span>{buyer.bedrooms} bed</span>
+            </>
+          )}
+          {buyer.land_size_min && (
+            <>
+              <span>·</span>
+              <span>{buyer.land_size_min}m²</span>
+            </>
+          )}
+          {buyer.next_reminder_at && (
+            <>
+              <span>·</span>
+              <ReminderBadge iso={buyer.next_reminder_at} />
+            </>
+          )}
+          {!buyer.next_reminder_at && (
+            <>
+              <span>·</span>
+              <span className="text-outline">No reminder</span>
+            </>
+          )}
+        </div>
       </div>
 
       <ThreeDotMenu

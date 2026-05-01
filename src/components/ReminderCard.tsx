@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { ReminderWithBuyer } from "@/types/reminders";
@@ -22,20 +22,11 @@ function formatReminderTime(iso: string): string {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  });
+  }).toLowerCase();
 }
 
 function formatReminderDate(iso: string): string {
   const d = new Date(iso);
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  if (d.toDateString() === today.toDateString()) return "Today";
-  if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
-  if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
   return d.toLocaleDateString("en-AU", {
     weekday: "short",
     day: "numeric",
@@ -53,11 +44,19 @@ function TempBadge({ temp }: { temp: "hot" | "warm" | "cold" | null }) {
   return (
     <span
       className={cn(
-        "text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full",
+        "text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full",
         styles[temp]
       )}
     >
       {temp}
+    </span>
+  );
+}
+
+function SummaryTag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center h-6 px-2 rounded-full bg-surface-container-low text-[12px] text-text-secondary">
+      {children}
     </span>
   );
 }
@@ -78,104 +77,99 @@ export function ReminderCard({
   isCompleting,
 }: Props) {
   const { buyer } = reminder;
-
   const budgetLabel = formatBudgetLabel(buyer.budget_min, buyer.budget_max);
   const suburbDisplay = buyer.preferred_suburbs?.[0]?.split(",")[0] ?? "";
+  const bedsLabel = buyer.bedrooms ? `${buyer.bedrooms} bed` : "";
+  const landLabel = buyer.land_size_min ? `${buyer.land_size_min}m²+` : "";
 
-  const isOverdue = new Date(reminder.reminder_at).getTime() < Date.now();
+  const now = Date.now();
+  const reminderTs = new Date(reminder.reminder_at).getTime();
+  const isOverdueNow = reminderTs < now && reminder.status !== "completed";
+  const isUpcomingNow = reminderTs >= now && reminder.status !== "completed";
+  const timeToneClass = isOverdueNow
+    ? "text-error"
+    : isUpcomingNow
+      ? "text-accent"
+      : "text-text-secondary";
+
+  const summaryItems = [suburbDisplay, budgetLabel, bedsLabel, landLabel].filter(Boolean);
 
   return (
-    <div className="bg-white rounded-xl border border-border shadow-card p-4 flex gap-3">
-      {/* Avatar */}
-      <div className="shrink-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center mt-0.5">
-        <span className="text-white text-[12px] font-bold">{initials(buyer.name)}</span>
+    <div className="bg-white rounded-lg shadow-card p-4">
+      <div className="flex items-center gap-3">
+        <div className="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <span className="text-white text-[11px] font-bold">{initials(buyer.name)}</span>
+        </div>
+        <h4 className="text-[18px] font-semibold text-primary leading-tight min-w-0 truncate">
+          {buyer.name}
+        </h4>
+        <div className="ml-auto">
+          <TempBadge temp={buyer.buyer_temperature} />
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {/* Name + badge + type label */}
-        <div className="flex items-center justify-between gap-1.5">
-          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            <span className="text-[14px] font-semibold text-text-primary leading-tight">
-              {buyer.name}
-            </span>
-            <TempBadge temp={buyer.buyer_temperature} />
-          </div>
-          {reminder.reminder_type && (
-            <span className="shrink-0 text-[10px] font-semibold text-text-secondary uppercase tracking-wide">
-              {reminder.reminder_type}
-            </span>
-          )}
-        </div>
+      <div className="mt-3 flex items-center gap-2">
+        <Clock size={14} className={timeToneClass} />
+        <span className={cn("text-[14px] font-semibold", timeToneClass)}>
+          {showDate ? `${formatReminderDate(reminder.reminder_at)} · ` : ""}
+          {formatReminderTime(reminder.reminder_at)}
+        </span>
+        {reminder.reminder_type && (
+          <span className="text-[14px] text-text-secondary">{reminder.reminder_type}</span>
+        )}
+      </div>
 
-        {/* Time */}
-        <div className="flex items-center gap-1 mt-0.5">
-          <Clock size={11} className={cn("shrink-0", isOverdue ? "text-error" : "text-text-secondary")} />
-          <span className={cn("text-[12px]", isOverdue ? "text-error font-medium" : "text-text-secondary")}>
-            {showDate ? formatReminderDate(reminder.reminder_at) + " · " : ""}
-            {formatReminderTime(reminder.reminder_at)}
-          </span>
+      {summaryItems.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {summaryItems.map((item, index) => (
+            <div key={`${item}-${index}`} className="inline-flex items-center gap-1.5">
+              {index > 0 && <span className="text-text-secondary text-[12px]">·</span>}
+              <SummaryTag>{item}</SummaryTag>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Note */}
-        {reminder.reminder_note && (
-          <blockquote className="mt-2 border-l-2 border-border pl-3 text-[12px] text-text-secondary italic line-clamp-2">
-            &ldquo;{reminder.reminder_note}&rdquo;
-          </blockquote>
+      {reminder.reminder_note && (
+        <p className="mt-2 text-[12px] text-text-secondary italic line-clamp-2">
+          {reminder.reminder_note}
+        </p>
+      )}
+
+      <div className="mt-4 flex items-center gap-2">
+        {buyer.phone && (
+          <a
+            href={`tel:${buyer.phone}`}
+            className="inline-flex items-center justify-center gap-1.5 h-10 min-w-20 px-4 rounded-lg bg-teal-action text-white text-[14px] font-semibold"
+          >
+            <Phone size={14} />
+            Call
+          </a>
+        )}
+        {buyer.phone && (
+          <a
+            href={`sms:${buyer.phone}`}
+            className="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-border text-[14px] font-semibold text-primary hover:bg-surface-container-low transition-colors"
+          >
+            SMS
+          </a>
         )}
 
-        {/* Buyer tags */}
-        {(budgetLabel || suburbDisplay) && (
-          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            {suburbDisplay && (
-              <span className="text-[11px] text-text-secondary bg-surface-container-low rounded-md px-1.5 py-0.5">
-                {suburbDisplay}
-              </span>
-            )}
-            {budgetLabel && (
-              <span className="text-[11px] text-text-secondary bg-surface-container-low rounded-md px-1.5 py-0.5">
-                {budgetLabel}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 mt-3">
-          {buyer.phone && (
-            <a
-              href={`tel:${buyer.phone}`}
-              className="flex items-center text-[12px] font-semibold text-white bg-teal-action rounded-full px-3 py-1.5 leading-none hover:bg-teal-action/90 transition-colors"
-            >
-              Call
-            </a>
-          )}
-          {buyer.phone && (
-            <a
-              href={`sms:${buyer.phone}`}
-              className="flex items-center text-[12px] font-semibold text-teal-action border border-teal-action/40 rounded-full px-3 py-1.5 leading-none hover:bg-teal-action/5 transition-colors"
-            >
-              SMS
-            </a>
-          )}
-
-          {/* Done */}
+        <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => onComplete(reminder.id)}
             disabled={isCompleting}
-            className="ml-auto flex items-center justify-center w-9 h-9 rounded-full border border-teal-action/30 text-teal-action hover:bg-teal-action/8 transition-colors disabled:opacity-50"
-            aria-label="Mark done"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors disabled:opacity-50"
+            aria-label="Done"
           >
-            <Check size={15} />
+            <Check size={16} />
           </button>
-
-          {/* Snooze */}
           <button
             onClick={() => onSnooze(reminder.id)}
-            className="flex items-center justify-center w-9 h-9 rounded-full border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
             aria-label="Snooze"
           >
-            <Clock size={15} />
+            <Clock size={16} />
           </button>
         </div>
       </div>

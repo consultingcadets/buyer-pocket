@@ -25,7 +25,7 @@ export async function fetchReminders(tab: ReminderTab): Promise<{
 
   let q = supabase
     .from("reminders")
-    .select("*, buyer:buyers!buyer_id(id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs)")
+    .select("*, buyer:buyers!buyer_id(id, name, phone, email, buyer_temperature, budget_min, budget_max, preferred_suburbs, bedrooms, land_size_min)")
     .eq("user_id", user.id);
 
   switch (tab) {

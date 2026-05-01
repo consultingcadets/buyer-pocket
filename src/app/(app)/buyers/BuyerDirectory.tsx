@@ -260,13 +260,13 @@ export function BuyerDirectory({
 
   const searchInput = (
     <div className="relative">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#44474C]">
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
         <SearchIcon />
       </span>
       <input
         ref={searchRef}
         type="search"
-        placeholder="Search buyers, suburbs…"
+        placeholder="Search by name, phone, suburb..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="h-10 w-full rounded-lg border border-border bg-surface-container-low pl-9 pr-3 text-[14px] text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action focus:bg-white transition-all"
@@ -281,7 +281,7 @@ export function BuyerDirectory({
       <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-border">
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="text-[18px] font-bold text-text-primary">
-            Buyer Directory
+            Buyers
             {!isLoading && (
               <span className="ml-1.5 text-text-secondary font-normal text-[15px]">
                 · {totalCount}
@@ -334,27 +334,36 @@ export function BuyerDirectory({
       </header>
 
       {/* ── Desktop Header ─────────────────────────────────────────────── */}
-      <header className="hidden lg:block bg-primary sticky top-0 z-20">
+      <header className="hidden lg:block bg-white sticky top-0 z-20 border-b border-border">
         <div className="flex items-center gap-4 px-6 py-5">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <h1 className="text-[22px] font-bold text-white tracking-tight">Buyer Directory</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">Buyers</h2>
             {!isLoading && (
-              <span className="text-white/40 text-[15px] font-normal">· {totalCount}</span>
+              <span className="text-text-secondary text-[20px] font-normal">· {totalCount}</span>
             )}
           </div>
-          <div className="w-72">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
-                <SearchIcon />
+          <div className="ml-auto w-72">
+            {searchInput}
+          </div>
+          <button
+            onClick={() => setIsFilterOpen((v) => !v)}
+            className={cn(
+              "flex items-center gap-1.5 h-10 px-3 rounded-lg border text-[13px] font-medium transition-colors",
+              filterCount > 0
+                ? "border-teal-action text-teal-action bg-teal-action/5"
+                : "border-border text-text-primary hover:bg-surface-container-low"
+            )}
+          >
+            <FilterIcon />
+            Filters
+            {filterCount > 0 && (
+              <span className="w-5 h-5 bg-teal-action text-on-teal-action text-[10px] font-bold rounded-full flex items-center justify-center">
+                {filterCount}
               </span>
-              <input
-                type="search"
-                placeholder="Search buyers, suburbs…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-10 w-full rounded-xl border border-white/15 bg-white/10 pl-9 pr-3 text-[14px] text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all"
-              />
-            </div>
+            )}
+          </button>
+          <div className="shrink-0">
+            <SortDropdown sort={sort} onChange={setSort} />
           </div>
           <Link
             href="/add"
@@ -364,6 +373,28 @@ export function BuyerDirectory({
             Add Buyer
           </Link>
         </div>
+        {activeChips.length > 0 && (
+          <div className="flex items-center gap-2 px-6 pb-4 flex-wrap">
+            {activeChips.map((chip) => (
+              <button
+                key={chip.id}
+                onClick={() => handleRemoveChip(chip.remove(filters))}
+                className="flex items-center gap-1.5 h-7 px-3 bg-surface-container-high rounded-full text-[12px] font-medium text-text-primary hover:bg-surface-container-highest"
+              >
+                {chip.label}
+                <XIcon />
+              </button>
+            ))}
+            {activeChips.length > 1 && (
+              <button
+                onClick={handleClearFilters}
+                className="h-7 px-2 text-[12px] text-teal-action font-semibold"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
       {/* ── Body ───────────────────────────────────────────────────────── */}
@@ -371,53 +402,6 @@ export function BuyerDirectory({
 
         {/* Main list */}
         <main className="flex-1 min-w-0 pb-20 lg:pb-0">
-
-          {/* Desktop toolbar */}
-          <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-white border-b border-border">
-            <button
-              onClick={() => setIsFilterOpen((v) => !v)}
-              className={cn(
-                "flex items-center gap-1.5 h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors",
-                filterCount > 0
-                  ? "border-teal-action text-teal-action bg-teal-action/5"
-                  : "border-border text-text-primary hover:bg-surface-container-low"
-              )}
-            >
-              <FilterIcon />
-              Filters
-              {filterCount > 0 && (
-                <span className="w-5 h-5 bg-teal-action text-on-teal-action text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {filterCount}
-                </span>
-              )}
-            </button>
-
-            <SortDropdown sort={sort} onChange={setSort} />
-
-            {/* Active chips — desktop */}
-            {activeChips.length > 0 && (
-              <div className="flex items-center gap-2 flex-1 flex-wrap">
-                {activeChips.map((chip) => (
-                  <button
-                    key={chip.id}
-                    onClick={() => handleRemoveChip(chip.remove(filters))}
-                    className="flex items-center gap-1.5 h-7 px-3 bg-surface-container-high rounded-full text-[12px] font-medium text-text-primary hover:bg-surface-container-highest"
-                  >
-                    {chip.label}
-                    <XIcon />
-                  </button>
-                ))}
-                {activeChips.length > 1 && (
-                  <button
-                    onClick={handleClearFilters}
-                    className="h-7 px-2 text-[12px] text-teal-action font-semibold"
-                  >
-                    Clear all
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
 
           {/* Loading */}
           {isLoading && <LoadingSkeleton />}
