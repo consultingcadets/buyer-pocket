@@ -25,7 +25,7 @@ export default function ContactPage() {
             Contact us
           </h1>
           <p className="text-[16px] text-text-secondary mb-8">
-            Send us a message and we'll get back to you within one business day. Or email us directly at{" "}
+            Send us a message and we&apos;ll get back to you within one business day. Or email us directly at{" "}
             <a
               href={`mailto:${SUPPORT_EMAIL}`}
               className="text-accent underline underline-offset-2"

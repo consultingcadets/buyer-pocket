@@ -269,7 +269,7 @@ function AddReminderModal({
                 type="button"
                 onClick={() => setReminderType((prev) => (prev === t ? "" : t))}
                 className={cn(
-                  "h-8 px-3 rounded-full border text-sm font-medium transition-colors",
+                  "h-10 px-3 rounded-full border text-sm font-medium transition-colors",
                   reminderType === t
                     ? "bg-secondary border-secondary text-white"
                     : "bg-white border-border text-text-secondary hover:border-secondary/40"
@@ -295,7 +295,7 @@ function AddReminderModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-accent text-sm font-medium"
+            className="text-teal-action text-sm font-medium"
           >
             Cancel
           </button>
@@ -391,7 +391,7 @@ function SnoozeModal({
         <button
           type="button"
           onClick={onClose}
-          className="w-full text-center text-sm text-accent font-medium pt-1"
+          className="w-full text-center text-sm text-teal-action font-medium pt-1"
         >
           Cancel
         </button>
@@ -451,7 +451,7 @@ function LookingForCard({ buyer }: { buyer: Buyer }) {
         ) : (
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm text-text-secondary">—</p>
-            <Link href={`/buyers/${buyer.id}/edit`} className="text-sm text-accent font-medium">
+            <Link href={`/buyers/${buyer.id}/edit`} className="text-sm text-teal-action font-medium">
               Add suburbs
             </Link>
           </div>
@@ -603,7 +603,7 @@ function NotesActivity({
           <select
             value={contactType}
             onChange={(e) => setContactType(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-border bg-white text-sm text-text-primary focus:outline-none focus:border-accent"
+            className="h-12 px-3 rounded-lg border border-border bg-white text-sm text-text-primary focus:outline-none focus:border-teal-action"
           >
             <option value="">Contact type…</option>
             {CONTACT_TYPES.map((t) => (
@@ -614,7 +614,7 @@ function NotesActivity({
             type="button"
             onClick={handleAddNote}
             disabled={isPendingAdd}
-            className="ml-auto h-9 px-5 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-60"
+            className="ml-auto h-12 px-5 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-60"
           >
             {isPendingAdd ? "Adding…" : "Add note"}
           </button>
@@ -625,7 +625,11 @@ function NotesActivity({
       {/* Timeline */}
       {timeline.length === 0 ? (
         <div className="py-8 text-center">
-          <div className="text-4xl mb-3">📝</div>
+          <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mx-auto mb-3">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
           <p className="font-semibold text-text-primary mb-1">No notes yet.</p>
           <p className="text-sm text-text-secondary">Add a note after your next call or inspection.</p>
         </div>
@@ -655,7 +659,7 @@ function NotesActivity({
                         <button
                           type="button"
                           onClick={() => { setEditingId(n.id); setEditText(n.note); }}
-                          className="text-xs text-accent font-medium"
+                          className="text-sm text-teal-action font-medium px-2 py-1 min-h-[44px] flex items-center"
                         >
                           Edit
                         </button>
@@ -663,7 +667,7 @@ function NotesActivity({
                           type="button"
                           onClick={() => handleDelete(n.id)}
                           disabled={isPendingDelete}
-                          className="text-xs text-error font-medium disabled:opacity-60"
+                          className="text-sm text-error font-medium px-2 py-1 min-h-[44px] flex items-center disabled:opacity-60"
                         >
                           Delete
                         </button>
@@ -676,21 +680,21 @@ function NotesActivity({
                           onChange={(e) => setEditText(e.target.value)}
                           rows={3}
                           autoFocus
-                          className="w-full px-3 py-2 rounded-lg border border-accent bg-white text-sm text-text-primary focus:outline-none resize-none"
+                          className="w-full px-3 py-2 rounded-lg border border-teal-action bg-white text-sm text-text-primary focus:outline-none resize-none"
                         />
                         <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => handleEditSave(n.id)}
                             disabled={isPendingEdit}
-                            className="h-8 px-4 rounded-lg bg-primary text-white text-xs font-semibold disabled:opacity-60"
+                            className="h-10 px-4 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-60"
                           >
                             {isPendingEdit ? "Saving…" : "Save"}
                           </button>
                           <button
                             type="button"
                             onClick={() => setEditingId(null)}
-                            className="h-8 px-3 text-xs text-text-secondary"
+                            className="h-10 px-3 text-sm text-text-secondary"
                           >
                             Cancel
                           </button>
@@ -738,7 +742,7 @@ function ContactCard({ buyer }: { buyer: Buyer }) {
         {hasPhone ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Phone</p>
-            <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-sm text-accent font-medium">
+            <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-sm text-teal-action font-medium">
               {phone}
             </a>
           </div>
@@ -746,7 +750,7 @@ function ContactCard({ buyer }: { buyer: Buyer }) {
         {hasEmail ? (
           <div>
             <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">Email</p>
-            <a href={`mailto:${email}`} className="text-sm text-accent font-medium break-all">
+            <a href={`mailto:${email}`} className="text-sm text-teal-action font-medium break-all">
               {email}
             </a>
           </div>
@@ -815,7 +819,7 @@ function RemindersCard({
           <button
             type="button"
             onClick={onAddReminder}
-            className="text-xs font-semibold text-accent"
+            className="text-xs font-semibold text-teal-action"
           >
             + Add
           </button>
@@ -828,7 +832,7 @@ function RemindersCard({
               <button
                 type="button"
                 onClick={onAddReminder}
-                className="text-sm font-semibold text-accent"
+                className="text-sm font-semibold text-teal-action"
               >
                 + Add
               </button>
@@ -1083,7 +1087,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
   return (
     <>
       {/* ── Desktop Layout ── */}
-      <div className="hidden md:block min-h-screen bg-background">
+      <div className="hidden lg:block min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-text-secondary">
@@ -1194,7 +1198,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
       </div>
 
       {/* ── Mobile Layout ── */}
-      <div className="md:hidden min-h-screen bg-background pb-28">
+      <div className="lg:hidden min-h-screen bg-background pb-28">
         {/* Mobile header */}
         <header className="sticky top-0 bg-white border-b border-border z-10">
           <div className="px-4 h-14 flex items-center justify-between">

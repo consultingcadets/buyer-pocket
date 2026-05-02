@@ -15,16 +15,17 @@ export function RevealOnView({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mq.matches);
     const mqHandler = () => setReduceMotion(mq.matches);
     mq.addEventListener("change", mqHandler);
 
     const el = ref.current;
-    if (!el) return;
+    if (!el) return () => mq.removeEventListener("change", mqHandler);
 
     const obs = new IntersectionObserver(
       ([entry]) => {

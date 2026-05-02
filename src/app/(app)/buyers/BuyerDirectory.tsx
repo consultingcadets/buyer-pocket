@@ -82,7 +82,7 @@ function SortDropdown({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-white text-[13px] font-medium text-text-primary hover:bg-surface-container-low"
+        className="flex items-center gap-1.5 h-10 px-3 rounded-lg border border-border bg-white text-[13px] font-medium text-text-primary hover:bg-surface-container-low"
       >
         {label}
         <ChevronDownIcon />
@@ -123,8 +123,7 @@ function LoadingSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="mx-4 lg:mx-0 mb-3 lg:mb-0 bg-white rounded-lg lg:rounded-none p-4 lg:px-6 lg:py-4 lg:border-b lg:border-[#E0E1DD]"
-          style={{ boxShadow: "0px 4px 20px rgba(13,27,42,0.05)" }}
+          className="mx-4 lg:mx-0 mb-3 lg:mb-0 bg-white rounded-lg lg:rounded-none p-4 lg:px-6 lg:py-4 lg:border-b lg:border-border shadow-card lg:shadow-none"
         >
           <div className="flex justify-between mb-2">
             <div className="h-5 w-40 bg-surface-container rounded animate-pulse" />
@@ -179,8 +178,8 @@ export function BuyerDirectory({
 
   // Reload on filter/sort/search change
   useEffect(() => {
-    setIsLoading(true);
     startTransition(async () => {
+      setIsLoading(true);
       const result = await fetchBuyers(
         { ...filters, search: debouncedSearch || undefined },
         sort,
@@ -282,7 +281,7 @@ export function BuyerDirectory({
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="text-[18px] font-bold text-text-primary">
             Buyers
-            {!isLoading && (
+            {!isLoading && totalCount > 0 && (
               <span className="ml-1.5 text-text-secondary font-normal text-[15px]">
                 · {totalCount}
               </span>
@@ -294,13 +293,13 @@ export function BuyerDirectory({
                 setShowSearchBar((v) => !v);
                 setTimeout(() => searchRef.current?.focus(), 50);
               }}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
+              className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
             >
               <SearchIcon />
             </button>
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
+              className="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
             >
               <FilterIcon />
               {filterCount > 0 && (
@@ -338,7 +337,7 @@ export function BuyerDirectory({
         <div className="flex items-center gap-4 px-6 py-5">
           <div className="flex items-center gap-2 min-w-0">
             <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">Buyers</h2>
-            {!isLoading && (
+            {!isLoading && totalCount > 0 && (
               <span className="text-text-secondary text-[20px] font-normal">· {totalCount}</span>
             )}
           </div>
@@ -451,23 +450,10 @@ export function BuyerDirectory({
 
           {/* Desktop column headers */}
           {!isLoading && buyers.length > 0 && (
-            <div className="hidden lg:flex items-center px-6 py-2.5 border-b border-border bg-surface-container-low/70 sticky top-[105px] z-10">
-              <div className="flex-1 min-w-0">
-                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
-                  Buyer
-                </span>
-              </div>
-              <div className="w-16 shrink-0 text-center ml-4">
-                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
-                  Status
-                </span>
-              </div>
-              <div className="shrink-0 ml-4">
-                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
-                  Details
-                </span>
-              </div>
-              <div className="w-8 ml-3 shrink-0" />
+            <div className="hidden lg:flex items-center px-6 py-2.5 border-b border-border bg-surface-container-low/70">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
+                Buyer
+              </span>
             </div>
           )}
 
@@ -499,17 +485,6 @@ export function BuyerDirectory({
           desktopOpen={isFilterOpen}
         />
       </div>
-
-      {/* Mobile FAB */}
-      <Link
-        href="/add"
-        className="lg:hidden fixed bottom-20 right-4 w-14 h-14 bg-teal-action rounded-full flex items-center justify-center shadow-lg z-20 hover:opacity-90 text-white"
-        aria-label="Add buyer"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14" /><path d="M12 5v14" />
-        </svg>
-      </Link>
 
       {/* Bottom nav */}
       <BottomNav />

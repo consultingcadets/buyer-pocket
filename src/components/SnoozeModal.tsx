@@ -66,32 +66,32 @@ export function SnoozeModal({ reminderId, onSnooze, onClose, isMobile = false }:
   }
 
   const content = (
-    <div className="bg-surface rounded-2xl overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden">
       <div className="px-5 pt-5 pb-4">
-        <h3 className="text-[17px] font-semibold text-foreground mb-4">Snooze until</h3>
+        <h3 className="text-[17px] font-semibold text-text-primary mb-4">Snooze until</h3>
         <div className="flex flex-col gap-2">
           {SNOOZE_OPTIONS.map((opt) => (
             <button
               key={opt.label}
               onClick={() => handleOption(opt.value)}
               disabled={isPending}
-              className="flex items-center justify-between px-4 py-3 rounded-xl border border-border hover:border-secondary hover:bg-secondary/5 transition-colors text-left"
+              className="flex items-center justify-between px-4 py-3 min-h-[48px] rounded-xl border border-border hover:border-teal-action hover:bg-teal-action/5 transition-colors text-left"
             >
-              <span className="text-[14px] font-medium text-foreground">{opt.label}</span>
-              <span className="text-[12px] text-foreground-subtle">{opt.sublabel}</span>
+              <span className="text-[14px] font-medium text-text-primary">{opt.label}</span>
+              <span className="text-[13px] text-text-secondary">{opt.sublabel}</span>
             </button>
           ))}
           <button
             onClick={() => setShowCustom((v) => !v)}
             className={cn(
-              "flex items-center justify-between px-4 py-3 rounded-xl border transition-colors text-left",
+              "flex items-center justify-between px-4 py-3 min-h-[48px] rounded-xl border transition-colors text-left",
               showCustom
-                ? "border-secondary bg-secondary/5"
-                : "border-border hover:border-secondary hover:bg-secondary/5"
+                ? "border-teal-action bg-teal-action/5"
+                : "border-border hover:border-teal-action hover:bg-teal-action/5"
             )}
           >
-            <span className="text-[14px] font-medium text-foreground">Custom…</span>
-            <Calendar size={16} className="text-foreground-subtle" />
+            <span className="text-[14px] font-medium text-text-primary">Custom…</span>
+            <Calendar size={16} className="text-text-secondary" />
           </button>
           {showCustom && (
             <div className="flex gap-2">
@@ -99,12 +99,12 @@ export function SnoozeModal({ reminderId, onSnooze, onClose, isMobile = false }:
                 type="datetime-local"
                 value={customValue}
                 onChange={(e) => setCustomValue(e.target.value)}
-                className="flex-1 rounded-xl border border-border px-3 py-2.5 text-[14px] text-foreground focus:outline-none focus:border-secondary"
+                className="flex-1 rounded-xl border border-border px-3 py-2.5 text-[14px] text-text-primary focus:outline-none focus:border-teal-action"
               />
               <button
                 onClick={handleCustom}
                 disabled={!customValue || isPending}
-                className="px-4 py-2.5 rounded-xl bg-secondary text-white text-[14px] font-medium disabled:opacity-40"
+                className="h-12 px-4 rounded-xl bg-teal-action text-white text-[14px] font-medium disabled:opacity-40"
               >
                 Set
               </button>
@@ -115,7 +115,7 @@ export function SnoozeModal({ reminderId, onSnooze, onClose, isMobile = false }:
       <div className="px-5 pb-5">
         <button
           onClick={onClose}
-          className="w-full text-center text-[14px] text-accent font-medium py-2"
+          className="w-full text-center text-[14px] text-teal-action font-medium py-3 min-h-[48px] flex items-center justify-center"
         >
           Cancel
         </button>

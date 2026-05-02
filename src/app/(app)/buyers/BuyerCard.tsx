@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Clock, Phone, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -59,53 +59,58 @@ function StatusChip({ status }: { status: string | null }) {
 }
 
 function ReminderBadge({ iso }: { iso: string | null }) {
-  if (!iso) return null;
-  const now = Date.now();
-  const at = new Date(iso).getTime();
-  const diffMs = now - at;
+  const badge = useMemo(() => {
+    if (!iso) return null;
+    // eslint-disable-next-line react-hooks/purity
+    const now = Date.now();
+    const at = new Date(iso).getTime();
+    const diffMs = now - at;
 
-  if (diffMs > 0) {
-    // overdue
-    const hrs = Math.floor(diffMs / 3_600_000);
-    if (hrs >= 24) {
+    if (diffMs > 0) {
+      // overdue
+      const hrs = Math.floor(diffMs / 3_600_000);
+      if (hrs >= 24) {
+        return (
+          <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-error/10 text-error rounded-full text-[11px] font-bold">
+            DUE NOW
+          </span>
+        );
+      }
       return (
-        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-error/10 text-error rounded-full text-[11px] font-bold">
-          DUE NOW
+        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
+          {hrs >= 1 ? `${hrs}H AGO` : "DUE NOW"}
         </span>
       );
     }
-    return (
-      <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
-        {hrs >= 1 ? `${hrs}H AGO` : "DUE NOW"}
-      </span>
-    );
-  }
 
-  // future
-  const d = new Date(iso);
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  if (d.toDateString() === today.toDateString()) {
+    // future
+    const d = new Date(iso);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    if (d.toDateString() === today.toDateString()) {
+      return (
+        <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
+          TODAY
+        </span>
+      );
+    }
+    if (d.toDateString() === tomorrow.toDateString()) {
+      return (
+        <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
+          TMR
+        </span>
+      );
+    }
+    const day = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase().slice(0, 3);
     return (
-      <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
-        TODAY
+      <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
+        {day}
       </span>
     );
-  }
-  if (d.toDateString() === tomorrow.toDateString()) {
-    return (
-      <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
-        TMR
-      </span>
-    );
-  }
-  const day = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase().slice(0, 3);
-  return (
-    <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-[11px] font-bold">
-      {day}
-    </span>
-  );
+  }, [iso]);
+
+  return badge;
 }
 
 function DataBox({ label, value }: { label: string; value: string }) {
@@ -142,7 +147,7 @@ function ThreeDotMenu({
     <div className={cn("relative", className)}>
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
-        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
+        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary"
         aria-label="More actions"
       >
         <MoreVertical className="w-4 h-4" />
@@ -312,7 +317,7 @@ export function BuyerCard({
           className="text-[13px] font-medium text-teal-action flex items-center gap-1"
         >
           <Phone className="w-3 h-3" />
-          Log Call
+          Call
         </a>
       </div>
     </article>

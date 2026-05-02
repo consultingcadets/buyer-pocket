@@ -57,11 +57,11 @@ function EmptyState({ tab }: { tab: ReminderTab }) {
   const { heading, body } = messages[tab];
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center px-8">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-        <Bell size={28} className="text-foreground-subtle" strokeWidth={1.5} />
+      <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4">
+        <Bell size={28} className="text-text-secondary" strokeWidth={1.5} />
       </div>
-      <p className="text-[17px] font-semibold text-foreground">{heading}</p>
-      {body && <p className="text-[13px] text-muted-foreground mt-1 max-w-xs">{body}</p>}
+      <p className="text-[17px] font-semibold text-text-primary">{heading}</p>
+      {body && <p className="text-[14px] text-text-secondary mt-1 max-w-xs">{body}</p>}
     </div>
   );
 }
@@ -128,7 +128,7 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
       return (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-surface rounded-2xl h-28 animate-pulse" />
+            <div key={i} className="bg-surface-container-low rounded-2xl h-28 animate-pulse" />
           ))}
         </div>
       );
@@ -189,19 +189,18 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
 
   return (
     <div className="min-h-screen bg-surface-container-low pb-24">
-      {/* Header — mobile has pt-12 for iOS status bar, desktop uses normal spacing */}
-      <div className="bg-white pt-12 lg:pt-0 pb-0 border-b border-border">
-        <div className="px-5 lg:px-7 lg:pt-6">
+      <div className="bg-white pb-0 border-b border-border">
+        <div className="px-5 lg:max-w-2xl lg:mx-auto lg:px-4 pt-4 lg:pt-6">
           <h1 className="text-[22px] lg:text-[32px] lg:leading-[1.2] lg:tracking-[-0.01em] font-bold text-primary pb-4">Reminders</h1>
         </div>
         {/* Tabs */}
-        <div className="flex gap-2 px-5 pb-4 overflow-x-auto">
+        <div className="flex gap-2 px-5 lg:max-w-2xl lg:mx-auto lg:px-4 pb-4 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => loadTab(tab.id)}
               className={cn(
-                "shrink-0 flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold rounded-full transition-colors",
+                "shrink-0 flex items-center gap-1.5 h-10 px-4 text-[13px] font-semibold rounded-full transition-colors",
                 activeTab === tab.id
                   ? "bg-teal-action text-white"
                   : "bg-surface-container text-text-secondary hover:text-text-primary"

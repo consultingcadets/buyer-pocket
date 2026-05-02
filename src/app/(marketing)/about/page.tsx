@@ -45,8 +45,8 @@ export default function AboutPage() {
           <h2 className="text-xl font-bold text-primary mb-4">Why we built it</h2>
           <p className="text-[16px] text-text-secondary leading-relaxed mb-4">
             Most real estate agents manage their buyer relationships the same way: phone
-            notes, spreadsheets, memory. It works until it doesn't — when a listing comes
-            up and you can't remember who wanted what, or when a buyer goes cold because
+            notes, spreadsheets, memory. It works until it doesn&apos;t — when a listing comes
+            up and you can&apos;t remember who wanted what, or when a buyer goes cold because
             you meant to call on Tuesday and it is now Friday.
           </p>
           <p className="text-[16px] text-text-secondary leading-relaxed mb-4">
@@ -63,7 +63,7 @@ export default function AboutPage() {
 
         {/* Who it's for */}
         <section className="mb-14">
-          <h2 className="text-xl font-bold text-primary mb-4">Who it's for</h2>
+          <h2 className="text-xl font-bold text-primary mb-4">Who it&apos;s for</h2>
           <ul className="space-y-2 text-[16px] text-text-secondary">
             <li className="flex items-start gap-2">
               <span className="text-teal-action font-bold mt-0.5">✓</span>
@@ -81,7 +81,7 @@ export default function AboutPage() {
           <div className="mt-5 rounded-xl bg-surface-container-low border border-border/40 px-5 py-4 text-[14px] text-text-secondary leading-relaxed">
             <strong className="text-text-primary">Not the right fit?</strong> If you work
             under a large agency network, check your contract first — buyer data may belong
-            to the agency. If you are a buyer's agent, look at Stash or BA-ICON instead.
+            to the agency. If you are a buyer&apos;s agent, look at Stash or BA-ICON instead.
             They are built for property research and matching in a way BuyerPocket is not.
           </div>
         </section>

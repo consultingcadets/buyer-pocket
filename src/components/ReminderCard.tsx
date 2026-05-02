@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Check, Clock, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
@@ -82,14 +83,19 @@ export function ReminderCard({
   const bedsLabel = buyer.bedrooms ? `${buyer.bedrooms} bed` : "";
   const landLabel = buyer.land_size_min ? `${buyer.land_size_min}m²+` : "";
 
-  const now = Date.now();
-  const reminderTs = new Date(reminder.reminder_at).getTime();
-  const isOverdueNow = reminderTs < now && reminder.status !== "completed";
-  const isUpcomingNow = reminderTs >= now && reminder.status !== "completed";
+  const { isOverdueNow, isUpcomingNow } = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity
+    const now = Date.now();
+    const reminderTs = new Date(reminder.reminder_at).getTime();
+    return {
+      isOverdueNow: reminderTs < now && reminder.status !== "completed",
+      isUpcomingNow: reminderTs >= now && reminder.status !== "completed",
+    };
+  }, [reminder.reminder_at, reminder.status]);
   const timeToneClass = isOverdueNow
     ? "text-error"
     : isUpcomingNow
-      ? "text-accent"
+      ? "text-teal-action"
       : "text-text-secondary";
 
   const summaryItems = [suburbDisplay, budgetLabel, bedsLabel, landLabel].filter(Boolean);
@@ -159,14 +165,14 @@ export function ReminderCard({
           <button
             onClick={() => onComplete(reminder.id)}
             disabled={isCompleting}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors disabled:opacity-50"
+            className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors disabled:opacity-50"
             aria-label="Done"
           >
             <Check size={16} />
           </button>
           <button
             onClick={() => onSnooze(reminder.id)}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
+            className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
             aria-label="Snooze"
           >
             <Clock size={16} />

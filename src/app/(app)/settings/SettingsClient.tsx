@@ -47,10 +47,10 @@ interface Props {
 // ── Shared input style ────────────────────────────────────────────────────────
 
 const inputCls =
-  "w-full h-12 px-4 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-accent transition-colors text-sm";
+  "w-full h-12 px-4 rounded-lg border border-border bg-white text-text-primary placeholder:text-outline focus:outline-none focus:border-2 focus:border-teal-action transition-colors text-sm";
 
 const selectCls =
-  "w-full h-12 px-4 rounded-lg border border-border bg-white text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors text-sm";
+  "w-full h-12 px-4 rounded-lg border border-border bg-white text-text-primary focus:outline-none focus:border-2 focus:border-teal-action transition-colors text-sm";
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
@@ -226,14 +226,10 @@ function NotificationsSection({
 }) {
   const [isPending, startTransition] = useTransition();
   const [prefs, setPrefs] = useState(initialPrefs);
-  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [permission, setPermission] = useState<NotificationPermission>(
+    () => (typeof Notification !== "undefined" ? Notification.permission : "default")
+  );
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    if ("Notification" in window) {
-      setPermission(Notification.permission);
-    }
-  }, []);
 
   function setField(key: keyof typeof prefs, value: boolean) {
     const next = { ...prefs, [key]: value };
@@ -313,16 +309,13 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [deactivating, setDeactivating] = useState<string | null>(null);
-  const [registerState, setRegisterState] = useState<"idle" | "loading" | "done" | "denied" | "unsupported">("idle");
-
-  // Detect current device permission state on mount
-  useEffect(() => {
-    if (typeof Notification === "undefined") {
-      setRegisterState("unsupported");
-    } else if (Notification.permission === "denied") {
-      setRegisterState("denied");
+  const [registerState, setRegisterState] = useState<"idle" | "loading" | "done" | "denied" | "unsupported">(
+    () => {
+      if (typeof Notification === "undefined") return "unsupported";
+      if (Notification.permission === "denied") return "denied";
+      return "idle";
     }
-  }, []);
+  );
 
   function handleDeactivate(id: string) {
     setDeactivating(id);
@@ -381,7 +374,7 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
           type="button"
           disabled={registerState === "loading" || registerState === "done"}
           onClick={handleRegisterDevice}
-          className="w-full min-h-[44px] rounded-lg border border-teal-action text-teal-action text-sm font-semibold hover:bg-teal-action/5 transition-colors disabled:opacity-60"
+          className="w-full min-h-[48px] rounded-lg border border-teal-action text-teal-action text-sm font-semibold hover:bg-teal-action/5 transition-colors disabled:opacity-60"
         >
           {registerState === "loading" ? "Enabling…" : registerState === "done" ? "Notifications enabled on this device ✓" : "Enable notifications on this device"}
         </button>
@@ -867,7 +860,7 @@ export function SettingsClient({
   return (
     <div className="min-h-screen bg-background">
       {/* ── Desktop ── */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <div className="max-w-2xl mx-auto px-6 py-10">
           <h1 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary mb-8">Settings</h1>
           {allSections}
@@ -876,7 +869,7 @@ export function SettingsClient({
       </div>
 
       {/* ── Mobile ── */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {/* Header */}
         <header className="sticky top-0 bg-white border-b border-border z-10">
           <div className="px-4 h-14 flex items-center">
@@ -885,7 +878,7 @@ export function SettingsClient({
                 <button
                   type="button"
                   onClick={() => setMobileView("landing")}
-                  className="text-accent font-medium text-sm mr-3"
+                  className="text-teal-action font-medium text-sm mr-3"
                 >
                   ← Settings
                 </button>
@@ -914,10 +907,12 @@ export function SettingsClient({
                 <button
                   type="button"
                   onClick={() => setMobileView("profile")}
-                  className="text-accent"
+                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container text-teal-action"
                   aria-label="Edit profile"
                 >
-                  ✏️
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                  </svg>
                 </button>
               </div>
 

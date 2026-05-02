@@ -135,6 +135,31 @@ export async function startTrialIfNeeded(
     return (data as Subscription) ?? null;
   }
 
+  const priceId = process.env.STRIPE_PRICE_ID;
+  if (!priceId) {
+    console.warn("[subscription] STRIPE_PRICE_ID missing — creating local trial row.");
+    const now = new Date();
+    const trialEnd = new Date(now);
+    trialEnd.setDate(trialEnd.getDate() + 7);
+    const { data } = await supabaseAdmin
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: userId,
+          status: "trialing",
+          trial_start: now.toISOString(),
+          trial_end: trialEnd.toISOString(),
+          current_period_start: now.toISOString(),
+          current_period_end: trialEnd.toISOString(),
+          cancel_at_period_end: false,
+        },
+        { onConflict: "user_id" }
+      )
+      .select("*")
+      .single();
+    return (data as Subscription) ?? null;
+  }
+
   const customer = await stripe.customers.create({
     email: userEmail,
     metadata: { user_id: userId },
@@ -142,7 +167,7 @@ export async function startTrialIfNeeded(
 
   const subscription = await stripe.subscriptions.create({
     customer: customer.id,
-    items: [{ price: process.env.STRIPE_PRICE_ID! }],
+    items: [{ price: priceId }],
     trial_period_days: 7,
     payment_settings: { save_default_payment_method: "on_subscription" },
     trial_settings: { end_behavior: { missing_payment_method: "cancel" } },

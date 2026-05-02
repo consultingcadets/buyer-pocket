@@ -99,7 +99,7 @@ export default function SignupPage() {
                 type="text"
                 required
                 autoComplete="name"
-                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-teal-action transition-colors"
               />
             </div>
 
@@ -112,7 +112,7 @@ export default function SignupPage() {
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+                className="w-full min-h-12 px-4 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-teal-action transition-colors"
               />
             </div>
 
@@ -128,7 +128,7 @@ export default function SignupPage() {
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full min-h-12 px-4 pr-12 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-accent transition-colors"
+                  className="w-full min-h-12 px-4 pr-12 bg-white border border-border rounded-lg text-[16px] text-text-primary focus:outline-none focus:border-2 focus:border-teal-action transition-colors"
                 />
                 <button
                   type="button"

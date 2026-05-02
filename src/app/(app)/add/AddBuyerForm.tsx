@@ -3,23 +3,22 @@
 import {
   useState,
   useTransition,
-  useRef,
-  useEffect,
   useCallback,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, BarChart2, Search, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { User, BarChart2, Search, FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
-import { formatPhone, parseAmount, formatAmount } from "@/lib/format";
+import { formatPhone } from "@/lib/format";
 import {
   getReminderDate,
   getReminderLabel,
   type ReminderChip,
 } from "@/lib/reminder-utils";
 import { addBuyer } from "./actions";
+import { BottomNav } from "@/components/BottomNav";
 
 // ─── Shared input style ───────────────────────────────────────────────────────
 
@@ -60,30 +59,31 @@ function FieldRow({
   );
 }
 
-// ─── Chip components ──────────────────────────────────────────────────────────
+// ─── Select dropdown ─────────────────────────────────────────────────────────
 
-function SelectChip({
-  label,
-  selected,
-  onClick,
+function SelectField({
+  options,
+  value,
+  onChange,
 }: {
-  label: string;
-  selected: boolean;
-  onClick: () => void;
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "h-8 px-4 rounded-full border text-[13px] font-medium transition-colors whitespace-nowrap",
-        selected
-          ? "bg-teal-action border-teal-action text-on-teal-action"
-          : "bg-white border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
-      )}
-    >
-      {label}
-    </button>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(inputBase, "appearance-none cursor-pointer pr-10", !value && "text-outline")}
+      >
+        <option value="">Select…</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+      <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+    </div>
   );
 }
 
@@ -101,7 +101,7 @@ function MultiChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "h-8 px-4 rounded-full border text-[13px] font-medium transition-colors whitespace-nowrap",
+        "h-10 px-4 rounded-full border text-[14px] font-medium transition-colors whitespace-nowrap",
         selected
           ? "bg-teal-action border-teal-action text-on-teal-action"
           : "bg-white border-border text-text-secondary hover:border-teal-action/40 hover:text-text-primary"
@@ -124,7 +124,7 @@ function TempButton({ label, active, onClick }: { label: string; active: boolean
       type="button"
       onClick={onClick}
       className={cn(
-        "flex-1 h-10 rounded-full border text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5",
+        "flex-1 h-12 rounded-full border text-[14px] font-semibold transition-all flex items-center justify-center gap-1.5",
         active ? `${s.ring} ${s.text} ${s.bg}` : "border-border text-text-secondary bg-surface-container-low hover:border-primary/30 hover:text-text-primary"
       )}
     >
@@ -138,7 +138,7 @@ function TempButton({ label, active, onClick }: { label: string; active: boolean
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.1em] mb-2">
+    <p className="text-[15px] font-bold text-primary tracking-tight pb-3 mb-3 border-b border-border">
       {children}
     </p>
   );
@@ -146,37 +146,37 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="flex items-center gap-2 mb-1">
+    <div className="flex items-center gap-2 pb-3 mb-3 border-b border-border">
       <span className="text-teal-action">{icon}</span>
-      <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wider">{title}</p>
+      <p className="text-[15px] font-bold text-primary tracking-tight">{title}</p>
     </div>
   );
 }
 
-// ─── Animated expand ──────────────────────────────────────────────────────────
+// ─── Budget dropdown ──────────────────────────────────────────────────────────
 
-function AnimatedExpand({
-  open,
-  children,
-}: {
-  open: boolean;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
+const BUDGET_OPTIONS = [
+  50000, 75000, 100000, 125000, 150000, 175000, 200000, 225000, 250000, 275000,
+  300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000,
+  550000, 600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000,
+  1000000, 1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000,
+  1800000, 1900000, 2000000,
+];
 
-  useEffect(() => {
-    if (!ref.current) return;
-    setHeight(open ? ref.current.scrollHeight : 0);
-  }, [open]);
-
-  useEffect(() => {
-    if (open && ref.current) setHeight(ref.current.scrollHeight);
-  });
-
+function BudgetSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ height, overflow: "hidden", transition: "height 300ms ease" }}>
-      <div ref={ref}>{children}</div>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(inputBase, "appearance-none cursor-pointer pr-10", !value && "text-outline")}
+      >
+        <option value="">Any</option>
+        {BUDGET_OPTIONS.map((n) => (
+          <option key={n} value={String(n)}>${n.toLocaleString("en-AU")}</option>
+        ))}
+      </select>
+      <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
     </div>
   );
 }
@@ -208,7 +208,6 @@ export function AddBuyerForm() {
   const [landSizeMin, setLandSizeMin] = useState("Any");
   const [note, setNote] = useState("");
   const [buyerTemperature, setBuyerTemperature] = useState("");
-  const [showMore, setShowMore] = useState(false);
 
   const [preferredContactMethod, setPreferredContactMethod] = useState("");
   const [bestTimeToContact, setBestTimeToContact] = useState("");
@@ -237,8 +236,8 @@ export function AddBuyerForm() {
     if (!name.trim()) errs.name = "Enter the buyer's name";
     if (suburbs.length === 0) errs.suburbs = "Add at least one suburb";
     if (!phone.trim() && !email.trim()) errs.phone = "Enter a phone number or email address";
-    const min = parseAmount(budgetMin);
-    const max = parseAmount(budgetMax);
+    const min = budgetMin ? parseInt(budgetMin) : null;
+    const max = budgetMax ? parseInt(budgetMax) : null;
     if (min !== null && max !== null && min > max)
       errs.budgetMax = "Max must be greater than minimum";
     setErrors(errs);
@@ -272,8 +271,8 @@ export function AddBuyerForm() {
         phone: phone || null,
         email: email || null,
         preferred_suburbs: suburbs,
-        budget_min: parseAmount(budgetMin),
-        budget_max: parseAmount(budgetMax),
+        budget_min: budgetMin ? parseInt(budgetMin) : null,
+        budget_max: budgetMax ? parseInt(budgetMax) : null,
         bedrooms: bedrooms === "Any" ? null : bedrooms,
         land_size_min: landSizeValue,
         notes_summary: note || null,
@@ -329,26 +328,20 @@ export function AddBuyerForm() {
   const footerPb = reminder ? "pb-[320px]" : "pb-[240px]";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+      <BottomNav />
 
       {/* ── Standard white app header ── */}
-      <header className="sticky top-0 bg-white z-20 border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
-          <Link
-            href="/buyers"
-            className="text-accent hover:text-accent/90 text-sm font-medium w-16 transition-colors"
-          >
-            Cancel
-          </Link>
+      <header className="shrink-0 bg-white z-20 border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-center">
           <h1 className="text-base font-semibold text-text-primary tracking-tight">
             Add Buyer
           </h1>
-          <div className="w-16" />
         </div>
       </header>
 
       {/* ── Scrollable content ── */}
-      <div className={cn("flex-1 overflow-y-auto", footerPb)}>
+      <div className={cn("flex-1 min-h-0 overflow-y-auto", footerPb)}>
         <div className="max-w-5xl mx-auto px-4 lg:px-6 py-5">
 
           {errors._form && (
@@ -358,7 +351,7 @@ export function AddBuyerForm() {
           )}
 
           {/* ── 2-column on desktop, single column on mobile ── */}
-          <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
 
             {/* Left column: identity + status + notes */}
             <div className="space-y-4">
@@ -375,27 +368,26 @@ export function AddBuyerForm() {
                   />
                 </FieldRow>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Phone">
-                    <input
-                      type="tel"
-                      placeholder="0412 345 678"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      onBlur={(e) => setPhone(formatPhone(e.target.value))}
-                      className={inputCls()}
-                    />
-                  </FieldRow>
-                  <FieldRow label="Email">
-                    <input
-                      type="email"
-                      placeholder="name@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className={inputCls()}
-                    />
-                  </FieldRow>
-                </div>
+                <FieldRow label="Phone">
+                  <input
+                    type="tel"
+                    placeholder="0412 345 678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onBlur={(e) => setPhone(formatPhone(e.target.value))}
+                    className={inputCls()}
+                  />
+                </FieldRow>
+
+                <FieldRow label="Email">
+                  <input
+                    type="email"
+                    placeholder="name@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputCls()}
+                  />
+                </FieldRow>
 
                 <FieldRow label="Buyer Temperature">
                   <div className="flex gap-2">
@@ -413,25 +405,27 @@ export function AddBuyerForm() {
 
               <FieldCard>
                 <SectionHeader icon={<BarChart2 size={14} />} title="Status" />
-                <SectionLabel>Buyer Status</SectionLabel>
-                <ChipFieldInline
-                  label="Timeline"
-                  options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
-                  value={buyingTimeline}
-                  onChange={setBuyingTimeline}
-                />
-                <ChipFieldInline
-                  label="Buyer type"
-                  options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
-                  value={buyerType}
-                  onChange={setBuyerType}
-                />
-                <ChipFieldInline
-                  label="Lead source"
-                  options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]}
-                  value={leadSource}
-                  onChange={setLeadSource}
-                />
+                <FieldRow label="Timeline">
+                  <SelectField
+                    options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
+                    value={buyingTimeline}
+                    onChange={setBuyingTimeline}
+                  />
+                </FieldRow>
+                <FieldRow label="Buyer type">
+                  <SelectField
+                    options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
+                    value={buyerType}
+                    onChange={setBuyerType}
+                  />
+                </FieldRow>
+                <FieldRow label="Lead source">
+                  <SelectField
+                    options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]}
+                    value={leadSource}
+                    onChange={setLeadSource}
+                  />
+                </FieldRow>
               </FieldCard>
 
               <FieldCard>
@@ -448,10 +442,11 @@ export function AddBuyerForm() {
               </FieldCard>
             </div>
 
-            {/* Right column: property criteria + expanded (sticky on desktop) */}
-            <div className="lg:sticky lg:top-[4.5rem] space-y-4">
+            {/* Right column: requirements + preferences */}
+            <div className="space-y-4">
               <FieldCard>
-                <SectionHeader icon={<Search size={14} />} title="Requirements" />
+                <SectionHeader icon={<Search size={14} />} title="Property Search" />
+
                 <FieldRow label="Preferred Suburbs" error={errors.suburbs}>
                   <SuburbCombobox
                     value={suburbs}
@@ -461,33 +456,26 @@ export function AddBuyerForm() {
                   />
                 </FieldRow>
 
-                <FieldRow label="Budget" error={errors.budgetMax}>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="Min"
-                        value={budgetMin}
-                        onChange={(e) => setBudgetMin(e.target.value.replace(/[^0-9]/g, ""))}
-                        onBlur={(e) => setBudgetMin(formatAmount(e.target.value))}
-                        className={cn(inputCls(), "pl-8")}
-                      />
-                    </div>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="Max"
-                        value={budgetMax}
-                        onChange={(e) => setBudgetMax(e.target.value.replace(/[^0-9]/g, ""))}
-                        onBlur={(e) => setBudgetMax(formatAmount(e.target.value))}
-                        className={cn(inputCls(errors.budgetMax), "pl-8")}
-                      />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Min Budget">
+                    <BudgetSelect value={budgetMin} onChange={setBudgetMin} />
+                  </FieldRow>
+                  <FieldRow label="Max Budget" error={errors.budgetMax}>
+                    <BudgetSelect value={budgetMax} onChange={setBudgetMax} />
+                  </FieldRow>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Property type">
+                    <SelectField options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
+                  </FieldRow>
+                  <FieldRow label="House style">
+                    <SelectField options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
+                  </FieldRow>
+                </div>
+
+                <FieldRow label="Condition">
+                  <SelectField options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
                 </FieldRow>
 
                 <FieldRow label="Bedrooms">
@@ -497,6 +485,15 @@ export function AddBuyerForm() {
                     onChange={setBedrooms}
                   />
                 </FieldRow>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Bathrooms">
+                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
+                  </FieldRow>
+                  <FieldRow label="Car spaces">
+                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
+                  </FieldRow>
+                </div>
 
                 <FieldRow label="Land Size (min)">
                   <div className="overflow-x-auto -mx-5 px-5">
@@ -509,66 +506,30 @@ export function AddBuyerForm() {
                     </div>
                   </div>
                 </FieldRow>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Building size min (sq)">
+                    <div className="relative">
+                      <input type="text" inputMode="numeric" placeholder="e.g. 25" value={buildingSizeMin}
+                        onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
+                        className={cn(inputCls(), "pr-12")} />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">sq</span>
+                    </div>
+                  </FieldRow>
+                  <FieldRow label="Block preference">
+                    <SelectField options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
+                  </FieldRow>
+                </div>
               </FieldCard>
 
-              {/* Expand toggle */}
-              <button
-                type="button"
-                onClick={() => setShowMore((v) => !v)}
-                className="w-full flex items-center justify-center gap-1.5 text-sm font-semibold text-teal-action py-1"
-              >
-                {showMore ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                {showMore ? "Hide details" : "Show more details"}
-              </button>
-
-              <AnimatedExpand open={showMore}>
-                <div className="space-y-4 pt-2">
-                  <FieldCard>
-                    <SectionLabel>Contact Preferences</SectionLabel>
-                    <ChipFieldInline label="Preferred method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
-                    <ChipFieldInline label="Best time" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
-                    <ChipFieldInline label="Consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
-                  </FieldCard>
-
-                  <FieldCard>
-                    <SectionLabel>Property Preferences</SectionLabel>
-                    <ChipFieldInline label="Type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
-                    <ChipFieldInline label="House style" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Bathrooms</p>
-                      <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Car spaces</p>
-                      <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
-                    </div>
-                    <ChipFieldInline label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
-                  </FieldCard>
-
-                  <FieldCard>
-                    <SectionLabel>Size Requirements</SectionLabel>
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-2">Building size min (squares)</p>
-                      <div className="relative">
-                        <input type="text" inputMode="numeric" placeholder="e.g. 25" value={buildingSizeMin}
-                          onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
-                          className={cn(inputCls(), "pr-12")} />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">sq</span>
-                      </div>
-                    </div>
-                    <ChipFieldInline label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
-                  </FieldCard>
-
-                  <FieldCard>
-                    <SectionLabel>Must-Haves</SectionLabel>
-                    <div className="flex flex-wrap gap-2">
-                      {MUST_HAVES_OPTIONS.map((item) => (
-                        <MultiChip key={item} label={item} selected={mustHaves.includes(item)} onClick={() => toggleMustHave(item)} />
-                      ))}
-                    </div>
-                  </FieldCard>
+              <FieldCard>
+                <SectionLabel>Must-Haves</SectionLabel>
+                <div className="flex flex-wrap gap-2">
+                  {MUST_HAVES_OPTIONS.map((item) => (
+                    <MultiChip key={item} label={item} selected={mustHaves.includes(item)} onClick={() => toggleMustHave(item)} />
+                  ))}
                 </div>
-              </AnimatedExpand>
+              </FieldCard>
             </div>
 
           </div>
@@ -602,7 +563,9 @@ export function AddBuyerForm() {
             </div>
 
             {reminder && reminder !== "custom" && (
-              <div className="mt-2.5 flex flex-wrap gap-2">
+              <div className="mt-2.5">
+                <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wide mb-2">Follow up type</p>
+                <div className="flex flex-wrap gap-2">
                 {["Call", "SMS", "Email", "Visit"].map((t) => (
                   <button
                     key={t}
@@ -618,6 +581,7 @@ export function AddBuyerForm() {
                     {t}
                   </button>
                 ))}
+                </div>
               </div>
             )}
 
@@ -631,51 +595,30 @@ export function AddBuyerForm() {
             )}
           </div>
 
-          {/* Save button */}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isPending}
-            className="w-full h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-60 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
-          >
-            {isPending
-              ? "Saving…"
-              : reminder
-              ? "Save buyer & set reminder"
-              : "Save buyer"}
-          </button>
+          {/* Actions */}
+          <div className="flex gap-3">
+            <Link
+              href="/buyers"
+              className="flex-1 h-14 flex items-center justify-center text-sm font-semibold text-text-secondary rounded-2xl border border-border hover:bg-surface-container transition-colors"
+            >
+              Cancel
+            </Link>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isPending || !name.trim()}
+              className="flex-1 h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-40 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
+            >
+              {isPending
+                ? "Saving…"
+                : reminder
+                ? "Save buyer & set reminder"
+                : "Save buyer"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Inline chip field (used in expanded sections) ────────────────────────────
-
-function ChipFieldInline({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <p className="text-sm font-medium text-text-secondary mb-2">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <SelectChip
-            key={opt}
-            label={opt}
-            selected={value === opt}
-            onClick={() => onChange(value === opt ? "" : opt)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}

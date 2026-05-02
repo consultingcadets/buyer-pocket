@@ -41,7 +41,7 @@ export default async function EligibilityPage() {
             <h2 className="text-[32px] font-bold tracking-tight text-primary mb-2">
               Quick question first.
             </h2>
-            <p className="text-[16px] text-text-secondary">
+            <p className="text-[13px] text-text-secondary">
               BuyerPocket is built for agents who own their buyer relationships. Some agents at large agencies have employment contracts that say buyer data belongs to the agency, not them. Using a personal tool for that data could put you in breach. Pick the option that matches your situation:
             </p>
           </div>

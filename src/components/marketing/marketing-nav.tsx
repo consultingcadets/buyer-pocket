@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import CTAButton from "./cta-button";
 
-export default function MarketingNav() {
+export default function MarketingNav({ isLoggedIn }: { isLoggedIn?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -41,15 +41,23 @@ export default function MarketingNav() {
           >
             About
           </Link>
-          <Link
-            href="/login"
-            className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
-          >
-            Login
-          </Link>
-          <CTAButton href="/signup" size="sm" className="shrink-0">
-            Start free trial
-          </CTAButton>
+          {isLoggedIn ? (
+            <CTAButton href="/today" size="sm" className="shrink-0">
+              Open app
+            </CTAButton>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+              >
+                Login
+              </Link>
+              <CTAButton href="/signup" size="sm" className="shrink-0">
+                Start free trial
+              </CTAButton>
+            </>
+          )}
         </div>
 
         <button
@@ -85,18 +93,28 @@ export default function MarketingNav() {
           >
             About
           </Link>
-          <Link
-            href="/login"
-            className="text-sm font-medium text-primary py-3.5 border-b border-border active:bg-surface-container-low"
-            onClick={() => setOpen(false)}
-          >
-            Login
-          </Link>
-          <div className="pt-4">
-            <CTAButton href="/signup" fullWidth onClick={() => setOpen(false)}>
-              Start free trial
-            </CTAButton>
-          </div>
+          {isLoggedIn ? (
+            <div className="pt-4">
+              <CTAButton href="/today" fullWidth onClick={() => setOpen(false)}>
+                Open app
+              </CTAButton>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-sm font-medium text-primary py-3.5 border-b border-border active:bg-surface-container-low"
+                onClick={() => setOpen(false)}
+              >
+                Login
+              </Link>
+              <div className="pt-4">
+                <CTAButton href="/signup" fullWidth onClick={() => setOpen(false)}>
+                  Start free trial
+                </CTAButton>
+              </div>
+            </>
+          )}
         </div>
       )}
     </header>

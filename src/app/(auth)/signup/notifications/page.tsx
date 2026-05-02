@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
 import { savePushToken } from "@/app/(app)/reminders/actions";
@@ -9,6 +9,7 @@ const DOTS = [false, false, false, true];
 
 function useIosSafariInstallState() {
   const [showInstallCard, setShowInstallCard] = useState(false);
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -20,7 +21,8 @@ function useIosSafariInstallState() {
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
-    setShowInstallCard(isIos && isSafari && !isStandalone);
+    startTransition(() => setShowInstallCard(isIos && isSafari && !isStandalone));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return showInstallCard;

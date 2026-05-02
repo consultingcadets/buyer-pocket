@@ -22,7 +22,7 @@ export default function ContactForm() {
         </div>
         <h2 className="text-[22px] font-bold text-primary mb-2">Message sent.</h2>
         <p className="text-[15px] text-text-secondary">
-          Thanks — we'll be in touch within one business day.
+          Thanks — we&apos;ll be in touch within one business day.
         </p>
       </div>
     );

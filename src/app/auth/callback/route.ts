@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -23,9 +24,23 @@ export async function GET(request: NextRequest) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("eligibility_acknowledged_at, state")
+          .select("name, eligibility_acknowledged_at, state")
           .eq("id", user.id)
           .single();
+
+        // Backfill name from OAuth metadata if profile has no name yet
+        if (!profile?.name) {
+          const metaName =
+            user.user_metadata?.full_name ??
+            user.user_metadata?.name ??
+            null;
+          if (metaName) {
+            await supabaseAdmin
+              .from("profiles")
+              .update({ name: metaName })
+              .eq("id", user.id);
+          }
+        }
 
         if (!profile?.eligibility_acknowledged_at) {
           return NextResponse.redirect(`${origin}/signup/eligibility`);

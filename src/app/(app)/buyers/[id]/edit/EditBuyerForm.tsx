@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useTransition, useRef, useEffect, useCallback } from "react";
+import { useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, BarChart2, Search, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, User, BarChart2, Search, FileText, ChevronDown } from "lucide-react";
+import { BottomNav } from "@/components/BottomNav";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
-import { formatPhone, parseAmount, formatAmount } from "@/lib/format";
+import { formatPhone } from "@/lib/format";
 import { updateBuyer } from "../actions";
 import type { Database } from "@/types/database";
 
@@ -30,9 +31,9 @@ function SectionCard({ children }: { children: React.ReactNode }) {
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="flex items-center gap-2 pb-1">
+    <div className="flex items-center gap-2 pb-3 mb-3 border-b border-border">
       <span className="text-teal-action">{icon}</span>
-      <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wider">{title}</p>
+      <p className="text-[15px] font-bold text-primary tracking-tight">{title}</p>
     </div>
   );
 }
@@ -86,37 +87,54 @@ function PillChip({ label, selected, onClick }: { label: string; selected: boole
   );
 }
 
-function ChipGroup({ label, options, value, onChange }: {
-  label: string;
+function SelectField({
+  options,
+  value,
+  onChange,
+}: {
   options: string[];
   value: string;
   onChange: (v: string) => void;
 }) {
   return (
-    <div>
-      <p className="text-[13px] font-medium text-text-secondary mb-2">{label}</p>
-      <div className="flex flex-wrap gap-2">
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(inputBase, "appearance-none cursor-pointer pr-10", !value && "text-outline")}
+      >
+        <option value="">Select…</option>
         {options.map((opt) => (
-          <PillChip key={opt} label={opt} selected={value === opt} onClick={() => onChange(value === opt ? "" : opt)} />
+          <option key={opt} value={opt}>{opt}</option>
         ))}
-      </div>
+      </select>
+      <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
     </div>
   );
 }
 
-function AnimatedExpand({ open, children }: { open: boolean; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    if (!ref.current) return;
-    setHeight(open ? ref.current.scrollHeight : 0);
-  }, [open]);
-  useEffect(() => {
-    if (open && ref.current) setHeight(ref.current.scrollHeight);
-  });
+const BUDGET_OPTIONS = [
+  50000, 75000, 100000, 125000, 150000, 175000, 200000, 225000, 250000, 275000,
+  300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000,
+  550000, 600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000,
+  1000000, 1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000,
+  1800000, 1900000, 2000000,
+];
+
+function BudgetSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ height, overflow: "hidden", transition: "height 300ms ease" }}>
-      <div ref={ref}>{children}</div>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(inputBase, "appearance-none cursor-pointer pr-10", !value && "text-outline")}
+      >
+        <option value="">Any</option>
+        {BUDGET_OPTIONS.map((n) => (
+          <option key={n} value={String(n)}>${n.toLocaleString("en-AU")}</option>
+        ))}
+      </select>
+      <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
     </div>
   );
 }
@@ -135,12 +153,11 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   const [phone, setPhone] = useState(buyer.phone ?? "");
   const [email, setEmail] = useState(buyer.email ?? "");
   const [suburbs, setSuburbs] = useState<string[]>(buyer.preferred_suburbs ?? []);
-  const [budgetMin, setBudgetMin] = useState(buyer.budget_min ? formatAmount(String(buyer.budget_min)) : "");
-  const [budgetMax, setBudgetMax] = useState(buyer.budget_max ? formatAmount(String(buyer.budget_max)) : "");
+  const [budgetMin, setBudgetMin] = useState(buyer.budget_min ? String(buyer.budget_min) : "");
+  const [budgetMax, setBudgetMax] = useState(buyer.budget_max ? String(buyer.budget_max) : "");
   const [bedrooms, setBedrooms] = useState(buyer.bedrooms ?? "Any");
   const [landSizeMin, setLandSizeMin] = useState(buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any");
   const [note, setNote] = useState(buyer.notes_summary ?? "");
-  const [showMore, setShowMore] = useState(false);
 
   const [preferredContactMethod, setPreferredContactMethod] = useState(buyer.preferred_contact_method ?? "");
   const [bestTimeToContact, setBestTimeToContact] = useState(buyer.best_time_to_contact ?? "");
@@ -166,8 +183,8 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs.name = "Enter the buyer's name";
     if (suburbs.length === 0) errs.suburbs = "Add at least one suburb";
-    const min = parseAmount(budgetMin);
-    const max = parseAmount(budgetMax);
+    const min = budgetMin ? parseInt(budgetMin, 10) : null;
+    const max = budgetMax ? parseInt(budgetMax, 10) : null;
     if (min !== null && max !== null && min > max) errs.budgetMax = "Max must be greater than minimum";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -191,8 +208,8 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
         phone: phone || null,
         email: email || null,
         preferred_suburbs: suburbs,
-        budget_min: parseAmount(budgetMin),
-        budget_max: parseAmount(budgetMax),
+        budget_min: budgetMin ? parseInt(budgetMin, 10) : null,
+        budget_max: budgetMax ? parseInt(budgetMax, 10) : null,
         bedrooms: bedrooms === "Any" ? null : bedrooms,
         land_size_min: landSizeValue,
         notes_summary: note || null,
@@ -231,10 +248,11 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+      <BottomNav />
 
       {/* ── Header ── */}
-      <header className="sticky top-0 bg-primary z-20 border-b border-white/10">
+      <header className="shrink-0 bg-primary z-20 border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 lg:px-6 h-14 flex items-center justify-between">
           <Link
             href={`/buyers/${buyer.id}`}
@@ -249,7 +267,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
       </header>
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-28">
         <div className="max-w-5xl mx-auto px-4 lg:px-6 py-5">
 
           {errors._form && (
@@ -259,7 +277,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
           )}
 
           {/* Desktop 2-col, mobile single-col */}
-          <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
 
             {/* ── Left: Identity + Status + Notes ── */}
             <div className="space-y-4">
@@ -279,27 +297,26 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                   />
                 </FieldRow>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Phone Number">
-                    <input
-                      type="tel"
-                      placeholder="+61 400 000 000"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      onBlur={(e) => setPhone(formatPhone(e.target.value))}
-                      className={inputCls()}
-                    />
-                  </FieldRow>
-                  <FieldRow label="Email Address">
-                    <input
-                      type="email"
-                      placeholder="name@email.com.au"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className={inputCls()}
-                    />
-                  </FieldRow>
-                </div>
+                <FieldRow label="Phone Number">
+                  <input
+                    type="tel"
+                    placeholder="+61 400 000 000"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onBlur={(e) => setPhone(formatPhone(e.target.value))}
+                    className={inputCls()}
+                  />
+                </FieldRow>
+
+                <FieldRow label="Email Address">
+                  <input
+                    type="email"
+                    placeholder="name@email.com.au"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputCls()}
+                  />
+                </FieldRow>
 
                 <FieldRow label="Buyer Temperature">
                   <div className="flex gap-2">
@@ -318,24 +335,27 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
               {/* Engagement Status */}
               <SectionCard>
                 <SectionHeader icon={<BarChart2 size={14} />} title="Engagement Status" />
-                <ChipGroup
-                  label="Buying Timeline"
-                  options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
-                  value={buyingTimeline}
-                  onChange={setBuyingTimeline}
-                />
-                <ChipGroup
-                  label="Buyer type"
-                  options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
-                  value={buyerType}
-                  onChange={setBuyerType}
-                />
-                <ChipGroup
-                  label="Lead source"
-                  options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]}
-                  value={leadSource}
-                  onChange={setLeadSource}
-                />
+                <FieldRow label="Buying Timeline">
+                  <SelectField
+                    options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
+                    value={buyingTimeline}
+                    onChange={setBuyingTimeline}
+                  />
+                </FieldRow>
+                <FieldRow label="Buyer type">
+                  <SelectField
+                    options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
+                    value={buyerType}
+                    onChange={setBuyerType}
+                  />
+                </FieldRow>
+                <FieldRow label="Lead source">
+                  <SelectField
+                    options={["Referral", "Database", "Open home", "Social media", "Website", "Other"]}
+                    value={leadSource}
+                    onChange={setLeadSource}
+                  />
+                </FieldRow>
               </SectionCard>
 
               {/* Internal Notes */}
@@ -351,11 +371,11 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
               </SectionCard>
             </div>
 
-            {/* ── Right: Search Criteria (sticky on desktop) ── */}
-            <div className="lg:sticky lg:top-[4.5rem] space-y-4">
+            {/* ── Right: Requirements + Preferences ── */}
+            <div className="space-y-4">
 
               <SectionCard>
-                <SectionHeader icon={<Search size={14} />} title="Search Criteria" />
+                <SectionHeader icon={<Search size={14} />} title="Property Search" />
 
                 <FieldRow label="Target Suburbs" error={errors.suburbs}>
                   <SuburbCombobox
@@ -367,40 +387,39 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                 </FieldRow>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Min Budget" error={errors.budgetMax}>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="1,200,000"
-                        value={budgetMin}
-                        onChange={(e) => setBudgetMin(e.target.value.replace(/[^0-9]/g, ""))}
-                        onBlur={(e) => setBudgetMin(formatAmount(e.target.value))}
-                        className={cn(inputCls(), "pl-8")}
-                      />
-                    </div>
+                  <FieldRow label="Min Budget">
+                    <BudgetSelect value={budgetMin} onChange={setBudgetMin} />
                   </FieldRow>
                   <FieldRow label="Max Budget" error={errors.budgetMax}>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">$</span>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="2,500,000"
-                        value={budgetMax}
-                        onChange={(e) => setBudgetMax(e.target.value.replace(/[^0-9]/g, ""))}
-                        onBlur={(e) => setBudgetMax(formatAmount(e.target.value))}
-                        className={cn(inputCls(errors.budgetMax), "pl-8")}
-                      />
-                    </div>
+                    <BudgetSelect value={budgetMax} onChange={setBudgetMax} />
                   </FieldRow>
                 </div>
-                {errors.budgetMax && <p className="text-xs text-error -mt-2">{errors.budgetMax}</p>}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Property type">
+                    <SelectField options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
+                  </FieldRow>
+                  <FieldRow label="House style">
+                    <SelectField options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
+                  </FieldRow>
+                </div>
+
+                <FieldRow label="Condition">
+                  <SelectField options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
+                </FieldRow>
 
                 <FieldRow label="Minimum Bedrooms">
                   <SegmentedControl options={["Any", "2+", "3+", "4+", "5+"]} value={bedrooms} onChange={setBedrooms} />
                 </FieldRow>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Bathrooms">
+                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
+                  </FieldRow>
+                  <FieldRow label="Car spaces">
+                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
+                  </FieldRow>
+                </div>
 
                 <FieldRow label="Land Size (min)">
                   <div className="overflow-x-auto -mx-5 px-5">
@@ -413,76 +432,40 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                     </div>
                   </div>
                 </FieldRow>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldRow label="Building size min (sq)">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="e.g. 25"
+                        value={buildingSizeMin}
+                        onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
+                        className={cn(inputCls(), "pr-12")}
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">sq</span>
+                    </div>
+                  </FieldRow>
+                  <FieldRow label="Block preference">
+                    <SelectField options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
+                  </FieldRow>
+                </div>
               </SectionCard>
 
-              {/* Show more toggle */}
-              <button
-                type="button"
-                onClick={() => setShowMore((v) => !v)}
-                className="w-full flex items-center justify-center gap-1.5 text-sm font-semibold text-teal-action py-1"
-              >
-                {showMore ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                {showMore ? "Hide details" : "Show more details"}
-              </button>
-
-              <AnimatedExpand open={showMore}>
-                <div className="space-y-4 pt-1">
-                  <SectionCard>
-                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Contact Preferences</p>
-                    <ChipGroup label="Preferred method" options={["Call", "SMS", "Email", "WhatsApp"]} value={preferredContactMethod} onChange={setPreferredContactMethod} />
-                    <ChipGroup label="Best time" options={["Morning", "Afternoon", "Evening", "Weekends"]} value={bestTimeToContact} onChange={setBestTimeToContact} />
-                    <ChipGroup label="Consent" options={["Consent given", "No consent", "Unknown"]} value={contactConsent} onChange={setContactConsent} />
-                  </SectionCard>
-
-                  <SectionCard>
-                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Property Preferences</p>
-                    <ChipGroup label="Type" options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
-                    <ChipGroup label="House style" options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
-                    <div>
-                      <p className="text-[13px] font-medium text-text-secondary mb-2">Bathrooms</p>
-                      <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-medium text-text-secondary mb-2">Car spaces</p>
-                      <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
-                    </div>
-                    <ChipGroup label="Condition" options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
-                  </SectionCard>
-
-                  <SectionCard>
-                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-1">Size Requirements</p>
-                    <div>
-                      <p className="text-[13px] font-medium text-text-secondary mb-2">Building size min (squares)</p>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="e.g. 25"
-                          value={buildingSizeMin}
-                          onChange={(e) => setBuildingSizeMin(e.target.value.replace(/[^0-9]/g, ""))}
-                          className={cn(inputCls(), "pr-12")}
-                        />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">sq</span>
-                      </div>
-                    </div>
-                    <ChipGroup label="Block preference" options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
-                  </SectionCard>
-
-                  <SectionCard>
-                    <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mb-3">Must-Haves</p>
-                    <div className="flex flex-wrap gap-2">
-                      {MUST_HAVES_OPTIONS.map((item) => (
-                        <PillChip
-                          key={item}
-                          label={item}
-                          selected={mustHaves.includes(item)}
-                          onClick={() => toggleMustHave(item)}
-                        />
-                      ))}
-                    </div>
-                  </SectionCard>
+              <SectionCard>
+                <p className="text-[15px] font-bold text-primary tracking-tight pb-3 mb-3 border-b border-border">Must-Haves</p>
+                <div className="flex flex-wrap gap-2">
+                  {MUST_HAVES_OPTIONS.map((item) => (
+                    <PillChip
+                      key={item}
+                      label={item}
+                      selected={mustHaves.includes(item)}
+                      onClick={() => toggleMustHave(item)}
+                    />
+                  ))}
                 </div>
-              </AnimatedExpand>
+              </SectionCard>
             </div>
 
           </div>
@@ -494,15 +477,15 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
         <div className="max-w-5xl mx-auto px-4 lg:px-6 py-4 flex items-center gap-3">
           <Link
             href={`/buyers/${buyer.id}`}
-            className="shrink-0 h-14 px-6 flex items-center justify-center text-sm font-semibold text-text-secondary rounded-2xl border border-border hover:bg-surface-container transition-colors"
+            className="flex-1 h-14 flex items-center justify-center text-sm font-semibold text-text-secondary rounded-2xl border border-border hover:bg-surface-container transition-colors"
           >
             Discard
           </Link>
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isPending}
-            className="flex-1 h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-60 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
+            disabled={isPending || !name.trim()}
+            className="flex-1 h-14 rounded-2xl bg-teal-action text-on-teal-action font-bold text-[15px] tracking-tight transition-opacity disabled:opacity-40 shadow-[0_4px_16px_rgba(0,106,98,0.35)]"
           >
             {isPending ? "Saving…" : "Save Buyer Profile"}
           </button>

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -28,9 +29,9 @@ export async function signUpWithEmail(
 
   if (error) return { error: error.message };
 
-  // Update profile with name and mobile
+  // Use admin client — no session exists until email is confirmed, so RLS blocks the anon client
   if (data.user) {
-    await supabase
+    await supabaseAdmin
       .from("profiles")
       .update({ name, mobile })
       .eq("id", data.user.id);

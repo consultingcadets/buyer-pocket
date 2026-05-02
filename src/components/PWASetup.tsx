@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 export function PWASetup() {
   useEffect(() => {
@@ -98,13 +98,15 @@ function isIosSafari(): boolean {
 
 export function IOSInstallPrompt() {
   const [show, setShow] = useState(false);
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     if (window.matchMedia("(display-mode: standalone)").matches) return;
     if (window.innerWidth > 1024) return;
     if (sessionStorage.getItem("pwa-ios-dismissed")) return;
     if (!isIosSafari()) return;
-    setShow(true);
+    startTransition(() => setShow(true));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!show) return null;
@@ -130,7 +132,7 @@ export function IOSInstallPrompt() {
                 <line x1="12" y1="2" x2="12" y2="15"/>
               </svg>
             </span>{" "}
-            button then <span className="font-medium text-white">"Add to Home Screen"</span>.
+            button then <span className="font-medium text-white">&quot;Add to Home Screen&quot;</span>.
           </p>
         </div>
         <button

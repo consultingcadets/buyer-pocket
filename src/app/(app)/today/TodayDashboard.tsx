@@ -333,6 +333,13 @@ export function TodayDashboard({
             </>
           )}
         </div>
+        {snoozeReminderId && (
+          <SnoozeModal
+            reminderId={snoozeReminderId}
+            onSnooze={handleSnoozeConfirm}
+            onClose={() => setSnoozeReminderId(null)}
+          />
+        )}
       </div>
 
       <div className="lg:hidden pb-24 bg-surface-container-low min-h-screen">
@@ -502,16 +509,15 @@ export function TodayDashboard({
             </>
           )}
         </div>
+        {snoozeReminderId && (
+          <SnoozeModal
+            reminderId={snoozeReminderId}
+            onSnooze={handleSnoozeConfirm}
+            onClose={() => setSnoozeReminderId(null)}
+            isMobile
+          />
+        )}
       </div>
-
-      {snoozeReminderId && (
-        <SnoozeModal
-          reminderId={snoozeReminderId}
-          onSnooze={handleSnoozeConfirm}
-          onClose={() => setSnoozeReminderId(null)}
-          isMobile
-        />
-      )}
 
       <BottomNav />
     </div>

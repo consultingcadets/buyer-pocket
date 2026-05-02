@@ -129,7 +129,7 @@ export function FilterSheet({
   const [count, setCount] = useState<number | null>(null);
   const [, startTransition] = useTransition();
 
-  useEffect(() => { setPending(filters); }, [filters]);
+  useEffect(() => { startTransition(() => setPending(filters)); }, [filters]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -157,7 +157,7 @@ export function FilterSheet({
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between px-5 py-3 border-b border-border">
         <h2 className="text-[16px] font-semibold text-text-primary">Filters</h2>
-        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-text-secondary">
+        <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary">
           <XIcon />
         </button>
       </div>
@@ -165,6 +165,12 @@ export function FilterSheet({
       {/* Desktop title */}
       <div className="hidden lg:flex items-center px-5 pt-5 pb-3 border-b border-border">
         <h2 className="text-[13px] font-bold text-primary uppercase tracking-[0.1em] flex-1">Filters</h2>
+        <button
+          onClick={handleClear}
+          className="text-[12px] font-semibold text-teal-action hover:opacity-70 transition-opacity"
+        >
+          Clear all
+        </button>
       </div>
 
       {/* Scrollable body */}
@@ -291,13 +297,13 @@ export function FilterSheet({
       <div className="border-t border-border bg-white p-4 flex gap-3">
         <button
           onClick={handleClear}
-          className="flex-1 h-11 text-teal-action font-semibold text-[14px] rounded-xl border border-teal-action/30 hover:bg-teal-action/5 transition-colors"
+          className="flex-1 h-12 text-teal-action font-semibold text-[14px] rounded-xl border border-teal-action/30 hover:bg-teal-action/5 transition-colors"
         >
           Clear
         </button>
         <button
           onClick={handleApply}
-          className="flex-1 h-11 bg-teal-action text-on-teal-action rounded-xl font-bold text-[14px] hover:opacity-90 transition-opacity"
+          className="flex-1 h-12 bg-teal-action text-on-teal-action rounded-xl font-bold text-[14px] hover:opacity-90 transition-opacity"
         >
           Show{count !== null ? ` ${count}` : ""}
         </button>
