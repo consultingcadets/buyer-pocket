@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PWASetup, InstallPrompt, IOSInstallPrompt } from "@/components/PWASetup";
+import { NativeHandlers } from "@/components/NativeHandlers";
 import { PHProvider } from "@/components/analytics/posthog-provider";
 
 const ORG_SCHEMA = {
@@ -90,6 +91,7 @@ export default function RootLayout({
         <PWASetup />
         <InstallPrompt />
         <IOSInstallPrompt />
+        <NativeHandlers />
       </body>
     </html>
   );

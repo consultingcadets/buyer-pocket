@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
 import { savePushToken } from "@/app/(app)/reminders/actions";
+import { isNative } from "@/lib/capacitor/native";
+import { registerNativePush } from "@/lib/capacitor/push";
 
 const DOTS = [false, false, false, true];
 
@@ -34,6 +36,12 @@ export default function NotificationsPage() {
   const [permissionDenied, setPermissionDenied] = useState(false);
 
   async function handleEnableNotifications() {
+    if (isNative()) {
+      await registerNativePush();
+      router.push("/today");
+      return;
+    }
+
     const permission = await requestPushPermission();
     if (permission === "denied") {
       setPermissionDenied(true);

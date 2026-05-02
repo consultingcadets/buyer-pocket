@@ -3,6 +3,8 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { loginWithEmail, loginWithGoogle, type LoginState } from "./actions";
+import { isNative } from "@/lib/capacitor/native";
+import { signInWithGoogleNative } from "@/lib/capacitor/auth";
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
@@ -32,6 +34,12 @@ export default function LoginPage() {
             <button
               type="submit"
               formAction={loginWithGoogle}
+              onClick={(e) => {
+                if (isNative()) {
+                  e.preventDefault();
+                  signInWithGoogleNative();
+                }
+              }}
               className="w-full min-h-12 flex items-center justify-center gap-2 bg-white text-primary text-[14px] font-semibold py-3 px-4 rounded-lg border border-primary hover:bg-surface-container-low transition-colors duration-200"
             >
               <GoogleIcon />
