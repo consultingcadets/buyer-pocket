@@ -19,6 +19,22 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400" },
         ],
       },
+      {
+        // Apple App Site Association — must be application/json, no-cache
+        source: "/.well-known/apple-app-site-association",
+        headers: [
+          { key: "Content-Type", value: "application/json" },
+          { key: "Cache-Control", value: "no-cache" },
+        ],
+      },
+      {
+        // Android Asset Links
+        source: "/.well-known/assetlinks.json",
+        headers: [
+          { key: "Content-Type", value: "application/json" },
+          { key: "Cache-Control", value: "no-cache" },
+        ],
+      },
     ];
   },
 };

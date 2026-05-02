@@ -3,6 +3,8 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signUpWithEmail, signUpWithGoogle, type SignupState } from "./actions";
+import { isNative } from "@/lib/capacitor/native";
+import { signInWithGoogleNative } from "@/lib/capacitor/auth";
 
 const DOTS = [true, false, false, false];
 
@@ -68,6 +70,12 @@ export default function SignupPage() {
             <button
               type="submit"
               formAction={signUpWithGoogle}
+              onClick={(e) => {
+                if (isNative()) {
+                  e.preventDefault();
+                  signInWithGoogleNative();
+                }
+              }}
               className="w-full min-h-12 flex items-center justify-center gap-2 bg-white border border-primary rounded-lg text-primary text-[16px] font-semibold hover:bg-surface-container-low transition-colors"
             >
               <GoogleIcon />
