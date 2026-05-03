@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339093035050",
+    "project_id": "buyer-pocket",
+    "storage_bucket": "buyer-pocket.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339093035050:android:ee76c6a4487b29ef084b53",
+        "android_client_info": {
+          "package_name": "com.buyerpocket.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBePl3hcS6Wj1sMxOkL_diEkztP5XZyeM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
