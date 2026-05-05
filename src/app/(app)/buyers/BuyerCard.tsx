@@ -190,7 +190,84 @@ function ThreeDotMenu({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Desktop Table Row ────────────────────────────────────────────────────────
+
+export function BuyerTableRow({
+  buyer,
+  onArchive,
+}: {
+  buyer: Buyer;
+  onArchive: (id: string) => void;
+}) {
+  const budgetLabel =
+    buyer.budget_min || buyer.budget_max
+      ? formatBudgetLabel(buyer.budget_min, buyer.budget_max)
+      : null;
+
+  return (
+    <tr className="border-b border-border hover:bg-surface-container-low/60 group transition-colors">
+      {/* Name */}
+      <td className="px-4 py-3 max-w-[200px]">
+        <Link href={`/buyers/${buyer.id}`} className="block">
+          <span className="font-semibold text-[14px] text-primary truncate block hover:underline">
+            {buyer.name}
+          </span>
+          {buyer.phone && (
+            <span className="text-[12px] text-text-secondary truncate block">{buyer.phone}</span>
+          )}
+        </Link>
+      </td>
+
+      {/* Suburb */}
+      <td className="px-4 py-3 max-w-[160px]">
+        <span className="text-[13px] text-text-primary truncate block">
+          {(buyer.preferred_suburbs?.length ?? 0) > 0
+            ? formatSuburbs(buyer.preferred_suburbs)
+            : <span className="text-outline">—</span>}
+        </span>
+      </td>
+
+      {/* Budget */}
+      <td className="px-4 py-3 whitespace-nowrap">
+        <span className="text-[13px] text-text-primary">
+          {budgetLabel ?? <span className="text-outline">—</span>}
+        </span>
+      </td>
+
+      {/* Land size */}
+      <td className="px-4 py-3 whitespace-nowrap">
+        <span className="text-[13px] text-text-primary">
+          {buyer.land_size_min
+            ? `${buyer.land_size_min.toLocaleString()}m²`
+            : <span className="text-outline">—</span>}
+        </span>
+      </td>
+
+      {/* Buying time */}
+      <td className="px-4 py-3 whitespace-nowrap">
+        <span className="text-[13px] text-text-primary">
+          {buyer.buying_timeline ?? <span className="text-outline">—</span>}
+        </span>
+      </td>
+
+      {/* Temperature */}
+      <td className="px-4 py-3">
+        <TemperatureChip temp={buyer.buyer_temperature} />
+      </td>
+
+      {/* Actions */}
+      <td className="px-2 py-3 w-10">
+        <ThreeDotMenu
+          buyer={buyer}
+          onArchive={onArchive}
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+        />
+      </td>
+    </tr>
+  );
+}
+
+// ─── Mobile Card ─────────────────────────────────────────────────────────────
 
 export function BuyerCard({
   buyer,
@@ -204,73 +281,8 @@ export function BuyerCard({
       ? formatBudgetLabel(buyer.budget_min, buyer.budget_max)
       : null;
 
-  // ── Desktop row ──────────────────────────────────────────────────────────
-  const desktopRow = (
-    <div className="hidden lg:flex items-center px-6 py-3 border-b border-border hover:bg-surface-container-low/60 group cursor-default transition-colors">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-3">
-          <h4 className="font-semibold text-[18px] text-primary truncate">
-            {buyer.name}
-          </h4>
-          <div className="shrink-0 flex items-center gap-1.5">
-            <TemperatureChip temp={buyer.buyer_temperature} />
-            <StatusChip status={buyer.lead_status} />
-          </div>
-        </div>
-
-        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap text-[13px] text-text-secondary">
-          {(buyer.preferred_suburbs?.length ?? 0) > 0 && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-low">
-              {formatSuburbs(buyer.preferred_suburbs)}
-            </span>
-          )}
-          {budgetLabel && (
-            <>
-              <span>·</span>
-              <span>{budgetLabel}</span>
-            </>
-          )}
-          {buyer.bedrooms && buyer.bedrooms !== "Any" && (
-            <>
-              <span>·</span>
-              <span>{buyer.bedrooms} bed</span>
-            </>
-          )}
-          {buyer.land_size_min && (
-            <>
-              <span>·</span>
-              <span>{buyer.land_size_min}m²</span>
-            </>
-          )}
-          {buyer.next_reminder_at && (
-            <>
-              <span>·</span>
-              <ReminderBadge iso={buyer.next_reminder_at} />
-            </>
-          )}
-          {!buyer.next_reminder_at && (
-            <>
-              <span>·</span>
-              <span className="text-outline">No reminder</span>
-            </>
-          )}
-        </div>
-      </div>
-
-      <ThreeDotMenu
-        buyer={buyer}
-        onArchive={onArchive}
-        className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity"
-      />
-    </div>
-  );
-
-  // ── Mobile card ───────────────────────────────────────────────────────────
-  const mobileCard = (
-    <article
-      className="lg:hidden relative mx-4 mb-3 bg-white rounded-lg overflow-hidden shadow-card"
-    >
-      {/* Reminder dot */}
+  return (
+    <article className="relative mx-4 mb-3 bg-white rounded-lg overflow-hidden shadow-card">
       {buyer.next_reminder_at && (
         <span className="absolute top-3.5 right-12 w-2.5 h-2.5 bg-secondary rounded-full" />
       )}
@@ -321,12 +333,5 @@ export function BuyerCard({
         </a>
       </div>
     </article>
-  );
-
-  return (
-    <>
-      {desktopRow}
-      {mobileCard}
-    </>
   );
 }

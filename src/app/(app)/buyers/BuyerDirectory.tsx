@@ -20,7 +20,7 @@ import {
 import type { Buyer } from "@/types/database";
 import { fetchBuyers, archiveBuyer } from "./actions";
 import { PAGE_SIZE } from "@/lib/buyer-filters";
-import { BuyerCard } from "./BuyerCard";
+import { BuyerCard, BuyerTableRow } from "./BuyerCard";
 import { FilterSheet } from "./FilterSheet";
 import { BottomNav } from "@/components/BottomNav";
 
@@ -448,22 +448,36 @@ export function BuyerDirectory({
             </div>
           )}
 
-          {/* Desktop column headers */}
+          {/* Mobile list */}
           {!isLoading && buyers.length > 0 && (
-            <div className="hidden lg:flex items-center px-6 py-2.5 border-b border-border bg-surface-container-low/70">
-              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary">
-                Buyer
-              </span>
-            </div>
-          )}
-
-          {/* Buyer list */}
-          {!isLoading && buyers.length > 0 && (
-            <div className="pt-2 lg:pt-0">
+            <div className="lg:hidden pt-2">
               {buyers.map((b) => (
                 <BuyerCard key={b.id} buyer={b} onArchive={handleArchive} />
               ))}
             </div>
+          )}
+
+          {/* Desktop table */}
+          {!isLoading && buyers.length > 0 && (
+            <table className="hidden lg:table w-full border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-surface-container-low/70">
+                  {["Name", "Suburb", "Budget", "Land size", "Buying time", "Temperature", ""].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-text-secondary whitespace-nowrap"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {buyers.map((b) => (
+                  <BuyerTableRow key={b.id} buyer={b} onArchive={handleArchive} />
+                ))}
+              </tbody>
+            </table>
           )}
 
           {/* Infinite scroll sentinel */}

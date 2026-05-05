@@ -78,10 +78,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }}
         />
         {/* iOS PWA icons */}
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
-        {/* Mask icon for Safari tab */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        {/* Mask icon for Safari pinned tab */}
         <link rel="mask-icon" href="/icons/icon.svg" color="#0F1C2C" />
       </head>
       <body className="min-h-full flex flex-col">

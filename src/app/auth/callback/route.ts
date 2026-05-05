@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("name, eligibility_acknowledged_at, state")
+          .select("name, mobile, eligibility_acknowledged_at, state")
           .eq("id", user.id)
           .single();
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         if (!profile?.eligibility_acknowledged_at) {
           return NextResponse.redirect(`${origin}/signup/eligibility`);
         }
-        if (!profile?.state) {
+        if (!profile?.state || !profile?.mobile) {
           return NextResponse.redirect(`${origin}/signup/profile`);
         }
       }

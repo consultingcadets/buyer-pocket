@@ -5,6 +5,7 @@ import { Phone, MessageSquare, Mail, Bell, Pencil, MoreHorizontal, CheckCircle, 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { BottomNav } from "@/components/BottomNav";
 import { getReminderDate, type ReminderChip } from "@/lib/reminder-utils";
 import type { Database } from "@/types/database";
 import {
@@ -1478,6 +1479,8 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
           onClose={() => setShowArchive(false)}
         />
       )}
+
+      <BottomNav />
     </>
   );
 }
