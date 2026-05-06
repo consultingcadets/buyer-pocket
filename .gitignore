@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase / Google secrets — never commit these
+ios/App/App/GoogleService-Info.plist
+android/app/google-services.json
