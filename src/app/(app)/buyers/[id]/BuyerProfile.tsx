@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/BottomNav";
 import { getReminderDate, type ReminderChip } from "@/lib/reminder-utils";
 import type { Database } from "@/types/database";
+import type { MatchedProperty } from "@/app/(app)/properties/actions";
 import {
   addNote,
   updateNote,
@@ -17,6 +18,7 @@ import {
   deleteReminder,
   addReminder,
   archiveBuyer,
+  markAsContacted,
 } from "./actions";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -24,12 +26,13 @@ import {
 type Buyer = Database["public"]["Tables"]["buyers"]["Row"];
 type Note = Database["public"]["Tables"]["notes"]["Row"];
 type Reminder = Database["public"]["Tables"]["reminders"]["Row"];
-type MobileTab = "looking-for" | "notes" | "reminders" | "contact";
+type MobileTab = "looking-for" | "notes" | "reminders" | "contact" | "properties";
 
 interface Props {
   buyer: Buyer;
   notes: Note[];
   reminders: Reminder[];
+  matchedProperties: MatchedProperty[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -1054,13 +1057,86 @@ function MoreMenu({
   );
 }
 
+// ─── Matching Properties Panel ───────────────────────────────────────────────
+
+function MatchingPropertiesPanel({ properties }: { properties: MatchedProperty[] }) {
+  const fmtPrice = (p: number) =>
+    p >= 1_000_000
+      ? `$${((p / 1_000_000) % 1 === 0 ? p / 1_000_000 : (p / 1_000_000).toFixed(1))}M`
+      : `$${Math.round(p / 1000)}k`;
+
+  return (
+    <div className="bg-white rounded-xl border border-border p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-[14px] font-semibold text-text-primary">
+          Matching properties
+          {properties.length > 0 && (
+            <span className="ml-1.5 text-text-secondary font-normal">· {properties.length}</span>
+          )}
+        </h3>
+        <Link href="/properties" className="text-[12px] text-teal-action font-medium hover:opacity-70">
+          View all
+        </Link>
+      </div>
+
+      {properties.length === 0 ? (
+        <p className="text-[13px] text-text-secondary py-2">
+          No active properties match this buyer&apos;s criteria yet.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {properties.map((p) => (
+            <Link
+              key={p.id}
+              href={`/properties/${p.id}`}
+              className="block border border-border rounded-lg px-3 py-3 hover:bg-surface-container transition-colors"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-text-primary truncate">
+                    {p.street_address}
+                  </p>
+                  <p className="text-[12px] text-text-secondary">
+                    {p.suburb}, {p.state}
+                  </p>
+                </div>
+                <span className="text-[13px] font-bold text-text-primary shrink-0">
+                  {fmtPrice(p.price)}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {p.matchedCriteria.map((c) => (
+                  <span
+                    key={c}
+                    className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium"
+                  >
+                    ✓ {c}
+                  </span>
+                ))}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main BuyerProfile ────────────────────────────────────────────────────────
 
-export function BuyerProfile({ buyer, notes, reminders }: Props) {
+export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Props) {
   const [activeTab, setActiveTab] = useState<MobileTab>("looking-for");
   const [showAddReminder, setShowAddReminder] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [contactedFlash, setContactedFlash] = useState(false);
+  const [, startContactTransition] = useTransition();
+
+  function handleMarkContacted() {
+    setContactedFlash(true);
+    setTimeout(() => setContactedFlash(false), 2000);
+    startContactTransition(async () => { await markAsContacted(buyer.id); });
+  }
 
   const tempConfig = buyer.buyer_temperature ? TEMP_STYLES[buyer.buyer_temperature] : null;
 
@@ -1078,8 +1154,9 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
   const mobileActionBtn = "flex flex-col items-center gap-1 text-xs text-text-secondary";
   const mobileIconBtn = "w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-xl";
 
-  const MOBILE_TABS: Array<{ id: MobileTab; label: string }> = [
+  const MOBILE_TABS: Array<{ id: MobileTab; label: string; badge?: number }> = [
     { id: "looking-for", label: "Looking for" },
+    { id: "properties", label: "Properties", badge: matchedProperties.length || undefined },
     { id: "notes", label: "Notes" },
     { id: "reminders", label: "Reminders" },
     { id: "contact", label: "Contact" },
@@ -1089,7 +1166,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
     <>
       {/* ── Desktop Layout ── */}
       <div className="hidden lg:block min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+        <div className="mx-auto px-6 py-6 space-y-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-text-secondary">
             <Link href="/buyers" className="hover:text-text-primary">Buyers</Link>
@@ -1145,6 +1222,19 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 )}
                 <button
                   type="button"
+                  onClick={handleMarkContacted}
+                  className={cn(
+                    "h-9 px-4 rounded-lg border text-sm font-medium flex items-center gap-1.5 transition-colors",
+                    contactedFlash
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  )}
+                >
+                  <Check className="w-4 h-4" />
+                  {contactedFlash ? "Contacted!" : "Mark contacted"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setShowAddReminder(true)}
                   className="h-9 px-4 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium flex items-center gap-1.5 hover:bg-white/20 transition-colors"
                 >
@@ -1181,6 +1271,7 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
             {/* Left column */}
             <div className="space-y-6">
               <LookingForCard buyer={buyer} />
+              <MatchingPropertiesPanel properties={matchedProperties} />
               <NotesActivity buyer={buyer} notes={notes} reminders={reminders} />
             </div>
 
@@ -1304,13 +1395,18 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex-1 py-3 text-xs font-semibold transition-colors border-b-2",
+                  "flex-1 py-3 text-xs font-semibold transition-colors border-b-2 flex items-center justify-center gap-1",
                   activeTab === tab.id
                     ? "text-secondary border-secondary"
                     : "text-text-secondary border-transparent"
                 )}
               >
                 {tab.label}
+                {tab.badge ? (
+                  <span className="w-4 h-4 rounded-full bg-teal-action text-on-teal-action text-[9px] font-bold flex items-center justify-center">
+                    {tab.badge}
+                  </span>
+                ) : null}
               </button>
             ))}
           </div>
@@ -1413,6 +1509,9 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               )}
             </>
           )}
+          {activeTab === "properties" && (
+            <MatchingPropertiesPanel properties={matchedProperties} />
+          )}
           {activeTab === "notes" && (
             <NotesActivity buyer={buyer} notes={notes} reminders={reminders} />
           )}
@@ -1461,6 +1560,19 @@ export function BuyerProfile({ buyer, notes, reminders }: Props) {
               <Mail className="w-5 h-5" />
             </a>
           )}
+          <button
+            type="button"
+            onClick={handleMarkContacted}
+            className={cn(
+              "w-12 h-12 rounded-lg border flex items-center justify-center transition-colors",
+              contactedFlash
+                ? "bg-emerald-500 border-emerald-500 text-white"
+                : "border-border text-text-primary"
+            )}
+            title="Mark as contacted"
+          >
+            <Check className="w-5 h-5" />
+          </button>
         </div>
       </div>
 

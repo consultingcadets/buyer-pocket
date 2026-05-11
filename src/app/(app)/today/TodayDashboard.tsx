@@ -220,7 +220,7 @@ export function TodayDashboard({
   return (
     <div className="min-h-screen bg-background">
       <div className="hidden lg:block">
-        <div className="max-w-6xl mx-auto px-8 pt-8 pb-8 space-y-6">
+        <div className="mx-auto px-8 pt-8 pb-8 space-y-6">
           {!isNewUserWelcome && (
             <div className="flex items-start justify-between gap-6">
               <div>

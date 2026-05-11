@@ -120,3 +120,29 @@ export async function addBuyer(
 
   return { success: true, buyerId: buyer.id };
 }
+
+export async function checkDuplicateBuyer(
+  phone?: string,
+  email?: string
+): Promise<{ match: { id: string; name: string } | null }> {
+  if (!phone?.trim() && !email?.trim()) return { match: null };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { match: null };
+
+  const conditions: string[] = [];
+  if (phone?.trim()) conditions.push(`phone.eq.${phone.trim()}`);
+  if (email?.trim()) conditions.push(`email.eq.${email.trim().toLowerCase()}`);
+
+  const { data } = await supabase
+    .from("buyers")
+    .select("id, name")
+    .eq("user_id", user.id)
+    .is("archived_at", null)
+    .or(conditions.join(","))
+    .limit(1)
+    .maybeSingle();
+
+  return { match: data ?? null };
+}

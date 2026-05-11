@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Clock, Phone, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
+import { getLeadStaleness } from "@/lib/format";
 import type { Buyer } from "@/types/database";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -209,11 +210,22 @@ export function BuyerTableRow({
       {/* Name */}
       <td className="px-4 py-3 max-w-[200px]">
         <Link href={`/buyers/${buyer.id}`} className="block">
-          <span className="font-semibold text-[14px] text-primary truncate block hover:underline">
-            {buyer.name}
+          <span className="flex items-center gap-1.5">
+            {(() => {
+              const { colour } = getLeadStaleness(buyer.last_contacted_at, buyer.created_at);
+              return <span className={cn("w-2 h-2 rounded-full shrink-0",
+                colour === "green" && "bg-emerald-500",
+                colour === "amber" && "bg-amber-500",
+                colour === "red"   && "bg-red-500",
+                colour === "grey"  && "bg-outline",
+              )} />;
+            })()}
+            <span className="font-semibold text-[14px] text-primary truncate hover:underline">
+              {buyer.name}
+            </span>
           </span>
           {buyer.phone && (
-            <span className="text-[12px] text-text-secondary truncate block">{buyer.phone}</span>
+            <span className="text-[12px] text-text-secondary truncate block pl-3.5">{buyer.phone}</span>
           )}
         </Link>
       </td>
@@ -318,12 +330,28 @@ export function BuyerCard({
       </div>
 
       <div className="border-t border-border px-4 py-2.5 flex items-center justify-between">
-        <span className="text-[13px] text-text-secondary flex items-center gap-1.5">
-          <Clock className="w-3 h-3" />
-          {buyer.last_contacted_at
-            ? `Last contact: ${formatRelativeTime(buyer.last_contacted_at)}`
-            : "Not yet contacted"}
-        </span>
+        {(() => {
+          const { label, colour } = getLeadStaleness(buyer.last_contacted_at, buyer.created_at);
+          return (
+            <span className={cn(
+              "text-[12px] font-medium flex items-center gap-1.5",
+              colour === "green" && "text-emerald-700",
+              colour === "amber" && "text-amber-600",
+              colour === "red" && "text-red-600",
+              colour === "grey" && "text-text-secondary",
+            )}>
+              <span className={cn(
+                "w-2 h-2 rounded-full shrink-0",
+                colour === "green" && "bg-emerald-500",
+                colour === "amber" && "bg-amber-500",
+                colour === "red" && "bg-red-500",
+                colour === "grey" && "bg-outline",
+              )} />
+              <Clock className="w-3 h-3 opacity-60" />
+              {buyer.last_contacted_at ? `Last contact: ${label}` : label}
+            </span>
+          );
+        })()}
         <a
           href={buyer.phone ? `tel:${buyer.phone}` : undefined}
           className="text-[13px] font-medium text-teal-action flex items-center gap-1"

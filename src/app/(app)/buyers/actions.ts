@@ -103,6 +103,33 @@ function buildQuery(
       break;
   }
 
+  switch (filters.dateAdded) {
+    case "last_week": {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 7);
+      q = q.gte("created_at", d.toISOString());
+      break;
+    }
+    case "last_fortnight": {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 14);
+      q = q.gte("created_at", d.toISOString());
+      break;
+    }
+    case "last_month": {
+      const d = new Date(now);
+      d.setMonth(d.getMonth() - 1);
+      q = q.gte("created_at", d.toISOString());
+      break;
+    }
+    case "last_3_months": {
+      const d = new Date(now);
+      d.setMonth(d.getMonth() - 3);
+      q = q.gte("created_at", d.toISOString());
+      break;
+    }
+  }
+
   return q;
 }
 
@@ -170,6 +197,61 @@ export async function getFilteredCount(
   const { count, error } = await q;
   if (error) return { count: 0, error: error.message };
   return { count: count ?? 0 };
+}
+
+export async function exportBuyersCSV(
+  filters: BuyerFilters,
+  sort: SortOption
+): Promise<{ csv: string; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { csv: "", error: "Not authenticated" };
+
+  let q = supabase
+    .from("buyers")
+    .select("name, phone, email, preferred_suburbs, budget_min, budget_max, bedrooms, land_size_min, property_type, buyer_temperature, buying_timeline, lead_status, notes_summary, last_contacted_at, created_at")
+    .eq("user_id", user.id)
+    .is("archived_at", null);
+
+  q = buildQuery(q, filters);
+
+  switch (sort) {
+    case "last_updated": q = q.order("updated_at", { ascending: false }); break;
+    case "last_contacted": q = q.order("last_contacted_at", { ascending: false, nullsFirst: false }); break;
+    case "next_reminder": q = q.order("next_reminder_at", { ascending: true, nullsFirst: false }); break;
+    case "temperature": q = q.order("temperature_sort", { ascending: true, nullsFirst: false }); break;
+    default: q = q.order("created_at", { ascending: false });
+  }
+
+  const { data, error } = await q;
+  if (error) return { csv: "", error: error.message };
+
+  const rows = data ?? [];
+  const headers = ["Name", "Phone", "Email", "Suburbs", "Budget Min", "Budget Max", "Bedrooms", "Land Size Min (m²)", "Property Type", "Temperature", "Buying Timeline", "Lead Status", "Notes", "Last Contacted", "Date Added"];
+
+  const escape = (v: unknown) => {
+    const s = v == null ? "" : String(v);
+    return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+
+  const lines = [
+    headers.join(","),
+    ...rows.map((r) => [
+      r.name, r.phone, r.email,
+      (r.preferred_suburbs as string[] ?? []).join("; "),
+      r.budget_min, r.budget_max,
+      r.bedrooms, r.land_size_min,
+      r.property_type, r.buyer_temperature,
+      r.buying_timeline, r.lead_status,
+      r.notes_summary,
+      r.last_contacted_at ? new Date(r.last_contacted_at).toLocaleDateString("en-AU") : "",
+      new Date(r.created_at).toLocaleDateString("en-AU"),
+    ].map(escape).join(",")),
+  ];
+
+  return { csv: lines.join("\n") };
 }
 
 export async function archiveBuyer(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
 import { SegmentedControl } from "@/components/ui/segmented-control";
@@ -14,6 +14,7 @@ import {
   LEAD_STATUS_OPTIONS,
   REMINDER_DUE_OPTIONS,
   LAST_CONTACTED_OPTIONS,
+  DATE_ADDED_OPTIONS,
 } from "@/lib/buyer-filters";
 import { getFilteredCount } from "./actions";
 
@@ -128,8 +129,12 @@ export function FilterSheet({
   const [pending, setPending] = useState<BuyerFilters>(filters);
   const [count, setCount] = useState<number | null>(null);
   const [, startTransition] = useTransition();
+  const syncFromParent = useRef(false);
 
-  useEffect(() => { startTransition(() => setPending(filters)); }, [filters]);
+  useEffect(() => {
+    syncFromParent.current = true;
+    startTransition(() => setPending(filters));
+  }, [filters]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -139,6 +144,17 @@ export function FilterSheet({
       });
     }, 350);
     return () => clearTimeout(t);
+  }, [pending]);
+
+  // Desktop sidebar: auto-apply on change (no "Show" click needed)
+  useEffect(() => {
+    if (!desktopOpen || syncFromParent.current) {
+      syncFromParent.current = false;
+      return;
+    }
+    const t = setTimeout(() => { onFiltersChange(pending); }, 500);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pending]);
 
   function handleApply() { onFiltersChange(pending); onClose(); }
@@ -290,11 +306,20 @@ export function FilterSheet({
           />
         </div>
 
+        <div>
+          <SectionTitle>Date added</SectionTitle>
+          <RadioChipRow
+            options={DATE_ADDED_OPTIONS}
+            value={pending.dateAdded ?? "any"}
+            onChange={(v) => setPending((f) => ({ ...f, dateAdded: v }))}
+          />
+        </div>
+
         <div className="h-2" />
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-border bg-white p-4 flex gap-3">
+      {/* Footer — mobile only (desktop auto-applies) */}
+      <div className="lg:hidden border-t border-border bg-white p-4 flex gap-3">
         <button
           onClick={handleClear}
           className="flex-1 h-12 text-teal-action font-semibold text-[14px] rounded-xl border border-teal-action/30 hover:bg-teal-action/5 transition-colors"

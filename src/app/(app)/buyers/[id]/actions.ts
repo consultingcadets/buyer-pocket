@@ -41,6 +41,23 @@ export async function addNote(
   return {};
 }
 
+export async function markAsContacted(
+  buyerId: string
+): Promise<{ error?: string }> {
+  const { supabase, user } = await authedClient();
+  if (!user) return { error: "Unauthorized" };
+
+  const { error } = await supabase
+    .from("buyers")
+    .update({ last_contacted_at: new Date().toISOString() })
+    .eq("id", buyerId)
+    .eq("user_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/buyers/${buyerId}`);
+  return {};
+}
+
 export async function updateNote(
   noteId: string,
   buyerId: string,

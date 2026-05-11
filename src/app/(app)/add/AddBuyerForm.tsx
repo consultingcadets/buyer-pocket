@@ -17,7 +17,7 @@ import {
   getReminderLabel,
   type ReminderChip,
 } from "@/lib/reminder-utils";
-import { addBuyer } from "./actions";
+import { addBuyer, checkDuplicateBuyer } from "./actions";
 import { BottomNav } from "@/components/BottomNav";
 
 // ─── Shared input style ───────────────────────────────────────────────────────
@@ -230,6 +230,7 @@ export function AddBuyerForm() {
   const [reminderNote, setReminderNote] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [duplicate, setDuplicate] = useState<{ id: string; name: string } | null>(null);
 
   function validate() {
     const errs: Record<string, string> = {};
@@ -373,10 +374,25 @@ export function AddBuyerForm() {
                     type="tel"
                     placeholder="0412 345 678"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    onBlur={(e) => setPhone(formatPhone(e.target.value))}
+                    onChange={(e) => { setPhone(e.target.value); setDuplicate(null); }}
+                    onBlur={async (e) => {
+                      const formatted = formatPhone(e.target.value);
+                      setPhone(formatted);
+                      if (formatted.trim()) {
+                        const { match } = await checkDuplicateBuyer(formatted.trim(), undefined);
+                        setDuplicate(match);
+                      }
+                    }}
                     className={inputCls()}
                   />
+                  {duplicate && (
+                    <p className="mt-1.5 text-[13px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      This buyer already exists in the system.{" "}
+                      <Link href={`/buyers/${duplicate.id}`} className="font-semibold underline">
+                        View {duplicate.name}
+                      </Link>
+                    </p>
+                  )}
                 </FieldRow>
 
                 <FieldRow label="Email">
@@ -384,9 +400,24 @@ export function AddBuyerForm() {
                     type="email"
                     placeholder="name@email.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); setDuplicate(null); }}
+                    onBlur={async (e) => {
+                      const val = e.target.value.trim();
+                      if (val) {
+                        const { match } = await checkDuplicateBuyer(undefined, val);
+                        setDuplicate(match);
+                      }
+                    }}
                     className={inputCls()}
                   />
+                  {duplicate && (
+                    <p className="mt-1.5 text-[13px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      This buyer already exists in the system.{" "}
+                      <Link href={`/buyers/${duplicate.id}`} className="font-semibold underline">
+                        View {duplicate.name}
+                      </Link>
+                    </p>
+                  )}
                 </FieldRow>
 
                 <FieldRow label="Buyer Temperature">

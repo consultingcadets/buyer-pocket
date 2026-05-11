@@ -20,6 +20,7 @@ export type BuyerFilters = {
   leadStatus?: string;
   reminderDue?: "any" | "today" | "this_week" | "overdue" | "none";
   lastContacted?: "any" | "this_week" | "this_month" | "over_month" | "never";
+  dateAdded?: "any" | "last_week" | "last_fortnight" | "last_month" | "last_3_months";
 };
 
 export type SortState = { field: SortOption; label: string };
@@ -66,6 +67,14 @@ export const LAST_CONTACTED_OPTIONS = [
   { value: "never", label: "Never" },
 ] as const;
 
+export const DATE_ADDED_OPTIONS = [
+  { value: "any", label: "Any time" },
+  { value: "last_week", label: "Last week" },
+  { value: "last_fortnight", label: "Last fortnight" },
+  { value: "last_month", label: "Last month" },
+  { value: "last_3_months", label: "Last 3 months" },
+] as const;
+
 export function getActiveFilterCount(filters: BuyerFilters): number {
   let n = 0;
   if (filters.suburbs?.length) n++;
@@ -78,6 +87,7 @@ export function getActiveFilterCount(filters: BuyerFilters): number {
   if (filters.leadStatus) n++;
   if (filters.reminderDue && filters.reminderDue !== "any") n++;
   if (filters.lastContacted && filters.lastContacted !== "any") n++;
+  if (filters.dateAdded && filters.dateAdded !== "any") n++;
   return n;
 }
 
@@ -190,6 +200,15 @@ export function filtersToChips(filters: BuyerFilters): ActiveChip[] {
       id: "contacted",
       label: `Contacted: ${opt?.label ?? filters.lastContacted}`,
       remove: (f) => ({ ...f, lastContacted: "any" }),
+    });
+  }
+
+  if (filters.dateAdded && filters.dateAdded !== "any") {
+    const opt = DATE_ADDED_OPTIONS.find((o) => o.value === filters.dateAdded);
+    chips.push({
+      id: "dateadded",
+      label: `Added: ${opt?.label ?? filters.dateAdded}`,
+      remove: (f) => ({ ...f, dateAdded: "any" }),
     });
   }
 

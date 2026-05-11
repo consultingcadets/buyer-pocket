@@ -324,6 +324,53 @@ export type Database = {
           }
         ];
       };
+      properties: {
+        Row: {
+          id: string;
+          user_id: string;
+          street_address: string;
+          suburb: string;
+          state: string;
+          postcode: string | null;
+          price: number;
+          property_type: string | null;
+          bedrooms: number | null;
+          bathrooms: number | null;
+          land_size: number | null;
+          listing_url: string | null;
+          notes: string | null;
+          status: "active" | "sold" | "off_market";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          street_address: string;
+          suburb: string;
+          state: string;
+          postcode?: string | null;
+          price: number;
+          property_type?: string | null;
+          bedrooms?: number | null;
+          bathrooms?: number | null;
+          land_size?: number | null;
+          listing_url?: string | null;
+          notes?: string | null;
+          status?: "active" | "sold" | "off_market";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["properties"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "properties_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       subscriptions: {
         Row: {
           id: string;

@@ -31,3 +31,35 @@ export function formatAmount(value: string): string {
   if (!digits) return "";
   return parseInt(digits, 10).toLocaleString("en-AU");
 }
+
+export type LeadStaleness = {
+  label: string;
+  colour: "green" | "amber" | "red" | "grey";
+};
+
+export function getLeadStaleness(
+  lastContactedAt: string | null,
+  createdAt: string
+): LeadStaleness {
+  if (!lastContactedAt) {
+    const daysSinceCreated = (Date.now() - new Date(createdAt).getTime()) / 86_400_000;
+    if (daysSinceCreated > 60)
+      return { label: "Never contacted", colour: "red" };
+    return { label: "Never contacted", colour: "grey" };
+  }
+  const days = (Date.now() - new Date(lastContactedAt).getTime()) / 86_400_000;
+  const label =
+    days < 1 ? "Today" :
+    days < 2 ? "Yesterday" :
+    days < 7 ? `${Math.floor(days)} days ago` :
+    days < 30 ? `${Math.floor(days / 7)}w ago` :
+    days < 365 ? `${Math.floor(days / 30)}mo ago` :
+    `${Math.floor(days / 365)}y ago`;
+
+  const colour: LeadStaleness["colour"] =
+    days < 14 ? "green" :
+    days < 60 ? "amber" :
+    "red";
+
+  return { label, colour };
+}

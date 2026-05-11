@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, Plus, Bell, Settings } from "lucide-react";
+import { CalendarDays, Users, Plus, Bell, Settings, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/today", label: "Today", icon: CalendarDays },
   { href: "/buyers", label: "Buyers", icon: Users },
+  { href: "/properties", label: "Properties", icon: Building2 },
   { href: "/reminders", label: "Reminders", icon: Bell },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

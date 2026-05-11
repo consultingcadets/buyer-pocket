@@ -18,7 +18,7 @@ import {
   filtersToChips,
 } from "@/lib/buyer-filters";
 import type { Buyer } from "@/types/database";
-import { fetchBuyers, archiveBuyer } from "./actions";
+import { fetchBuyers, archiveBuyer, exportBuyersCSV } from "./actions";
 import { PAGE_SIZE } from "@/lib/buyer-filters";
 import { BuyerCard, BuyerTableRow } from "./BuyerCard";
 import { FilterSheet } from "./FilterSheet";
@@ -48,6 +48,13 @@ function PlusIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 12h14" /><path d="M12 5v14" />
+    </svg>
+  );
+}
+function ExportIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
     </svg>
   );
 }
@@ -241,6 +248,21 @@ export function BuyerDirectory({
     });
   }
 
+  async function handleExport() {
+    const result = await exportBuyersCSV(
+      { ...filters, search: debouncedSearch || undefined },
+      sort
+    );
+    if (result.error || !result.csv) return;
+    const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `buyers-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function handleApplyFilters(newFilters: BuyerFilters) {
     setFilters(newFilters);
   }
@@ -364,6 +386,14 @@ export function BuyerDirectory({
           <div className="shrink-0">
             <SortDropdown sort={sort} onChange={setSort} />
           </div>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 h-10 px-3 rounded-lg border border-border text-[13px] font-medium text-text-primary hover:bg-surface-container-low transition-colors shrink-0"
+            title="Export to CSV"
+          >
+            <ExportIcon />
+            Export
+          </button>
           <Link
             href="/add"
             className="flex items-center gap-1.5 h-10 px-4 bg-teal-action text-on-teal-action rounded-xl font-semibold text-[14px] hover:bg-teal-action/90 transition-colors shrink-0"
@@ -448,11 +478,45 @@ export function BuyerDirectory({
             </div>
           )}
 
+          {/* Lead age legend */}
+          {!isLoading && buyers.length > 0 && (
+            <div className="lg:hidden flex flex-wrap gap-x-3 gap-y-1 px-4 pt-3 pb-1">
+              {[
+                { cls: "bg-emerald-500", label: "< 2 weeks" },
+                { cls: "bg-amber-500",   label: "2 wks – 2 mo" },
+                { cls: "bg-red-500",     label: "Stale" },
+                { cls: "bg-outline",     label: "Never contacted" },
+              ].map(({ cls, label }) => (
+                <span key={label} className="flex items-center gap-1 text-[11px] text-text-secondary">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${cls}`} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Mobile list */}
           {!isLoading && buyers.length > 0 && (
             <div className="lg:hidden pt-2">
               {buyers.map((b) => (
                 <BuyerCard key={b.id} buyer={b} onArchive={handleArchive} />
+              ))}
+            </div>
+          )}
+
+          {/* Desktop lead age legend */}
+          {!isLoading && buyers.length > 0 && (
+            <div className="hidden lg:flex items-center gap-5 px-4 pt-3 pb-1">
+              {[
+                { cls: "bg-emerald-500", label: "< 2 weeks" },
+                { cls: "bg-amber-500",   label: "2 weeks – 2 months" },
+                { cls: "bg-red-500",     label: "Stale (> 2 months)" },
+                { cls: "bg-outline",     label: "Never contacted" },
+              ].map(({ cls, label }) => (
+                <span key={label} className="flex items-center gap-1.5 text-[11px] text-text-secondary">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${cls}`} />
+                  {label}
+                </span>
               ))}
             </div>
           )}
