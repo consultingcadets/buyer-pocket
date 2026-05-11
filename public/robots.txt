@@ -2,12 +2,30 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /auth/
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
 Disallow: /today
 Disallow: /dashboard
 Disallow: /buyers
 Disallow: /add
 Disallow: /reminders
 Disallow: /settings
+Disallow: /properties
 Disallow: /offline
+
+# AI search crawlers — explicitly permitted to index public marketing content
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
 
 Sitemap: https://buyerpocket.com.au/sitemap.xml

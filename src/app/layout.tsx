@@ -12,11 +12,16 @@ const ORG_SCHEMA = {
   name: "BuyerPocket",
   legalName: "Consulting Cadets Pty Ltd",
   url: "https://buyerpocket.com.au",
-  logo: "https://buyerpocket.com.au/icons/icon-512.png",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://buyerpocket.com.au/icons/icon-512.png",
+    width: 512,
+    height: 512,
+  },
   contactPoint: {
     "@type": "ContactPoint",
     email: "hello@consultingcadets.com",
-    contactType: "customer support",
+    contactType: "customer service",
     areaServed: "AU",
     availableLanguage: "English",
   },
@@ -34,7 +39,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://buyerpocket.com.au"),
   title: { default: "BuyerPocket", template: "%s — BuyerPocket" },
-  description: "Your buyers, always in your pocket.",
+  description: "Buyer list and reminder tool for independent Australian real estate agents. Capture buyers at open homes, match them to new listings, and never miss a follow-up.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -43,15 +48,15 @@ export const metadata: Metadata = {
   },
   formatDetection: { telephone: false },
   openGraph: {
-    title: "BuyerPocket",
-    description: "Your buyers, always in your pocket.",
+    title: "BuyerPocket — Buyer List for Australian Real Estate Agents",
+    description: "Capture buyers at open homes, match them to new listings, and never miss a follow-up. Built for independent Australian real estate agents.",
     type: "website",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket — buyer list and reminder tool for Australian real estate agents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuyerPocket",
-    description: "Your buyers, always in your pocket.",
+    title: "BuyerPocket — Buyer List for Australian Real Estate Agents",
+    description: "Capture buyers at open homes, match them to new listings, and never miss a follow-up.",
     images: ["/og-image.png"],
   },
 };

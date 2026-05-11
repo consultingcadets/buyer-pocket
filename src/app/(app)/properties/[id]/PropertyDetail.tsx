@@ -130,7 +130,7 @@ export function PropertyDetail({ property, matchedBuyers }: PropertyDetailProps)
   const maxCriteria = 5; // suburb, budget, bedrooms, land size, property type
 
   return (
-    <div className="min-h-screen bg-surface-container lg:ml-60">
+    <div className="min-h-screen bg-surface-container">
       {/* Header */}
       <div className="bg-white border-b border-border px-4 pt-safe-top">
         <div className="max-w-2xl mx-auto flex items-center gap-3 h-16">

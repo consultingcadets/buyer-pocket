@@ -17,6 +17,42 @@ import {
 import CTAButton from "@/components/marketing/cta-button";
 import { Testimonials } from "@/components/marketing/testimonials";
 
+const SOFTWARE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "BuyerPocket",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web, iOS, Android",
+  description:
+    "Buyer list and reminder tool for independent Australian real estate agents. Capture buyer preferences at open homes, filter your list when new listings arrive, and receive phone reminders before follow-ups go cold.",
+  url: "https://buyerpocket.com.au",
+  offers: {
+    "@type": "Offer",
+    price: "19",
+    priceCurrency: "AUD",
+    priceSpecification: {
+      "@type": "UnitPriceSpecification",
+      price: "19",
+      priceCurrency: "AUD",
+      billingDuration: "P1M",
+    },
+    eligibleRegion: { "@type": "Country", name: "Australia" },
+  },
+  featureList: [
+    "Buyer capture at open homes",
+    "Filter by suburb, budget, bedrooms, land size, property type",
+    "Phone push notifications for reminders",
+    "Notes and contact history per buyer",
+    "CSV export",
+    "Matched buyer suggestions for new listings",
+  ],
+  publisher: {
+    "@type": "Organization",
+    name: "Consulting Cadets Pty Ltd",
+    url: "https://buyerpocket.com.au",
+  },
+};
+
 export const metadata = {
   title: { absolute: "Capture buyers fast. Follow up on time. — BuyerPocket" },
   description:
@@ -26,13 +62,17 @@ export const metadata = {
     description:
       "A simple buyer list and reminder tool built for Australian real estate agents. Save buyer details in seconds, find matching buyers for new listings, and never miss a follow-up.",
     url: "https://buyerpocket.com.au",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuyerPocket — buyer list and reminder tool for Australian real estate agents" }],
   },
 };
 
 export default function MarketingHome() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE_SCHEMA) }}
+      />
       {/* ── Hero ── */}
       <section className="max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

@@ -36,7 +36,7 @@ export function PropertiesList({ initialProperties }: PropertiesListProps) {
   const properties = initialProperties;
 
   return (
-    <div className="min-h-screen bg-surface-container lg:ml-60">
+    <div className="min-h-screen bg-surface-container">
       {/* Header */}
       <div className="bg-white border-b border-border px-4 pt-safe-top">
         <div className="max-w-2xl mx-auto flex items-center justify-between h-16">

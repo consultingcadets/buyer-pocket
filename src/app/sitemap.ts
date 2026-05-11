@@ -1,10 +1,14 @@
 import { MetadataRoute } from "next";
 
-import { getPublicAppUrl } from "@/lib/app-url";
+const CANONICAL_ORIGIN = "https://buyerpocket.com.au";
 
-const BASE = getPublicAppUrl();
+function sitemapBase(): string {
+  if (process.env.NODE_ENV === "production") return CANONICAL_ORIGIN;
+  return process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const BASE = sitemapBase();
   return [
     { url: BASE, lastModified: new Date(), changeFrequency: "monthly", priority: 1.0 },
     { url: `${BASE}/features`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },

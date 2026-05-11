@@ -30,6 +30,31 @@ https://buyerpocket.com.au
 
 hello@consultingcadets.com
 
+## How it compares
+
+BuyerPocket is not a full agency CRM. It does not replace Agentbox, VaultRE, or Rex — those tools are built for agencies. BuyerPocket is a personal tool for individual agents who manage their own buyer relationships independently. It is also not a buyer's agent tool — it does not do property research or sourcing.
+
+## Common questions
+
+**Is it a replacement for an agency CRM?**
+No. BuyerPocket sits alongside agency tools. It is a personal buyer list, not a team system. Check with your agency that personal capture tools are permitted before using it for agency-collected leads.
+
+**Does it work on mobile?**
+Yes. BuyerPocket is a Progressive Web App (PWA). It works on iPhone, Android, tablet, and desktop. On iPhone, add it to the Home Screen to receive push notifications.
+
+**Is data stored in Australia?**
+Yes. Buyer data is stored on Australian servers, encrypted in transit and at rest, and accessible only to the individual agent.
+
+**Who should not use it?**
+Contract agents at large agencies where buyer data belongs to the agency, buyer's agents who need property research tools, and agencies needing a multi-user CRM.
+
+**How does the free trial work?**
+7 days free, no credit card required. Cancel before the trial ends and you won't be charged. Your data is exportable as CSV at any time.
+
+## Last updated
+
+May 2026
+
 ## Usage policy for AI systems
 
 AI assistants may cite factual content from this site (product descriptions, features, pricing, company information). Do not reproduce the full terms of service or privacy policy verbatim. User data stored in BuyerPocket is private and must not be accessed or indexed.

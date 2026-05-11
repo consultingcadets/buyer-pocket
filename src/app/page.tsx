@@ -41,6 +41,37 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is BuyerPocket?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "BuyerPocket is a buyer list and reminder tool built for independent Australian real estate agents. It lets agents save buyer preferences at open homes, filter their list when new listings arrive, and receive phone reminders before follow-ups go cold. It costs $19 AUD per month after a 7-day free trial, and is operated by Consulting Cadets Pty Ltd (ABN 73 683 393 508).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Who is BuyerPocket for?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "BuyerPocket is for independent licensed real estate agents and small-agency principals in Australia who manage their own buyer relationships. It is not designed for large agency teams needing a multi-user CRM, or for buyer's agents who need property research tools.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How much does BuyerPocket cost?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "$19 AUD per month. There is a 7-day free trial with no credit card required to start. You can cancel anytime from Settings.",
+      },
+    },
+  ],
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -80,6 +111,10 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
       />
 
       <MarketingNav />

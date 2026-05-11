@@ -1,12 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import CTAButton from "./cta-button";
+import { createClient } from "@/lib/supabase/client";
 
-export default function MarketingNav({ isLoggedIn }: { isLoggedIn?: boolean }) {
+export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLoggedIn?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn ?? false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(15,28,44,0.05)]">

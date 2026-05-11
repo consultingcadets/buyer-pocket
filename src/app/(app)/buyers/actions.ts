@@ -12,8 +12,9 @@ function buildQuery(
 ): any {
   let q = baseQuery;
 
-  if (filters.search?.trim()) {
-    q = q.textSearch("searchable_text", filters.search.trim(), {
+  const searchTerm = filters.search?.trim();
+  if (searchTerm && searchTerm !== "$undefined") {
+    q = q.textSearch("searchable_text", searchTerm, {
       type: "websearch",
       config: "english",
     });
