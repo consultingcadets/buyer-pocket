@@ -25,20 +25,27 @@ function BottomNavItem({
   active: boolean;
 }) {
   return (
-    <Link href={href} className="flex flex-col items-center justify-center gap-1 w-14 pt-1">
+    <Link
+      href={href}
+      className={cn(
+        "flex min-h-12 min-w-12 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1.5 transition-colors",
+        active ? "text-teal-action" : "text-white/70 hover:text-white"
+      )}
+      aria-current={active ? "page" : undefined}
+    >
       <span
         className={cn(
-          "w-1 h-1 rounded-full mb-0.5 transition-colors",
+          "mb-0.5 h-1 w-1 rounded-full transition-colors",
           active ? "bg-teal-action" : "bg-transparent"
         )}
       />
-      <span className={cn("transition-colors", active ? "text-teal-action" : "text-white/55")}>
-        <Icon size={22} />
+      <span className="transition-colors">
+        <Icon size={20} />
       </span>
       <span
         className={cn(
-          "text-[11px] font-medium leading-none transition-colors",
-          active ? "text-teal-action" : "text-white/55"
+          "text-xs font-medium leading-none transition-colors",
+          active ? "text-teal-action" : "text-inherit"
         )}
       >
         {label}
@@ -62,14 +69,15 @@ function SidebarItem({
     <Link
       href={href}
       className={cn(
-        "relative flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13.5px] font-medium transition-all",
+        "relative flex min-h-12 items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
         active
-          ? "bg-white/10 text-white"
-          : "text-white/55 hover:text-white/85 hover:bg-white/6"
+          ? "bg-white/12 text-white"
+          : "text-white/70 hover:bg-white/8 hover:text-white"
       )}
+      aria-current={active ? "page" : undefined}
     >
       {active && (
-        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-teal-action rounded-full" />
+        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 h-5 w-0.75 rounded-full bg-teal-action" />
       )}
       <Icon
         size={18}
@@ -86,7 +94,8 @@ export function BottomNav() {
   return (
     <>
       {/* ── Mobile / tablet bottom nav ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-primary h-16 flex items-center justify-around px-2 pb-safe">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-primary/98 px-2 pb-safe pt-2 backdrop-blur lg:hidden">
+        <div className="mx-auto flex h-16 max-w-xl items-center justify-around">
         {NAV_ITEMS.slice(0, 2).map((item) => (
           <BottomNavItem
             key={item.href}
@@ -102,7 +111,7 @@ export function BottomNav() {
         <Link
           href="/add"
           aria-label="Add buyer"
-          className="relative -top-4 flex items-center justify-center w-14 h-14 bg-teal-action rounded-full shadow-[0_4px_16px_rgba(0,106,98,0.45)]"
+          className="relative -top-5 flex size-14 items-center justify-center rounded-full bg-teal-action shadow-[0_10px_24px_rgba(0,106,98,0.45)]"
         >
           <Plus size={26} className="text-white" />
         </Link>
@@ -115,13 +124,14 @@ export function BottomNav() {
             active={pathname.startsWith(item.href)}
           />
         ))}
+        </div>
       </nav>
 
       {/* ── Desktop left sidebar ── */}
-      <nav className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-60 bg-primary z-30 py-6 px-3">
+      <nav className="fixed bottom-0 left-0 top-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-primary px-3 py-6 lg:flex">
         {/* Brand */}
-        <Link href="/today" className="flex items-center gap-2.5 px-3 py-2 mb-6">
-          <div className="w-8 h-8 rounded-xl bg-teal-action flex items-center justify-center shrink-0">
+        <Link href="/today" className="mb-6 flex min-h-12 items-center gap-2.5 px-3 py-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-teal-action">
             <svg
               width="16"
               height="16"
@@ -137,8 +147,8 @@ export function BottomNav() {
             </svg>
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-[15px] text-white tracking-tight leading-tight">BuyerPocket</span>
-            <span className="text-[10px] text-white/40 leading-none">Agent Portal</span>
+            <span className="text-[15px] font-bold leading-tight tracking-tight text-white">BuyerPocket</span>
+            <span className="text-xs leading-none text-white/55">Agent Portal</span>
           </div>
         </Link>
 
@@ -161,7 +171,7 @@ export function BottomNav() {
         <div className="mt-auto pt-4 border-t border-white/10">
           <Link
             href="/add"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-teal-action text-white text-[13.5px] font-semibold hover:bg-teal-action/90 transition-colors"
+            className="flex min-h-12 items-center gap-3 rounded-xl bg-teal-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-action/90"
           >
             <Plus size={18} />
             Add Buyer

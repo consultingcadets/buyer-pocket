@@ -14,13 +14,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <main className="min-h-screen bg-surface-container-low flex flex-col justify-center items-center px-4 py-8 antialiased">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 antialiased">
       <div className="w-full max-w-[480px] flex flex-col items-center">
         <div className="mb-8">
           <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
         </div>
 
-        <div className="bg-white w-full rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 border border-border">
+        <div className="app-section-card w-full rounded-xl p-6 md:p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1 text-center">
             <h1 className="text-[32px] font-bold leading-tight tracking-tight text-primary">
               Welcome back.
@@ -40,7 +40,7 @@ export default function LoginPage() {
                   signInWithGoogleNative();
                 }
               }}
-              className="w-full min-h-12 flex items-center justify-center gap-2 bg-white text-primary text-[14px] font-semibold py-3 px-4 rounded-lg border border-primary hover:bg-surface-container-low transition-colors duration-200"
+              className="w-full min-h-12 flex items-center justify-center gap-2 rounded-lg border border-primary bg-white px-4 py-3 text-[14px] font-semibold text-primary transition-colors duration-200 hover:bg-surface-container-low"
             >
               <GoogleIcon />
               Continue with Google
@@ -57,7 +57,7 @@ export default function LoginPage() {
 
           <form action={formAction} className="flex flex-col gap-4">
             {state?.error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[14px] text-error">
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[14px] text-error">
                 {state.error}
               </div>
             )}

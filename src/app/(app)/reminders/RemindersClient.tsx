@@ -3,7 +3,6 @@
 import { useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
 import { ReminderCard } from "@/components/ReminderCard";
 import { SnoozeModal } from "@/components/SnoozeModal";
 import { fetchReminders, completeReminder, snoozeReminder } from "./actions";
@@ -80,7 +79,7 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
   const [isLoading, setIsLoading] = useState(false);
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [snoozeReminderId, setSnoozeReminderId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const loadTab = useCallback(async (tab: ReminderTab) => {
     setActiveTab(tab);
@@ -238,7 +237,6 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
         />
       )}
 
-      <BottomNav />
     </div>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { BottomNav } from "@/components/BottomNav";
 import { requestPushPermission, getFCMToken } from "@/lib/fcm/client";
 import { savePushToken } from "@/app/(app)/reminders/actions";
 import { formatPhone } from "@/lib/format";
@@ -87,7 +86,7 @@ function Toggle({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 min-h-[48px]">
+    <div className="flex min-h-12 items-center justify-between gap-4">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-primary">{label}</p>
         {description && (
@@ -101,7 +100,7 @@ function Toggle({
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative inline-flex h-6 w-11 flex-shrink-0 rounded-full transition-colors focus:outline-none disabled:opacity-40",
+          "relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors focus:outline-none disabled:opacity-40",
           checked ? "bg-secondary" : "bg-surface-container-highest"
         )}
       >
@@ -154,7 +153,7 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
             <input type="email" value={email} readOnly className={cn(inputCls, "bg-surface-container text-text-secondary flex-1")} />
             <a
               href={`mailto:${SUPPORT_EMAIL}?subject=Change email address`}
-              className="h-12 px-4 rounded-lg border border-border text-accent text-sm font-medium flex items-center flex-shrink-0 hover:bg-surface-container"
+              className="h-12 px-4 rounded-lg border border-border text-accent text-sm font-medium flex items-center shrink-0 hover:bg-surface-container"
             >
               Change
             </a>
@@ -226,7 +225,7 @@ function NotificationsSection({
 }) {
   const [isPending, startTransition] = useTransition();
   const [prefs, setPrefs] = useState(initialPrefs);
-  const [permission, setPermission] = useState<NotificationPermission>(
+  const [permission] = useState<NotificationPermission>(
     () => (typeof Notification !== "undefined" ? Notification.permission : "default")
   );
   const [success, setSuccess] = useState(false);
@@ -374,7 +373,7 @@ function DevicesSection({ tokens }: { tokens: PushToken[] }) {
           type="button"
           disabled={registerState === "loading" || registerState === "done"}
           onClick={handleRegisterDevice}
-          className="w-full min-h-[48px] rounded-lg border border-teal-action text-teal-action text-sm font-semibold hover:bg-teal-action/5 transition-colors disabled:opacity-60"
+          className="w-full min-h-12 rounded-lg border border-teal-action text-teal-action text-sm font-semibold hover:bg-teal-action/5 transition-colors disabled:opacity-60"
         >
           {registerState === "loading" ? "Enabling…" : registerState === "done" ? "Notifications enabled on this device ✓" : "Enable notifications on this device"}
         </button>
@@ -434,7 +433,7 @@ function DataSection() {
             <button
               type="button"
               onClick={() => setShowExportConfirm(true)}
-              className="flex-shrink-0 h-10 px-4 rounded-lg border border-border text-sm font-medium text-text-primary hover:bg-surface-container"
+              className="h-10 shrink-0 rounded-lg border border-border px-4 text-sm font-medium text-text-primary hover:bg-surface-container"
             >
               Export CSV
             </button>
@@ -452,7 +451,7 @@ function DataSection() {
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="flex-shrink-0 h-10 px-4 rounded-lg border border-error/30 text-sm font-medium text-error hover:bg-error/5"
+              className="h-10 shrink-0 rounded-lg border border-error/30 px-4 text-sm font-medium text-error hover:bg-error/5"
             >
               Delete account
             </button>
@@ -678,7 +677,7 @@ function BillingSection({
                 type="button"
                 onClick={handleAddPayment}
                 disabled={isPending}
-                className="flex-shrink-0 h-10 px-4 rounded-lg bg-teal-action text-on-teal-action text-sm font-semibold hover:opacity-90 disabled:opacity-60"
+                className="h-10 shrink-0 rounded-lg bg-teal-action px-4 text-sm font-semibold text-on-teal-action hover:opacity-90 disabled:opacity-60"
               >
                 {isPending ? "Loading…" : "Add payment"}
               </button>
@@ -688,7 +687,7 @@ function BillingSection({
                 type="button"
                 onClick={handlePortal}
                 disabled={isPending}
-                className="flex-shrink-0 h-10 px-4 rounded-lg border border-border text-sm font-medium text-text-primary hover:bg-surface-container disabled:opacity-60"
+                className="h-10 shrink-0 rounded-lg border border-border px-4 text-sm font-medium text-text-primary hover:bg-surface-container disabled:opacity-60"
               >
                 {isPending ? "Loading…" : "Manage billing →"}
               </button>
@@ -782,7 +781,7 @@ function MobileLanding({ onSelect, onSignOut }: { onSelect: (id: string) => void
               i > 0 && "border-t border-border"
             )}
           >
-            <span className="text-xl w-7 flex-shrink-0">{s.icon}</span>
+            <span className="w-7 shrink-0 text-xl">{s.icon}</span>
             <span className="flex-1 text-sm font-medium text-text-primary">{s.label}</span>
             <span className="text-text-secondary">›</span>
           </button>
@@ -795,7 +794,7 @@ function MobileLanding({ onSelect, onSignOut }: { onSelect: (id: string) => void
           onClick={onSignOut}
           className="w-full flex items-center gap-3 px-4 h-14 text-left hover:bg-error/5 transition-colors"
         >
-          <span className="text-xl w-7 flex-shrink-0">🚪</span>
+          <span className="w-7 shrink-0 text-xl">🚪</span>
           <span className="flex-1 text-sm font-medium text-error">Sign out</span>
         </button>
       </div>
@@ -865,7 +864,6 @@ export function SettingsClient({
           <h1 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary mb-8">Settings</h1>
           {allSections}
         </div>
-        <BottomNav />
       </div>
 
       {/* ── Mobile ── */}
@@ -897,7 +895,7 @@ export function SettingsClient({
             <>
               {/* Profile card */}
               <div className="bg-white rounded-xl border border-border p-4 flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white">
                   {initials}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -938,8 +936,6 @@ export function SettingsClient({
             </>
           )}
         </div>
-
-        <BottomNav />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function MarketingFooter() {
   return (
     <footer className="bg-primary text-white border-t border-white/10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-12">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-12">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8">
           <div>
             <div className="font-bold text-[18px] tracking-tight text-white">BuyerPocket</div>
@@ -25,7 +25,7 @@ export default function MarketingFooter() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-white/75 hover:text-white transition-colors py-1 inline-block min-h-[44px] sm:min-h-0 flex items-center"
+                    className="inline-flex min-h-12 items-center rounded-lg px-2 py-1 text-sm text-white/75 transition-colors hover:bg-white/10 hover:text-white sm:min-h-0"
                   >
                     {label}
                   </Link>

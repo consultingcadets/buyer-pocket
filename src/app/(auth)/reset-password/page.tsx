@@ -14,7 +14,7 @@ export default function ResetPasswordPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
-    <main className="min-h-screen bg-surface-container-low flex flex-col justify-center items-center p-4 antialiased">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 antialiased">
       <div className="w-full max-w-[480px] flex flex-col items-center">
         <div className="mb-8">
           <span className="text-primary text-[24px] font-semibold tracking-tight">
@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
           </span>
         </div>
 
-        <div className="bg-white rounded-lg shadow-card border border-border p-6 md:p-8 w-full flex flex-col gap-6">
+        <div className="app-section-card w-full rounded-xl p-6 md:p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-3 text-center">
             <h1 className="text-[32px] font-bold tracking-tight text-primary">
               Choose a new password.

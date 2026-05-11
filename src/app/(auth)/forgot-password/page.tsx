@@ -11,12 +11,12 @@ export default function ForgotPasswordPage() {
   >(sendResetLink, null);
 
   return (
-    <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 antialiased">
       <div className="w-full max-w-[480px] flex flex-col items-center">
         <div className="mb-8">
           <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
         </div>
-        <div className="w-full bg-white rounded-lg shadow-card p-6 md:p-8 border border-border flex flex-col gap-6">
+        <div className="app-section-card w-full rounded-xl p-6 md:p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1 text-center">
             <h1 className="text-[32px] font-bold text-primary">
               Forgot your password?

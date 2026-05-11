@@ -20,7 +20,7 @@ export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLogg
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(15,28,44,0.05)]">
       <nav
-        className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4"
+        className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6"
         aria-label="Main navigation"
       >
         <Link
@@ -34,19 +34,19 @@ export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLogg
         <div className="hidden md:flex flex-nowrap items-center gap-5 lg:gap-7 shrink-0 min-w-0">
           <Link
             href="/features"
-            className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+            className="flex min-h-12 items-center whitespace-nowrap rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-container-low hover:text-text-primary"
           >
             Features
           </Link>
           <Link
             href="/pricing"
-            className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+            className="flex min-h-12 items-center whitespace-nowrap rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-container-low hover:text-text-primary"
           >
             Pricing
           </Link>
           <Link
             href="/about"
-            className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+            className="flex min-h-12 items-center whitespace-nowrap rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-container-low hover:text-text-primary"
           >
             About
           </Link>
@@ -58,7 +58,7 @@ export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLogg
             <>
               <Link
                 href="/login"
-                className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+                className="flex min-h-12 items-center whitespace-nowrap rounded-lg px-3 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-container-low hover:text-text-primary"
               >
                 Login
               </Link>
@@ -70,7 +70,7 @@ export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLogg
         </div>
 
         <button
-          className="md:hidden p-2 -mr-2 text-text-primary hover:text-text-secondary transition-colors"
+          className="md:hidden min-h-12 min-w-12 rounded-lg p-2 text-text-primary transition-colors hover:bg-surface-container-low hover:text-text-secondary"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}

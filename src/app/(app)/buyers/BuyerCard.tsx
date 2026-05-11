@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Clock, Phone, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,21 +15,6 @@ function formatSuburbs(suburbs: string[] | null): string {
   const clean = suburbs.map((s) => s.split(",")[0].trim());
   if (clean.length <= 3) return clean.join(", ");
   return `${clean.slice(0, 3).join(", ")} +${clean.length - 3} more`;
-}
-
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days === 1) return "yesterday";
-  if (days < 7) return `${days} days ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return `${Math.floor(days / 365)}y ago`;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -48,70 +33,6 @@ function TemperatureChip({ temp }: { temp: string | null }) {
       {temp}
     </span>
   );
-}
-
-function StatusChip({ status }: { status: string | null }) {
-  if (!status) return null;
-  return (
-    <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container text-text-secondary">
-      {status}
-    </span>
-  );
-}
-
-function ReminderBadge({ iso }: { iso: string | null }) {
-  const badge = useMemo(() => {
-    if (!iso) return null;
-    // eslint-disable-next-line react-hooks/purity
-    const now = Date.now();
-    const at = new Date(iso).getTime();
-    const diffMs = now - at;
-
-    if (diffMs > 0) {
-      // overdue
-      const hrs = Math.floor(diffMs / 3_600_000);
-      if (hrs >= 24) {
-        return (
-          <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-error/10 text-error rounded-full text-[11px] font-bold">
-            DUE NOW
-          </span>
-        );
-      }
-      return (
-        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
-          {hrs >= 1 ? `${hrs}H AGO` : "DUE NOW"}
-        </span>
-      );
-    }
-
-    // future
-    const d = new Date(iso);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    if (d.toDateString() === today.toDateString()) {
-      return (
-        <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
-          TODAY
-        </span>
-      );
-    }
-    if (d.toDateString() === tomorrow.toDateString()) {
-      return (
-        <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
-          TMR
-        </span>
-      );
-    }
-    const day = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase().slice(0, 3);
-    return (
-      <span className="ml-2 px-2 py-0.5 bg-teal-action/10 text-teal-action rounded-full text-[11px] font-bold">
-        {day}
-      </span>
-    );
-  }, [iso]);
-
-  return badge;
 }
 
 function DataBox({ label, value }: { label: string; value: string }) {

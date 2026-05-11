@@ -4,7 +4,6 @@ import { useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, BarChart2, Search, FileText, ChevronDown } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
@@ -159,9 +158,9 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   const [landSizeMin, setLandSizeMin] = useState(buyer.land_size_min ? `${buyer.land_size_min}m²` : "Any");
   const [note, setNote] = useState(buyer.notes_summary ?? "");
 
-  const [preferredContactMethod, setPreferredContactMethod] = useState(buyer.preferred_contact_method ?? "");
-  const [bestTimeToContact, setBestTimeToContact] = useState(buyer.best_time_to_contact ?? "");
-  const [contactConsent, setContactConsent] = useState(buyer.contact_consent ?? "");
+  const [preferredContactMethod] = useState(buyer.preferred_contact_method ?? "");
+  const [bestTimeToContact] = useState(buyer.best_time_to_contact ?? "");
+  const [contactConsent] = useState(buyer.contact_consent ?? "");
   const [propertyType, setPropertyType] = useState(buyer.property_type ?? "");
   const [houseType, setHouseType] = useState(buyer.house_type ?? "");
   const [bathrooms, setBathrooms] = useState(buyer.bathrooms ?? "Any");
@@ -248,9 +247,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
   }, []);
 
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-      <BottomNav />
-
+    <div className="h-dvh bg-background flex flex-col overflow-hidden">
       {/* ── Header ── */}
       <header className="shrink-0 bg-primary z-20 border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 lg:px-6 h-14 flex items-center justify-between">

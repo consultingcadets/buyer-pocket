@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Plus, Building2, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BottomNav } from "@/components/BottomNav";
 import type { Property } from "@/types/property";
 
 function formatPrice(price: number): string {
@@ -122,8 +121,6 @@ export function PropertiesList({ initialProperties }: PropertiesListProps) {
           </ul>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

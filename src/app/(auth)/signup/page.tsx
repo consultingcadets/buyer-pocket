@@ -18,11 +18,11 @@ export default function SignupPage() {
 
   if (state && "checkEmail" in state) {
     return (
-      <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+      <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 antialiased">
         <div className="mb-8">
           <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
         </div>
-        <div className="w-full max-w-[480px] bg-white rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 text-center border border-border">
+        <div className="app-section-card w-full max-w-[480px] rounded-xl p-6 md:p-8 flex flex-col gap-6 text-center">
           <h2 className="text-[32px] font-bold text-brand-navy">Check your email.</h2>
           <p className="text-[16px] text-text-secondary">
             We&apos;ve sent a confirmation link to your email address. Click it
@@ -42,7 +42,7 @@ export default function SignupPage() {
   const strength = getPasswordStrength(password);
 
   return (
-    <main className="min-h-screen bg-surface-container-low flex flex-col items-center justify-center px-4 py-8 antialiased">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 antialiased">
       <div className="w-full max-w-[480px] flex flex-col items-center">
         <div className="mb-6">
           <span className="text-[24px] font-semibold text-primary">BuyerPocket</span>
@@ -56,7 +56,7 @@ export default function SignupPage() {
           ))}
         </div>
 
-        <div className="w-full bg-white rounded-lg shadow-card p-6 md:p-8 flex flex-col gap-6 border border-border">
+        <div className="app-section-card w-full rounded-xl p-6 md:p-8 flex flex-col gap-6">
           <div className="text-center flex flex-col gap-1">
             <h2 className="text-[32px] font-bold tracking-tight text-primary">
               Start your 7-day free trial.

@@ -14,11 +14,9 @@ import { SuburbCombobox } from "@/components/ui/suburb-combobox";
 import { formatPhone } from "@/lib/format";
 import {
   getReminderDate,
-  getReminderLabel,
   type ReminderChip,
 } from "@/lib/reminder-utils";
 import { addBuyer, checkDuplicateBuyer } from "./actions";
-import { BottomNav } from "@/components/BottomNav";
 
 // ─── Shared input style ───────────────────────────────────────────────────────
 
@@ -209,9 +207,9 @@ export function AddBuyerForm() {
   const [note, setNote] = useState("");
   const [buyerTemperature, setBuyerTemperature] = useState("");
 
-  const [preferredContactMethod, setPreferredContactMethod] = useState("");
-  const [bestTimeToContact, setBestTimeToContact] = useState("");
-  const [contactConsent, setContactConsent] = useState("");
+  const [preferredContactMethod] = useState("");
+  const [bestTimeToContact] = useState("");
+  const [contactConsent] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [houseType, setHouseType] = useState("");
   const [bathrooms, setBathrooms] = useState("Any");
@@ -227,7 +225,7 @@ export function AddBuyerForm() {
   const [reminder, setReminder] = useState<ReminderChip>(null);
   const [customDate, setCustomDate] = useState("");
   const [reminderContactType, setReminderContactType] = useState("");
-  const [reminderNote, setReminderNote] = useState("");
+  const [reminderNote] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicate, setDuplicate] = useState<{ id: string; name: string } | null>(null);
@@ -329,9 +327,7 @@ export function AddBuyerForm() {
   const footerPb = reminder ? "pb-[320px]" : "pb-[240px]";
 
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-      <BottomNav />
-
+    <div className="h-dvh bg-background flex flex-col overflow-hidden">
       {/* ── Standard white app header ── */}
       <header className="shrink-0 bg-white z-20 border-b border-border">
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-center">

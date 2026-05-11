@@ -5,7 +5,6 @@ import { Phone, MessageSquare, Mail, Bell, Pencil, MoreHorizontal, CheckCircle, 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { BottomNav } from "@/components/BottomNav";
 import { getReminderDate, type ReminderChip } from "@/lib/reminder-utils";
 import type { Database } from "@/types/database";
 import type { MatchedProperty } from "@/app/(app)/properties/actions";
@@ -646,7 +645,7 @@ function NotesActivity({
               return (
                 <div key={n.id} className="flex gap-3">
                   {/* Icon */}
-                  <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                     {n.contact_type === "Call" ? <Phone className="w-3.5 h-3.5" /> : n.contact_type === "SMS" ? <MessageSquare className="w-3.5 h-3.5" /> : n.contact_type === "Email" ? <Mail className="w-3.5 h-3.5" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -659,11 +658,11 @@ function NotesActivity({
                           {fmtDate(n.created_at)}
                         </span>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex shrink-0 gap-2">
                         <button
                           type="button"
                           onClick={() => { setEditingId(n.id); setEditText(n.note); }}
-                          className="text-sm text-teal-action font-medium px-2 py-1 min-h-[44px] flex items-center"
+                          className="flex min-h-11 items-center px-2 py-1 text-sm font-medium text-teal-action"
                         >
                           Edit
                         </button>
@@ -671,7 +670,7 @@ function NotesActivity({
                           type="button"
                           onClick={() => handleDelete(n.id)}
                           disabled={isPendingDelete}
-                          className="text-sm text-error font-medium px-2 py-1 min-h-[44px] flex items-center disabled:opacity-60"
+                          className="flex min-h-11 items-center px-2 py-1 text-sm font-medium text-error disabled:opacity-60"
                         >
                           Delete
                         </button>
@@ -715,7 +714,7 @@ function NotesActivity({
             // Activity event
             return (
               <div key={`activity-${i}`} className="flex gap-3">
-                <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container">
                   {item.type === "reminder-completed" ? <CheckCircle className="w-3.5 h-3.5 text-secondary" /> : <Clock className="w-3.5 h-3.5 text-text-secondary" />}
                 </div>
                 <div className="flex-1">
@@ -1044,7 +1043,7 @@ function MoreMenu({
   return (
     <div
       ref={ref}
-      className="absolute right-0 top-full mt-1 bg-white rounded-lg border border-border shadow-lg py-1 z-20 min-w-[140px]"
+      className="absolute right-0 top-full z-20 mt-1 min-w-35 rounded-lg border border-border bg-white py-1 shadow-lg"
     >
       <button
         type="button"
@@ -1195,7 +1194,7 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
               </div>
 
               {/* Action buttons */}
-              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                 {phoneHref && (
                   <a
                     href={phoneHref}
@@ -1295,7 +1294,7 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
         <header className="sticky top-0 bg-white border-b border-border z-10">
           <div className="px-4 h-14 flex items-center justify-between">
             <Link href="/buyers" className="text-text-primary text-xl">←</Link>
-            <h1 className="text-base font-semibold text-text-primary truncate max-w-[200px]">
+            <h1 className="max-w-50 truncate text-base font-semibold text-text-primary">
               {buyer.name}
             </h1>
             <div className="relative">
@@ -1331,7 +1330,7 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
                 )}
               </div>
             </div>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
               {initials}
             </div>
           </div>
@@ -1592,7 +1591,6 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
         />
       )}
 
-      <BottomNav />
     </>
   );
 }

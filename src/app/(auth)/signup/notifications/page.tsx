@@ -24,7 +24,6 @@ function useIosSafariInstallState() {
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
     startTransition(() => setShowInstallCard(isIos && isSafari && !isStandalone));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return showInstallCard;

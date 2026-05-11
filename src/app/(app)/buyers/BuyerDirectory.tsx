@@ -8,7 +8,6 @@ import {
   useCallback,
 } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   type BuyerFilters,
@@ -19,10 +18,8 @@ import {
 } from "@/lib/buyer-filters";
 import type { Buyer } from "@/types/database";
 import { fetchBuyers, archiveBuyer, exportBuyersCSV } from "./actions";
-import { PAGE_SIZE } from "@/lib/buyer-filters";
 import { BuyerCard, BuyerTableRow } from "./BuyerCard";
 import { FilterSheet } from "./FilterSheet";
-import { BottomNav } from "@/components/BottomNav";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -157,7 +154,6 @@ export function BuyerDirectory({
   initialBuyers: Buyer[];
   initialCount: number;
 }) {
-  const router = useRouter();
   const [, startTransition] = useTransition();
 
   const [buyers, setBuyers] = useState<Buyer[]>(initialBuyers);
@@ -200,7 +196,6 @@ export function BuyerDirectory({
       }
       setIsLoading(false);
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, sort, debouncedSearch]);
 
   // Infinite scroll
@@ -222,7 +217,6 @@ export function BuyerDirectory({
       setPage(nextPage);
     }
     setIsLoadingMore(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingMore, hasMore, page, filters, sort, debouncedSearch]);
 
   useEffect(() => {
@@ -563,9 +557,6 @@ export function BuyerDirectory({
           desktopOpen={isFilterOpen}
         />
       </div>
-
-      {/* Bottom nav */}
-      <BottomNav />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "flex h-12 rounded-lg border border-border overflow-hidden",
+        "flex min-h-12 rounded-xl border border-border overflow-hidden bg-surface-container-low p-1",
         className
       )}
     >
@@ -30,10 +30,10 @@ export function SegmentedControl({
             type="button"
             onClick={() => onChange(option)}
             className={cn(
-              "flex-1 flex items-center justify-center text-sm font-medium transition-colors duration-150 border-r border-border last:border-r-0",
+              "flex-1 flex min-h-10 items-center justify-center rounded-lg text-sm font-semibold transition-colors duration-150",
               isActive
-                ? "bg-primary text-white font-semibold"
-                : "bg-white text-text-secondary hover:bg-surface-container"
+                ? "bg-primary text-white shadow-sm"
+                : "text-text-secondary hover:bg-white hover:text-text-primary"
             )}
           >
             {option}

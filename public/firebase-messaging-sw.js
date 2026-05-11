@@ -13,20 +13,6 @@ self.addEventListener("message", (event) => {
   }
 });
 
-// Fallback: initialise with placeholder values overridden at runtime via postMessage
-let app;
-function ensureApp() {
-  if (firebase.apps.length === 0) return null;
-  return firebase.apps[0];
-}
-
-const messaging = firebase.messaging.isSupported()
-  ? (() => {
-      // Will be initialised lazily once config is available
-      return null;
-    })()
-  : null;
-
 self.addEventListener("push", (event) => {
   if (!event.data) return;
   let payload;
@@ -68,8 +54,9 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 // FCM background message handler (when app is closed / in background)
-firebase.messaging.isSupported() &&
+if (firebase.messaging.isSupported()) {
   self.addEventListener("install", () => {
     // Activate immediately
     self.skipWaiting();
   });
+}

@@ -1,9 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getReminderDate } from "@/lib/reminder-utils";
 import type { ReminderWithBuyer } from "@/types/reminders";
-import type { ReminderChip } from "@/lib/reminder-utils";
 
 export type ReminderTab = "today" | "upcoming" | "overdue" | "completed";
 

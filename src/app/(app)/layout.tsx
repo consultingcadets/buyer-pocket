@@ -6,6 +6,7 @@ import {
   startTrialIfNeeded,
 } from "@/lib/subscription";
 import { BillingGuard } from "@/components/billing/BillingGuard";
+import { BottomNav } from "@/components/BottomNav";
 import { isBillingSkipped } from "@/lib/billing-flags";
 import type { Subscription } from "@/types/database";
 
@@ -43,8 +44,9 @@ export default async function AppLayout({
 
   return (
     <BillingGuard accessLevel={accessLevel} bannerType={bannerType}>
-      <div className="lg:pl-60">
-        {children}
+      <div className="app-page-shell lg:pl-64">
+        <main className="mx-auto w-full max-w-400">{children}</main>
+        <BottomNav />
       </div>
     </BillingGuard>
   );

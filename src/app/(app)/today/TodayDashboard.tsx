@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BottomNav } from "@/components/BottomNav";
 import { ReminderCard } from "@/components/ReminderCard";
 import { SnoozeModal } from "@/components/SnoozeModal";
 import { completeReminder, snoozeReminder } from "@/app/(app)/reminders/actions";
@@ -163,10 +162,8 @@ type Props = {
   profileName: string | null;
   todayReminders: ReminderWithBuyer[];
   overdueReminders: ReminderWithBuyer[];
-  hotBuyers: Buyer[];
   recentlyAdded: Buyer[];
   todayCount: number;
-  overdueCount: number;
   buyersThisWeek: number;
 };
 
@@ -174,10 +171,8 @@ export function TodayDashboard({
   profileName,
   todayReminders: initialToday,
   overdueReminders: initialOverdue,
-  hotBuyers: _hotBuyers,
   recentlyAdded,
   todayCount,
-  overdueCount: _overdueCount,
   buyersThisWeek,
 }: Props) {
   const router = useRouter();
@@ -519,7 +514,6 @@ export function TodayDashboard({
         )}
       </div>
 
-      <BottomNav />
     </div>
   );
 }

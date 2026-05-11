@@ -106,7 +106,6 @@ export function IOSInstallPrompt() {
     if (sessionStorage.getItem("pwa-ios-dismissed")) return;
     if (!isIosSafari()) return;
     startTransition(() => setShow(true));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!show) return null;

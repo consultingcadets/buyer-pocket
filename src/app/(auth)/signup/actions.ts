@@ -43,7 +43,8 @@ export async function signUpWithEmail(
   redirect("/signup/eligibility");
 }
 
-export async function signUpWithGoogle(_formData: FormData): Promise<void> {
+export async function signUpWithGoogle(formData: FormData): Promise<void> {
+  void formData;
   const headersList = await headers();
   const host = headersList.get("host")!;
   const proto = process.env.NODE_ENV === "production" ? "https" : "http";
