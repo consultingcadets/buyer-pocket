@@ -134,6 +134,11 @@ export function FilterSheet({
   useEffect(() => {
     syncFromParent.current = true;
     startTransition(() => setPending(filters));
+    // Always reset flag — if setPending is a no-op (same value), the auto-apply
+    // effect won't fire to reset it, leaving the flag stuck true and silently
+    // eating the next user interaction.
+    const reset = setTimeout(() => { syncFromParent.current = false; }, 0);
+    return () => clearTimeout(reset);
   }, [filters]);
 
   useEffect(() => {

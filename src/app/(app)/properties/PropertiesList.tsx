@@ -38,8 +38,8 @@ export function PropertiesList({ initialProperties }: PropertiesListProps) {
   return (
     <div className="min-h-screen bg-surface-container">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 pt-safe-top">
-        <div className="max-w-2xl mx-auto flex items-center justify-between h-16">
+      <div className="bg-white border-b border-border px-4 lg:px-6 pt-safe-top">
+        <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <h1 className="text-[18px] font-bold text-text-primary">Properties</h1>
             {properties.length > 0 && (

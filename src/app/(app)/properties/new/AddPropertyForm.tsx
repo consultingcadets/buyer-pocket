@@ -115,10 +115,10 @@ export function AddPropertyForm() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-container lg:ml-60">
+    <div className="min-h-screen bg-surface-container">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 pt-safe-top">
-        <div className="max-w-2xl mx-auto flex items-center gap-3 h-16">
+      <div className="bg-white border-b border-border px-4 lg:px-6 pt-safe-top">
+        <div className="flex items-center gap-3 h-16">
           <Link
             href="/properties"
             className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-container transition-colors text-text-secondary"

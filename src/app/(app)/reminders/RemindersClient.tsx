@@ -190,11 +190,11 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
   return (
     <div className="min-h-screen bg-surface-container-low pb-24">
       <div className="bg-white pb-0 border-b border-border">
-        <div className="px-5 lg:max-w-2xl lg:mx-auto lg:px-4 pt-4 lg:pt-6">
+        <div className="px-4 lg:px-6 pt-4 lg:pt-6">
           <h1 className="text-[22px] lg:text-[32px] lg:leading-[1.2] lg:tracking-[-0.01em] font-bold text-primary pb-4">Reminders</h1>
         </div>
         {/* Tabs */}
-        <div className="flex gap-2 px-5 lg:max-w-2xl lg:mx-auto lg:px-4 pb-4 overflow-x-auto">
+        <div className="flex gap-2 px-4 lg:px-6 pb-4 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}
