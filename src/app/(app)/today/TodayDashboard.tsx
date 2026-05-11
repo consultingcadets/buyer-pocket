@@ -162,19 +162,22 @@ type Props = {
   profileName: string | null;
   todayReminders: ReminderWithBuyer[];
   overdueReminders: ReminderWithBuyer[];
+  hotBuyers: Buyer[];
   recentlyAdded: Buyer[];
   todayCount: number;
+  overdueCount: number;
   buyersThisWeek: number;
 };
 
-export function TodayDashboard({
-  profileName,
-  todayReminders: initialToday,
-  overdueReminders: initialOverdue,
-  recentlyAdded,
-  todayCount,
-  buyersThisWeek,
-}: Props) {
+export function TodayDashboard(props: Props) {
+  const {
+    profileName,
+    todayReminders: initialToday,
+    overdueReminders: initialOverdue,
+    recentlyAdded,
+    todayCount,
+    buyersThisWeek,
+  } = props;
   const router = useRouter();
   const [todayReminders, setTodayReminders] = useState(initialToday);
   const [overdueReminders, setOverdueReminders] = useState(initialOverdue);
