@@ -64,8 +64,7 @@ function LeadAgeLegend() {
   const items = [
     { colour: "bg-emerald-500", label: "< 2 weeks" },
     { colour: "bg-amber-500",   label: "2 weeks – 2 months" },
-    { colour: "bg-red-500",     label: "> 2 months / stale" },
-    { colour: "bg-outline",     label: "Never contacted" },
+    { colour: "bg-red-500",     label: "> 2 months" },
   ];
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 px-1">

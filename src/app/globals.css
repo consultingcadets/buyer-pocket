@@ -199,7 +199,8 @@
   }
 
   .app-page-shell {
-    @apply min-h-screen bg-surface-container-low pb-24 lg:pb-10;
+    @apply min-h-screen bg-surface-container-low pb-24 lg:pb-10 lg:pt-0;
+    padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
   }
 
   .app-section-card {

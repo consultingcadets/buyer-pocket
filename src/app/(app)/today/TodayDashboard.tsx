@@ -51,7 +51,7 @@ function initials(name: string) {
 
 function StatCard({ value, label }: { value: number; label: string }) {
   return (
-    <div className="bg-white rounded-lg border border-border shadow-card px-4 py-3 min-h-12 flex-1">
+    <div className="bg-white rounded-lg border border-border shadow-card px-4 py-3 min-h-12 w-full min-w-0 text-center">
       <p className="text-[14px] text-text-secondary">{label}</p>
       <p className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">{value}</p>
     </div>
@@ -220,15 +220,17 @@ export function TodayDashboard(props: Props) {
       <div className="hidden lg:block">
         <div className="mx-auto px-8 pt-8 pb-8 space-y-6">
           {!isNewUserWelcome && (
-            <div className="flex items-start justify-between gap-6">
-              <div>
+            <div className="grid grid-cols-[2fr_1fr_1fr] items-start gap-6">
+              <div className="min-w-0">
                 <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">
                   {greeting(profileName)}
                 </h2>
                 <p className="text-[14px] text-text-secondary mt-1">{todayDateLabel()}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="min-w-0">
                 <StatCard value={todayCount} label="Reminders today" />
+              </div>
+              <div className="min-w-0">
                 <StatCard value={buyersThisWeek} label="Buyers this week" />
               </div>
             </div>

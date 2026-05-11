@@ -41,7 +41,8 @@ export function SectionPatternMuted({ flipped, uid = "default" }: { flipped?: bo
 export function CTADecorationBackdrop() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="absolute inset-0 bg-gradient-to-b from-[#162a41] via-primary to-[#0a141f]" />
+      {/* Same base as MarketingFooter (`bg-primary`) so the CTA strip and footer read as one navy block */}
+      <div className="absolute inset-0 bg-primary" />
       <svg className="absolute -left-[10%] top-1/2 h-[min(400px,60vw)] w-[min(400px,85vw)] -translate-y-1/2 text-white/[0.05] motion-safe:animate-float-slow">
         <circle cx="200" cy="200" r="190" stroke="currentColor" strokeWidth="1.5" fill="none" />
       </svg>

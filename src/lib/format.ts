@@ -41,25 +41,34 @@ export function getLeadStaleness(
   lastContactedAt: string | null,
   createdAt: string
 ): LeadStaleness {
+  const daysSinceCreated = (Date.now() - new Date(createdAt).getTime()) / 86_400_000;
+
+  // Dot colour always reflects how long the buyer has been in the system
+  const colour: LeadStaleness["colour"] =
+    daysSinceCreated < 14 ? "green" :
+    daysSinceCreated < 60 ? "amber" :
+    "red";
+
   if (!lastContactedAt) {
-    const daysSinceCreated = (Date.now() - new Date(createdAt).getTime()) / 86_400_000;
-    if (daysSinceCreated > 60)
-      return { label: "Never contacted", colour: "red" };
-    return { label: "Never contacted", colour: "grey" };
+    const d = daysSinceCreated;
+    const label =
+      d < 1   ? "Added today" :
+      d < 2   ? "Added yesterday" :
+      d < 7   ? `Added ${Math.floor(d)}d ago` :
+      d < 30  ? `Added ${Math.floor(d / 7)}w ago` :
+      d < 365 ? `Added ${Math.floor(d / 30)}mo ago` :
+                `Added ${Math.floor(d / 365)}y ago`;
+    return { label, colour };
   }
+
   const days = (Date.now() - new Date(lastContactedAt).getTime()) / 86_400_000;
   const label =
-    days < 1 ? "Today" :
-    days < 2 ? "Yesterday" :
-    days < 7 ? `${Math.floor(days)} days ago` :
-    days < 30 ? `${Math.floor(days / 7)}w ago` :
+    days < 1   ? "Today" :
+    days < 2   ? "Yesterday" :
+    days < 7   ? `${Math.floor(days)}d ago` :
+    days < 30  ? `${Math.floor(days / 7)}w ago` :
     days < 365 ? `${Math.floor(days / 30)}mo ago` :
-    `${Math.floor(days / 365)}y ago`;
-
-  const colour: LeadStaleness["colour"] =
-    days < 14 ? "green" :
-    days < 60 ? "amber" :
-    "red";
+                 `${Math.floor(days / 365)}y ago`;
 
   return { label, colour };
 }

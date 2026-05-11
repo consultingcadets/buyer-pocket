@@ -37,10 +37,12 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
   );
 }
 
+const fieldLabelClass = "text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary";
+
 function FieldRow({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-outline">
+      <label className={cn("mb-1.5 block", fieldLabelClass)}>
         {label}
       </label>
       {children}
@@ -333,13 +335,6 @@ export function EditBuyerForm({ buyer, agentState }: { buyer: Buyer; agentState?
                 <div className="pt-1 border-t border-border/70">
                   <p className="text-[15px] font-bold text-primary tracking-tight pt-3 mb-3">Engagement</p>
                 </div>
-                <FieldRow label="Buying Timeline">
-                  <SelectField
-                    options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
-                    value={buyingTimeline}
-                    onChange={setBuyingTimeline}
-                  />
-                </FieldRow>
                 <FieldRow label="Buyer type">
                   <SelectField
                     options={["First home buyer", "Investor", "Upgrader", "Downsizer", "Interstate"]}
@@ -375,62 +370,89 @@ export function EditBuyerForm({ buyer, agentState }: { buyer: Buyer; agentState?
               <SectionCard>
                 <SectionHeader icon={<Search size={14} />} title="Property Search" />
 
-                <FieldRow label="Target Suburbs" error={errors.suburbs}>
-                  <SuburbCombobox
-                    value={suburbs}
-                    onChange={setSuburbs}
-                    placeholder="e.g. Paddington, Woollahra"
-                    error={errors.suburbs}
-                    preferredState={agentState}
-                  />
-                </FieldRow>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Min Budget">
-                    <BudgetSelect value={budgetMin} onChange={setBudgetMin} />
-                  </FieldRow>
-                  <FieldRow label="Max Budget" error={errors.budgetMax}>
-                    <BudgetSelect value={budgetMax} onChange={setBudgetMax} />
-                  </FieldRow>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Property type">
-                    <SelectField options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
-                  </FieldRow>
-                  <FieldRow label="House style">
-                    <SelectField options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
-                  </FieldRow>
-                </div>
-
-                <FieldRow label="Condition">
-                  <SelectField options={["Any", "Established", "New/Modern", "Renovation project"]} value={conditionPreference} onChange={setConditionPreference} />
-                </FieldRow>
-
-                <FieldRow label="Minimum Bedrooms">
-                  <SegmentedControl options={["Any", "2+", "3+", "4+", "5+"]} value={bedrooms} onChange={setBedrooms} />
-                </FieldRow>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldRow label="Bathrooms">
-                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
-                  </FieldRow>
-                  <FieldRow label="Car spaces">
-                    <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
-                  </FieldRow>
-                </div>
-
-                <FieldRow label="Land Size (min)">
-                  <div className="overflow-x-auto -mx-5 px-5">
-                    <div className="min-w-max">
-                      <SegmentedControl
-                        options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]}
-                        value={landSizeMin}
-                        onChange={setLandSizeMin}
+                <div className="space-y-5">
+                  {/* Row 1: Suburbs | Budget */}
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+                    <FieldRow label="Target Suburbs" error={errors.suburbs}>
+                      <SuburbCombobox
+                        value={suburbs}
+                        onChange={setSuburbs}
+                        placeholder="e.g. Paddington, Woollahra"
+                        error={errors.suburbs}
+                        preferredState={agentState}
                       />
+                    </FieldRow>
+                    <div className="space-y-3 min-w-0">
+                      <FieldRow label="Min Budget">
+                        <BudgetSelect value={budgetMin} onChange={setBudgetMin} />
+                      </FieldRow>
+                      <FieldRow label="Max Budget" error={errors.budgetMax}>
+                        <BudgetSelect value={budgetMax} onChange={setBudgetMax} />
+                      </FieldRow>
                     </div>
                   </div>
-                </FieldRow>
+
+                  {/* Row 2: Timeline | Condition */}
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+                    <FieldRow label="Buying Timeline">
+                      <SelectField
+                        options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
+                        value={buyingTimeline}
+                        onChange={setBuyingTimeline}
+                      />
+                    </FieldRow>
+                    <FieldRow label="Condition">
+                      <SelectField
+                        options={["Any", "Established", "New/Modern", "Renovation project"]}
+                        value={conditionPreference}
+                        onChange={setConditionPreference}
+                      />
+                    </FieldRow>
+                  </div>
+
+                  {/* Row 3: Property criteria */}
+                  <div>
+                    <p className={cn(fieldLabelClass, "mb-2")}>Property criteria</p>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+                      <div className="rounded-lg border border-border/80 bg-surface-container-low p-3 min-w-0">
+                        <FieldRow label="Minimum Bedrooms">
+                          <SegmentedControl options={["Any", "2+", "3+", "4+", "5+"]} value={bedrooms} onChange={setBedrooms} />
+                        </FieldRow>
+                      </div>
+                      <div className="rounded-lg border border-border/80 bg-surface-container-low p-3 min-w-0">
+                        <FieldRow label="Bathrooms">
+                          <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={bathrooms} onChange={setBathrooms} />
+                        </FieldRow>
+                      </div>
+                      <div className="rounded-lg border border-border/80 bg-surface-container-low p-3 min-w-0">
+                        <FieldRow label="Car spaces">
+                          <SegmentedControl options={["Any", "1+", "2+", "3+"]} value={carSpaces} onChange={setCarSpaces} />
+                        </FieldRow>
+                      </div>
+                    </div>
+                    <div className="mt-2 rounded-lg border border-border/80 bg-surface-container-low p-3 min-w-0">
+                      <FieldRow label="Land Size (min)">
+                        <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                          <div className="min-w-max">
+                            <SegmentedControl
+                              options={["Any", "300m²", "400m²", "500m²", "600m²", "700m²+"]}
+                              value={landSizeMin}
+                              onChange={setLandSizeMin}
+                            />
+                          </div>
+                        </div>
+                      </FieldRow>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <FieldRow label="Property type">
+                      <SelectField options={["House", "Apartment/Unit", "Townhouse", "Land", "Rural"]} value={propertyType} onChange={setPropertyType} />
+                    </FieldRow>
+                    <FieldRow label="House style">
+                      <SelectField options={["Freestanding", "Semi-detached", "Terrace", "Villa"]} value={houseType} onChange={setHouseType} />
+                    </FieldRow>
+                  </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <FieldRow label="Building size min (sq)">
@@ -449,6 +471,7 @@ export function EditBuyerForm({ buyer, agentState }: { buyer: Buyer; agentState?
                   <FieldRow label="Block preference">
                     <SelectField options={["Flat", "Sloped", "Corner", "Any"]} value={blockPreference} onChange={setBlockPreference} />
                   </FieldRow>
+                </div>
                 </div>
               </SectionCard>
 

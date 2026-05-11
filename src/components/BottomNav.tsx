@@ -7,7 +7,14 @@ import { CalendarDays, Users, Plus, Bell, Settings, Building2, LogOut } from "lu
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/(app)/settings/actions";
 
-const NAV_ITEMS = [
+const BOTTOM_NAV_ITEMS = [
+  { href: "/today", label: "Today", icon: CalendarDays },
+  { href: "/buyers", label: "Buyers", icon: Users },
+  { href: "/reminders", label: "Reminders", icon: Bell },
+  { href: "/settings", label: "Settings", icon: Settings },
+];
+
+const SIDEBAR_NAV_ITEMS = [
   { href: "/today", label: "Today", icon: CalendarDays },
   { href: "/buyers", label: "Buyers", icon: Users },
   { href: "/properties", label: "Properties", icon: Building2 },
@@ -30,28 +37,13 @@ function BottomNavItem({
     <Link
       href={href}
       className={cn(
-        "flex min-h-12 min-w-12 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1.5 transition-colors",
-        active ? "text-teal-action" : "text-white/70 hover:text-white"
+        "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 py-1.5 transition-colors",
+        active ? "text-teal-action" : "text-white/55 hover:text-white/80"
       )}
       aria-current={active ? "page" : undefined}
     >
-      <span
-        className={cn(
-          "mb-0.5 h-1 w-1 rounded-full transition-colors",
-          active ? "bg-teal-action" : "bg-transparent"
-        )}
-      />
-      <span className="transition-colors">
-        <Icon size={20} />
-      </span>
-      <span
-        className={cn(
-          "text-xs font-medium leading-none transition-colors",
-          active ? "text-teal-action" : "text-inherit"
-        )}
-      >
-        {label}
-      </span>
+      <Icon size={24} strokeWidth={active ? 2.2 : 1.8} />
+      <span className="text-[11px] font-medium leading-none">{label}</span>
     </Link>
   );
 }
@@ -113,37 +105,58 @@ export function BottomNav() {
 
   return (
     <>
+      {/* ── Mobile top bar ── */}
+      <header className="fixed left-0 right-0 top-0 z-30 border-b border-white/10 bg-primary/98 backdrop-blur lg:hidden pt-safe">
+        <div className="flex h-14 items-center px-4">
+          <Link href="/today" className="flex items-center gap-2.5">
+            <Image
+              src="/icons/house.svg"
+              alt="BuyerPocket logo"
+              width={30}
+              height={30}
+              className="rounded-lg shrink-0"
+            />
+            <span className="text-[17px] font-bold tracking-tight text-white">BuyerPocket</span>
+          </Link>
+        </div>
+      </header>
+
       {/* ── Mobile / tablet bottom nav ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-primary/98 px-2 pb-safe pt-2 backdrop-blur lg:hidden">
-        <div className="mx-auto flex h-16 max-w-xl items-center justify-around">
-        {NAV_ITEMS.slice(0, 2).map((item) => (
-          <BottomNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            Icon={item.icon}
-            active={
-              pathname === item.href ||
-              (item.href !== "/today" && pathname.startsWith(item.href))
-            }
-          />
-        ))}
-        <Link
-          href="/add"
-          aria-label="Add buyer"
-          className="relative -top-5 flex size-14 items-center justify-center rounded-full bg-teal-action shadow-[0_10px_24px_rgba(0,106,98,0.45)]"
-        >
-          <Plus size={26} className="text-white" />
-        </Link>
-        {NAV_ITEMS.slice(2).map((item) => (
-          <BottomNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            Icon={item.icon}
-            active={pathname.startsWith(item.href)}
-          />
-        ))}
+      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-primary/98 pb-safe backdrop-blur lg:hidden">
+        <div className="mx-auto flex h-16 max-w-xl items-center">
+          {BOTTOM_NAV_ITEMS.slice(0, 2).map((item) => (
+            <BottomNavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              Icon={item.icon}
+              active={
+                pathname === item.href ||
+                (item.href !== "/today" && pathname.startsWith(item.href))
+              }
+            />
+          ))}
+
+          {/* Centre FAB */}
+          <div className="flex flex-1 items-center justify-center">
+            <Link
+              href="/add"
+              aria-label="Add buyer"
+              className="relative -top-4 flex size-14 items-center justify-center rounded-full bg-teal-action shadow-[0_8px_20px_rgba(0,106,98,0.5)]"
+            >
+              <Plus size={26} className="text-white" strokeWidth={2.5} />
+            </Link>
+          </div>
+
+          {BOTTOM_NAV_ITEMS.slice(2).map((item) => (
+            <BottomNavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              Icon={item.icon}
+              active={pathname.startsWith(item.href)}
+            />
+          ))}
         </div>
       </nav>
 
@@ -159,7 +172,7 @@ export function BottomNav() {
         </Link>
 
         <div className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map((item) => (
+          {SIDEBAR_NAV_ITEMS.map((item) => (
             <SidebarItem
               key={item.href}
               href={item.href}
@@ -175,9 +188,6 @@ export function BottomNav() {
         </div>
 
         <div className="mt-auto space-y-2 border-t border-white/10 pt-4">
-          <form action={signOut}>
-            <SidebarAction label="Log out" Icon={LogOut} />
-          </form>
           <Link
             href="/add"
             className="flex min-h-12 items-center gap-3 rounded-xl bg-teal-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-action/90"
@@ -185,6 +195,9 @@ export function BottomNav() {
             <Plus size={18} />
             Add Buyer
           </Link>
+          <form action={signOut}>
+            <SidebarAction label="Log out" Icon={LogOut} />
+          </form>
         </div>
       </nav>
     </>

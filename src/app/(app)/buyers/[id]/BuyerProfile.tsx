@@ -138,7 +138,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-outline">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary">
         {label}
       </p>
       <p className="text-[15px] font-semibold leading-snug text-text-primary">
@@ -431,81 +431,102 @@ function ModalBackdrop({
 
 // ─── Looking For Card ─────────────────────────────────────────────────────────
 
+const profileFieldLabel = "text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary";
+
 function LookingForCard({ buyer }: { buyer: Buyer }) {
   const budget = fmtBudget(buyer.budget_min, buyer.budget_max);
   const hasBudget = buyer.budget_min != null || buyer.budget_max != null;
   const hasSuburbs = (buyer.preferred_suburbs?.length ?? 0) > 0;
-  const propertyCriteria = [
-    buyer.bedrooms ? `${buyer.bedrooms} bed` : null,
-    buyer.bathrooms ? `${buyer.bathrooms} bath` : null,
-    buyer.car_spaces ? `${buyer.car_spaces} parking` : null,
-    buyer.land_size_min ? `${buyer.land_size_min}m²+ land` : null,
-  ].filter(Boolean).join(", ");
+  const criteriaItems: { key: string; text: string }[] = [];
+  if (buyer.bedrooms) criteriaItems.push({ key: "bedrooms", text: `${buyer.bedrooms}+ bed` });
+  if (buyer.bathrooms) criteriaItems.push({ key: "bathrooms", text: `${buyer.bathrooms}+ bath` });
+  if (buyer.car_spaces) criteriaItems.push({ key: "parking", text: `${buyer.car_spaces}+ parking` });
+  if (buyer.land_size_min) criteriaItems.push({ key: "land", text: `${buyer.land_size_min}m²+ land` });
+
+  const hasMorePreferences =
+    buyer.block_preference ||
+    buyer.building_size_min ||
+    buyer.deposit_ready ||
+    buyer.school_zone_required;
 
   return (
     <Card title="Looking for">
-      {/* Suburbs */}
-      <div>
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Suburbs</p>
-        {hasSuburbs ? (
-          <div className="flex flex-wrap gap-1.5">
-            {buyer.preferred_suburbs!.map((s) => (
-              <Chip key={s} label={s.split(",")[0].trim()} className="bg-teal-action/15 text-teal-action border border-teal-action/30 font-semibold" />
-            ))}
+      <div className="space-y-5">
+        {/* Row 1: Suburbs | Budget (+ Finance when set) */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+          <div className="min-w-0">
+            <p className={cn(profileFieldLabel, "mb-1.5")}>Suburbs</p>
+            {hasSuburbs ? (
+              <div className="flex flex-wrap gap-1.5">
+                {buyer.preferred_suburbs!.map((s) => (
+                  <Chip
+                    key={s}
+                    label={s.split(",")[0].trim()}
+                    className="bg-teal-action/15 text-teal-action border border-teal-action/30 font-semibold"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[15px] font-semibold text-text-primary">—</p>
+                <Link href={`/buyers/${buyer.id}/edit`} className="text-sm text-teal-action font-medium shrink-0">
+                  Add suburbs
+                </Link>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-text-secondary">—</p>
-            <Link href={`/buyers/${buyer.id}/edit`} className="text-sm text-teal-action font-medium">
-              Add suburbs
-            </Link>
+          <div className="min-w-0 space-y-3">
+            <Field label="Budget" value={hasBudget ? budget : null} />
+            {buyer.finance_status ? <Field label="Finance" value={buyer.finance_status} /> : null}
+          </div>
+        </div>
+
+        {/* Row 2: Timeline | Condition */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+          <Field label="Timeline" value={buyer.buying_timeline} />
+          <Field label="Condition" value={buyer.condition_preference} />
+        </div>
+
+        {/* Row 3: Property criteria */}
+        {criteriaItems.length > 0 && (
+          <div>
+            <p className={cn(profileFieldLabel, "mb-2")}>Property criteria</p>
+            <ul className="grid grid-cols-2 gap-2 sm:gap-3">
+              {criteriaItems.map(({ key, text }) => (
+                <li
+                  key={key}
+                  className="rounded-lg border border-border/80 bg-surface-container-low px-3 py-2.5 text-center text-sm font-semibold leading-snug text-text-primary"
+                >
+                  {text}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
-      </div>
 
-      {(hasBudget || buyer.finance_status) && (
-        <div className="grid grid-cols-2 gap-4">
-          {hasBudget && <Field label="Budget" value={budget} />}
-          {buyer.finance_status && <Field label="Finance" value={buyer.finance_status} />}
-        </div>
-      )}
-
-      {propertyCriteria && (
-        <div>
-          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Property Criteria</p>
-          <p className="text-sm text-text-primary">{propertyCriteria}</p>
-        </div>
-      )}
-
-      {/* Must-haves */}
-      {buyer.must_haves && buyer.must_haves.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Must-haves</p>
-          <div className="flex flex-wrap gap-1.5">
-            {buyer.must_haves.map((m) => (
-              <Chip key={m} label={m} className="bg-surface-container text-text-secondary" />
-            ))}
+        {buyer.must_haves && buyer.must_haves.length > 0 && (
+          <div>
+            <p className={cn(profileFieldLabel, "mb-2")}>Must-haves</p>
+            <div className="flex flex-wrap gap-1.5">
+              {buyer.must_haves.map((m) => (
+                <Chip key={m} label={m} className="bg-surface-container text-text-secondary" />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {(buyer.buying_timeline || buyer.condition_preference || buyer.block_preference || buyer.building_size_min || buyer.deposit_ready || buyer.school_zone_required) && (
-        <div className="grid grid-cols-2 gap-4">
-          {buyer.buying_timeline && <Field label="Timeline" value={buyer.buying_timeline} />}
-          {buyer.condition_preference && <Field label="Condition" value={buyer.condition_preference} />}
-          {buyer.block_preference && <Field label="Block" value={buyer.block_preference} />}
-          {buyer.building_size_min && <Field label="Building size" value={`${buyer.building_size_min} sq min`} />}
-          {buyer.deposit_ready && <Field label="Deposit" value={buyer.deposit_ready} />}
-          {buyer.school_zone_required && <Field label="School zone" value={buyer.school_zone_required} />}
-        </div>
-      )}
+        {hasMorePreferences && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {buyer.block_preference && <Field label="Block" value={buyer.block_preference} />}
+            {buyer.building_size_min && <Field label="Building size" value={`${buyer.building_size_min} sq min`} />}
+            {buyer.deposit_ready && <Field label="Deposit" value={buyer.deposit_ready} />}
+            {buyer.school_zone_required && <Field label="School zone" value={buyer.school_zone_required} />}
+          </div>
+        )}
 
-      {buyer.deal_breakers && (
-        <Field label="Deal breakers" value={buyer.deal_breakers} />
-      )}
-      {buyer.other_must_haves && (
-        <Field label="Additional must-haves" value={buyer.other_must_haves} />
-      )}
+        {buyer.deal_breakers && <Field label="Deal breakers" value={buyer.deal_breakers} />}
+        {buyer.other_must_haves && <Field label="Additional must-haves" value={buyer.other_must_haves} />}
+      </div>
     </Card>
   );
 }

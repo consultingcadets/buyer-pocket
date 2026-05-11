@@ -170,7 +170,7 @@ export function BuyerDirectory({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -297,11 +297,11 @@ export function BuyerDirectory({
       {/* ── Mobile Header ──────────────────────────────────────────────── */}
       <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-border">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-[18px] font-bold text-text-primary">
+          <h1 className="flex items-center gap-2 text-[18px] font-bold text-text-primary">
             Buyers
             {!isLoading && totalCount > 0 && (
-              <span className="ml-1.5 text-text-secondary font-normal text-[15px]">
-                · {totalCount}
+              <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-surface-container-high text-[12px] font-semibold text-text-secondary">
+                {totalCount}
               </span>
             )}
           </h1>
@@ -353,10 +353,12 @@ export function BuyerDirectory({
       {/* ── Desktop Header ─────────────────────────────────────────────── */}
       <header className="hidden lg:block bg-white sticky top-0 z-20 border-b border-border">
         <div className="flex items-center gap-4 px-6 py-5">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
             <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">Buyers</h2>
             {!isLoading && totalCount > 0 && (
-              <span className="text-text-secondary text-[20px] font-normal">· {totalCount}</span>
+              <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-surface-container-high text-[14px] font-semibold text-text-secondary">
+                {totalCount}
+              </span>
             )}
           </div>
           <div className="ml-auto w-72">
@@ -426,7 +428,7 @@ export function BuyerDirectory({
       <div className="flex flex-1 min-h-0">
 
         {/* Main list */}
-        <main className="flex-1 min-w-0 pb-20 lg:pb-0">
+        <main className="flex-1 min-w-0 pb-20">
 
           {/* Loading */}
           {isLoading && <LoadingSkeleton />}
@@ -476,12 +478,12 @@ export function BuyerDirectory({
 
           {/* Lead age legend */}
           {!isLoading && buyers.length > 0 && (
-            <div className="lg:hidden flex flex-wrap gap-x-3 gap-y-1 px-4 pt-3 pb-1">
+            <div className="lg:hidden flex items-center gap-3 px-4 pt-3 pb-1">
+              <span className="text-[11px] text-text-secondary mr-1">Added:</span>
               {[
-                { cls: "bg-emerald-500", label: "< 2 weeks" },
+                { cls: "bg-emerald-500", label: "< 2 wks" },
                 { cls: "bg-amber-500",   label: "2 wks – 2 mo" },
-                { cls: "bg-red-500",     label: "Stale" },
-                { cls: "bg-outline",     label: "Never contacted" },
+                { cls: "bg-red-500",     label: "> 2 mo" },
               ].map(({ cls, label }) => (
                 <span key={label} className="flex items-center gap-1 text-[11px] text-text-secondary">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${cls}`} />
@@ -502,12 +504,12 @@ export function BuyerDirectory({
 
           {/* Desktop lead age legend */}
           {!isLoading && buyers.length > 0 && (
-            <div className="hidden lg:flex items-center gap-5 px-4 pt-3 pb-1">
+            <div className="hidden lg:flex items-center gap-4 px-4 pt-3 pb-1">
+              <span className="text-[11px] text-text-secondary">Added:</span>
               {[
                 { cls: "bg-emerald-500", label: "< 2 weeks" },
                 { cls: "bg-amber-500",   label: "2 weeks – 2 months" },
-                { cls: "bg-red-500",     label: "Stale (> 2 months)" },
-                { cls: "bg-outline",     label: "Never contacted" },
+                { cls: "bg-red-500",     label: "> 2 months" },
               ].map(({ cls, label }) => (
                 <span key={label} className="flex items-center gap-1.5 text-[11px] text-text-secondary">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${cls}`} />
@@ -556,7 +558,6 @@ export function BuyerDirectory({
           onClear={handleClearFilters}
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
-          desktopOpen={isFilterOpen}
           agentState={agentState}
         />
       </div>
