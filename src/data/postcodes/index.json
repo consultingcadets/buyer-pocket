@@ -1,0 +1,14 @@
+{
+  "source_file": "standard_postcode_file_pc001_11052026.pdf",
+  "mode": "street_delivery_only",
+  "states": {
+    "NSW": 4548,
+    "VIC": 3055,
+    "QLD": 3212,
+    "SA": 1693,
+    "WA": 1728,
+    "TAS": 773,
+    "ACT": 129,
+    "NT": 273
+  }
+}

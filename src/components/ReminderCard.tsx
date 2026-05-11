@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Check, Clock, Phone } from "lucide-react";
+import { Check, Clock, Phone, MessageSquare, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import type { ReminderWithBuyer } from "@/types/reminders";
@@ -56,7 +56,7 @@ function TempBadge({ temp }: { temp: "hot" | "warm" | "cold" | null }) {
 
 function SummaryTag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center h-6 px-2 rounded-full bg-surface-container-low text-[12px] text-text-secondary">
+    <span className="inline-flex h-6 items-center rounded-full border border-border/60 bg-surface-container-low px-2 text-[12px] text-text-secondary">
       {children}
     </span>
   );
@@ -101,9 +101,9 @@ export function ReminderCard({
   const summaryItems = [suburbDisplay, budgetLabel, bedsLabel, landLabel].filter(Boolean);
 
   return (
-    <div className="bg-white rounded-lg shadow-card p-4">
+    <div className="w-full rounded-2xl border border-border/70 bg-white p-4 lg:p-5 shadow-card transition-shadow hover:shadow-dropdown">
       <div className="flex items-center gap-3">
-        <div className="shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary">
           <span className="text-white text-[11px] font-bold">{initials(buyer.name)}</span>
         </div>
         <h4 className="text-[18px] font-semibold text-primary leading-tight min-w-0 truncate">
@@ -114,19 +114,22 @@ export function ReminderCard({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex items-center gap-2 border-b border-border/60 pb-3">
         <Clock size={14} className={timeToneClass} />
         <span className={cn("text-[14px] font-semibold", timeToneClass)}>
           {showDate ? `${formatReminderDate(reminder.reminder_at)} · ` : ""}
           {formatReminderTime(reminder.reminder_at)}
         </span>
         {reminder.reminder_type && (
-          <span className="text-[14px] text-text-secondary">{reminder.reminder_type}</span>
+          <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-surface-container-low px-2 py-0.5 text-[12px] text-text-secondary">
+            <BellRing size={12} />
+            {reminder.reminder_type}
+          </span>
         )}
       </div>
 
       {summaryItems.length > 0 && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
           {summaryItems.map((item, index) => (
             <div key={`${item}-${index}`} className="inline-flex items-center gap-1.5">
               {index > 0 && <span className="text-text-secondary text-[12px]">·</span>}
@@ -143,36 +146,39 @@ export function ReminderCard({
       )}
 
       <div className="mt-4 flex items-center gap-2">
-        {buyer.phone && (
-          <a
-            href={`tel:${buyer.phone}`}
-            className="inline-flex items-center justify-center gap-1.5 h-10 min-w-20 px-4 rounded-lg bg-teal-action text-white text-[14px] font-semibold"
-          >
-            <Phone size={14} />
-            Call
-          </a>
-        )}
-        {buyer.phone && (
-          <a
-            href={`sms:${buyer.phone}`}
-            className="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-border text-[14px] font-semibold text-primary hover:bg-surface-container-low transition-colors"
-          >
-            SMS
-          </a>
-        )}
+        <div className="flex items-center gap-2">
+          {buyer.phone && (
+            <a
+              href={`tel:${buyer.phone}`}
+              className="inline-flex h-11 min-w-24 items-center justify-center gap-1.5 rounded-lg bg-teal-action px-4 text-[14px] font-semibold text-white shadow-sm transition-colors hover:bg-teal-action/90"
+            >
+              <Phone size={14} />
+              Call
+            </a>
+          )}
+          {buyer.phone && (
+            <a
+              href={`sms:${buyer.phone}`}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-lg border border-border px-4 text-[14px] font-semibold text-primary transition-colors hover:bg-surface-container-low"
+            >
+              <MessageSquare size={14} />
+              SMS
+            </a>
+          )}
+        </div>
 
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => onComplete(reminder.id)}
             disabled={isCompleting}
-            className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors disabled:opacity-50"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:bg-surface-container-low disabled:opacity-50"
             aria-label="Done"
           >
             <Check size={16} />
           </button>
           <button
             onClick={() => onSnooze(reminder.id)}
-            className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-border text-text-secondary hover:bg-surface-container-low transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:bg-surface-container-low"
             aria-label="Snooze"
           >
             <Clock size={16} />

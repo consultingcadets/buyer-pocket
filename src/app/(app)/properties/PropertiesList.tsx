@@ -57,7 +57,7 @@ export function PropertiesList({ initialProperties }: PropertiesListProps) {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-4 pb-28">
+      <div className="w-full px-4 py-4 pb-28 lg:px-6">
         {properties.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center justify-center text-center py-20 gap-4">

@@ -1,0 +1,518 @@
+[
+  {
+    "suburb": "Acton",
+    "postcode": "2601"
+  },
+  {
+    "suburb": "Ainslie",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Amaroo",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Aranda",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Banks",
+    "postcode": "2906"
+  },
+  {
+    "suburb": "Barton",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Beard",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Belconnen",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Bonner",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Bonython",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Booth",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Braddon",
+    "postcode": "2612"
+  },
+  {
+    "suburb": "Bruce",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Calwell",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Campbell",
+    "postcode": "2612"
+  },
+  {
+    "suburb": "Canberra",
+    "postcode": "2601"
+  },
+  {
+    "suburb": "Canberra Airport",
+    "postcode": "2609"
+  },
+  {
+    "suburb": "Capital Hill",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Casey",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Chapman",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Charnwood",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Chifley",
+    "postcode": "2606"
+  },
+  {
+    "suburb": "Chisholm",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Conder",
+    "postcode": "2906"
+  },
+  {
+    "suburb": "Cook",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Coombs",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Coree",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Crace",
+    "postcode": "2911"
+  },
+  {
+    "suburb": "Curtin",
+    "postcode": "2605"
+  },
+  {
+    "suburb": "Deakin",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Denman Prospect",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Dickson",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Downer",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Duffy",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Dunlop",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Evatt",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Fadden",
+    "postcode": "2904"
+  },
+  {
+    "suburb": "Farrer",
+    "postcode": "2607"
+  },
+  {
+    "suburb": "Fisher",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Florey",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Flynn",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Forde",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Forrest",
+    "postcode": "2603"
+  },
+  {
+    "suburb": "Franklin",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Fraser",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Fyshwick",
+    "postcode": "2609"
+  },
+  {
+    "suburb": "Garran",
+    "postcode": "2605"
+  },
+  {
+    "suburb": "Gilmore",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Giralang",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Gordon",
+    "postcode": "2906"
+  },
+  {
+    "suburb": "Gowrie",
+    "postcode": "2904"
+  },
+  {
+    "suburb": "Greenway",
+    "postcode": "2900"
+  },
+  {
+    "suburb": "Griffith",
+    "postcode": "2603"
+  },
+  {
+    "suburb": "Gungahlin",
+    "postcode": "2912"
+  },
+  {
+    "suburb": "Hackett",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Hall",
+    "postcode": "2618"
+  },
+  {
+    "suburb": "Harman",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Harrison",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Hawker",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Higgins",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Hol T",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Holder",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Hughes",
+    "postcode": "2605"
+  },
+  {
+    "suburb": "Hume",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Isaacs",
+    "postcode": "2607"
+  },
+  {
+    "suburb": "Isabella Plains",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Jacka",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Jervis Bay",
+    "postcode": "2540"
+  },
+  {
+    "suburb": "Kaleen",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Kambah",
+    "postcode": "2902"
+  },
+  {
+    "suburb": "Kenny",
+    "postcode": "2911"
+  },
+  {
+    "suburb": "Kingston",
+    "postcode": "2604"
+  },
+  {
+    "suburb": "Kowen",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Latham",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Lawson",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Lyneham",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Lyons",
+    "postcode": "2606"
+  },
+  {
+    "suburb": "Macarthur",
+    "postcode": "2904"
+  },
+  {
+    "suburb": "Macgregor",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Macnamara",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Macquarie",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Majura",
+    "postcode": "2609"
+  },
+  {
+    "suburb": "Mawson",
+    "postcode": "2607"
+  },
+  {
+    "suburb": "Mckellar",
+    "postcode": "2617"
+  },
+  {
+    "suburb": "Melba",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Mitchell",
+    "postcode": "2911"
+  },
+  {
+    "suburb": "Monash",
+    "postcode": "2904"
+  },
+  {
+    "suburb": "Moncrieff",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Narrabundah",
+    "postcode": "2604"
+  },
+  {
+    "suburb": "Ngunnawal",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Nicholls",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Oaks Estate",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Oxley",
+    "postcode": "2903"
+  },
+  {
+    "suburb": "Paddys River",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Page",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Palmerston",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Parkes",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Pearce",
+    "postcode": "2607"
+  },
+  {
+    "suburb": "Phillip",
+    "postcode": "2606"
+  },
+  {
+    "suburb": "Pialligo",
+    "postcode": "2609"
+  },
+  {
+    "suburb": "Red Hill",
+    "postcode": "2603"
+  },
+  {
+    "suburb": "Reid",
+    "postcode": "2612"
+  },
+  {
+    "suburb": "Richardson",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Rivett",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Russell",
+    "postcode": "2600"
+  },
+  {
+    "suburb": "Scullin",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Spence",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Stirling",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Strathnairn",
+    "postcode": "2615"
+  },
+  {
+    "suburb": "Stromlo",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Symonston",
+    "postcode": "2609"
+  },
+  {
+    "suburb": "Taylor",
+    "postcode": "2913"
+  },
+  {
+    "suburb": "Tennent",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Tharwa",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Theodore",
+    "postcode": "2905"
+  },
+  {
+    "suburb": "Throsby",
+    "postcode": "2914"
+  },
+  {
+    "suburb": "Torrens",
+    "postcode": "2607"
+  },
+  {
+    "suburb": "Turner",
+    "postcode": "2612"
+  },
+  {
+    "suburb": "Uriarra Village",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Wanniassa",
+    "postcode": "2903"
+  },
+  {
+    "suburb": "Waramanga",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Watson",
+    "postcode": "2602"
+  },
+  {
+    "suburb": "Weetangera",
+    "postcode": "2614"
+  },
+  {
+    "suburb": "Weston",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Whitlam",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Williamsdale",
+    "postcode": "2620"
+  },
+  {
+    "suburb": "Wreck Bay",
+    "postcode": "2540"
+  },
+  {
+    "suburb": "Wright",
+    "postcode": "2611"
+  },
+  {
+    "suburb": "Yarralumla",
+    "postcode": "2600"
+  }
+]

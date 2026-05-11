@@ -150,9 +150,11 @@ function LoadingSkeleton() {
 export function BuyerDirectory({
   initialBuyers,
   initialCount,
+  agentState,
 }: {
   initialBuyers: Buyer[];
   initialCount: number;
+  agentState?: string | null;
 }) {
   const [, startTransition] = useTransition();
 
@@ -555,6 +557,7 @@ export function BuyerDirectory({
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
           desktopOpen={isFilterOpen}
+          agentState={agentState}
         />
       </div>
     </div>

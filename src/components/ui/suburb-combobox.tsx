@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { searchSuburbs } from "@/data/au-suburbs";
 
@@ -9,6 +9,7 @@ interface SuburbComboboxProps {
   onChange: (v: string[]) => void;
   placeholder?: string;
   error?: string;
+  preferredState?: string | null;
 }
 
 export function SuburbCombobox({
@@ -16,13 +17,17 @@ export function SuburbCombobox({
   onChange,
   placeholder = "Search suburbs…",
   error,
+  preferredState,
 }: SuburbComboboxProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const results = query.length >= 1 ? searchSuburbs(query, 20) : [];
+  const results = useMemo(
+    () => (query.length >= 1 ? searchSuburbs(query, 20, preferredState) : []),
+    [query, preferredState]
+  );
 
   // Close dropdown on outside click
   useEffect(() => {

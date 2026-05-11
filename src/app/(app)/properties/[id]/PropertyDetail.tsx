@@ -147,7 +147,7 @@ export function PropertyDetail({ property, matchedBuyers }: PropertyDetailProps)
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-5 pb-28 flex flex-col gap-5">
+      <div className="w-full px-4 py-5 pb-28 lg:px-6 flex flex-col gap-5">
         {/* Property summary card */}
         <div className="bg-white rounded-xl border border-border p-4 flex flex-col gap-3">
           <div>

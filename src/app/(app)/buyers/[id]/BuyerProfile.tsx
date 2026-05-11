@@ -137,11 +137,13 @@ function Field({
   fallback?: string;
 }) {
   return (
-    <div>
-      <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-0.5">
+    <div className="space-y-1">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-outline">
         {label}
       </p>
-      <p className="text-sm text-text-primary">{value ?? fallback}</p>
+      <p className="text-[15px] font-semibold leading-snug text-text-primary">
+        {value ?? fallback}
+      </p>
     </div>
   );
 }
@@ -502,10 +504,7 @@ function LookingForCard({ buyer }: { buyer: Buyer }) {
         <Field label="Deal breakers" value={buyer.deal_breakers} />
       )}
       {buyer.other_must_haves && (
-        <Field label="Other must-haves" value={buyer.other_must_haves} />
-      )}
-      {buyer.notes_summary && (
-        <Field label="Notes" value={buyer.notes_summary} />
+        <Field label="Additional must-haves" value={buyer.other_must_haves} />
       )}
     </Card>
   );
@@ -965,7 +964,6 @@ function StatsCard({
           label="Engagement"
           value={`${notes.length} note${notes.length !== 1 ? "s" : ""} · ${reminders.length} reminder${reminders.length !== 1 ? "s" : ""}`}
         />
-        {buyer.buyer_type && <Field label="Buyer type" value={buyer.buyer_type} />}
         {buyer.priority && <Field label="Priority" value={buyer.priority} />}
       </div>
     </Card>
@@ -1184,9 +1182,6 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
                   {tempConfig && (
                     <Chip label={tempConfig.label} className={tempConfig.chip} />
                   )}
-                  {buyer.lead_status && (
-                    <Chip label={buyer.lead_status} className="bg-white/15 text-white border border-white/20" />
-                  )}
                   {buyer.buyer_type && (
                     <Chip label={buyer.buyer_type} className="bg-white/10 text-white/75 border border-white/15" />
                   )}
@@ -1325,8 +1320,8 @@ export function BuyerProfile({ buyer, notes, reminders, matchedProperties }: Pro
                 {tempConfig && (
                   <Chip label={tempConfig.label} className={tempConfig.chip} />
                 )}
-                {buyer.lead_status && (
-                  <Chip label={buyer.lead_status} className="bg-primary text-white" />
+                {buyer.buyer_type && (
+                  <Chip label={buyer.buyer_type} className="bg-primary text-white" />
                 )}
               </div>
             </div>

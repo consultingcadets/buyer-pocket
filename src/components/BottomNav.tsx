@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, Plus, Bell, Settings, Building2 } from "lucide-react";
+import { CalendarDays, Users, Plus, Bell, Settings, Building2, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/app/(app)/settings/actions";
 
 const NAV_ITEMS = [
   { href: "/today", label: "Today", icon: CalendarDays },
@@ -88,6 +90,24 @@ function SidebarItem({
   );
 }
 
+function SidebarAction({
+  label,
+  Icon,
+}: {
+  label: string;
+  Icon: React.ElementType;
+}) {
+  return (
+    <button
+      type="submit"
+      className="relative flex min-h-12 w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-white/70 transition-all hover:bg-white/8 hover:text-white"
+    >
+      <Icon size={18} className="shrink-0 transition-colors text-current" />
+      {label}
+    </button>
+  );
+}
+
 export function BottomNav() {
   const pathname = usePathname();
 
@@ -131,21 +151,7 @@ export function BottomNav() {
       <nav className="fixed bottom-0 left-0 top-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-primary px-3 py-6 lg:flex">
         {/* Brand */}
         <Link href="/today" className="mb-6 flex min-h-12 items-center gap-2.5 px-3 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-teal-action">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-          </div>
+          <Image src="/icons/house.svg" alt="BuyerPocket logo" width={32} height={32} className="rounded-xl shrink-0" />
           <div className="flex flex-col">
             <span className="text-[15px] font-bold leading-tight tracking-tight text-white">BuyerPocket</span>
             <span className="text-xs leading-none text-white/55">Agent Portal</span>
@@ -168,7 +174,10 @@ export function BottomNav() {
           ))}
         </div>
 
-        <div className="mt-auto pt-4 border-t border-white/10">
+        <div className="mt-auto space-y-2 border-t border-white/10 pt-4">
+          <form action={signOut}>
+            <SidebarAction label="Log out" Icon={LogOut} />
+          </form>
           <Link
             href="/add"
             className="flex min-h-12 items-center gap-3 rounded-xl bg-teal-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-action/90"

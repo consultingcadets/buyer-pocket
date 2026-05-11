@@ -47,7 +47,7 @@ function selectClass(hasError?: boolean) {
   );
 }
 
-export function AddPropertyForm() {
+export function AddPropertyForm({ agentState }: { agentState?: string | null }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -130,7 +130,7 @@ export function AddPropertyForm() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="w-full px-4 py-6 pb-28 lg:px-6">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
           {errors.general && (
             <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
@@ -161,6 +161,7 @@ export function AddPropertyForm() {
               onChange={handleSuburbChange}
               placeholder="Search suburbs…"
               error={errors.suburb}
+              preferredState={agentState}
             />
           </div>
 

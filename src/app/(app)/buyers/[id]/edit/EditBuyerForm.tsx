@@ -3,7 +3,7 @@
 import { useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, BarChart2, Search, FileText, ChevronDown } from "lucide-react";
+import { ArrowLeft, User, Search, FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SuburbCombobox } from "@/components/ui/suburb-combobox";
@@ -40,7 +40,9 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
 function FieldRow({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[13px] font-medium text-text-primary mb-1.5">{label}</label>
+      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-outline">
+        {label}
+      </label>
       {children}
       {error && <p className="mt-1.5 text-xs text-error">{error}</p>}
     </div>
@@ -144,7 +146,7 @@ const MUST_HAVES_OPTIONS = [
   "North-facing", "Large garden", "Street appeal", "Open plan living",
 ];
 
-export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
+export function EditBuyerForm({ buyer, agentState }: { buyer: Buyer; agentState?: string | null }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -250,7 +252,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
     <div className="h-dvh bg-background flex flex-col overflow-hidden">
       {/* ── Header ── */}
       <header className="shrink-0 bg-primary z-20 border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 h-14 flex items-center justify-between">
+        <div className="w-full px-4 lg:px-6 h-14 flex items-center justify-between">
           <Link
             href={`/buyers/${buyer.id}`}
             className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-colors"
@@ -265,7 +267,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
 
       {/* ── Scrollable content ── */}
       <div className="flex-1 min-h-0 overflow-y-auto pb-28">
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-5">
+        <div className="w-full px-4 lg:px-6 py-5">
 
           {errors._form && (
             <div className="px-4 py-3 rounded-xl bg-error/10 border border-error/20 text-sm text-error mb-4">
@@ -327,11 +329,10 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                     ))}
                   </div>
                 </FieldRow>
-              </SectionCard>
 
-              {/* Engagement Status */}
-              <SectionCard>
-                <SectionHeader icon={<BarChart2 size={14} />} title="Engagement Status" />
+                <div className="pt-1 border-t border-border/70">
+                  <p className="text-[15px] font-bold text-primary tracking-tight pt-3 mb-3">Engagement</p>
+                </div>
                 <FieldRow label="Buying Timeline">
                   <SelectField
                     options={["Ready now", "0–3 months", "3–6 months", "6+ months", "Just researching"]}
@@ -380,6 +381,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
                     onChange={setSuburbs}
                     placeholder="e.g. Paddington, Woollahra"
                     error={errors.suburbs}
+                    preferredState={agentState}
                   />
                 </FieldRow>
 
@@ -471,7 +473,7 @@ export function EditBuyerForm({ buyer }: { buyer: Buyer }) {
 
       {/* ── Save footer ── */}
       <div className="fixed bottom-0 left-0 right-0 lg:left-60 bg-white border-t border-border shadow-[0_-4px_16px_rgba(15,28,44,0.06)]">
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-4 flex items-center gap-3">
+        <div className="w-full px-4 lg:px-6 py-4 flex items-center gap-3">
           <Link
             href={`/buyers/${buyer.id}`}
             className="flex-1 h-14 flex items-center justify-center text-sm font-semibold text-text-secondary rounded-2xl border border-border hover:bg-surface-container transition-colors"

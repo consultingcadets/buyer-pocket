@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Clock, Phone, MoreVertical } from "lucide-react";
+import { Clock, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatBudgetLabel } from "@/lib/buyer-filters";
 import { getLeadStaleness } from "@/lib/format";
@@ -58,9 +58,6 @@ function ThreeDotMenu({
   const [open, setOpen] = useState(false);
 
   const actions = [
-    { label: "Call", href: buyer.phone ? `tel:${buyer.phone}` : null },
-    { label: "SMS", href: buyer.phone ? `sms:${buyer.phone}` : null },
-    { label: "Email", href: buyer.email ? `mailto:${buyer.email}` : null },
     { label: "Edit", href: `/buyers/${buyer.id}/edit` },
     { label: "Archive", href: null, danger: true },
   ];
@@ -129,7 +126,7 @@ export function BuyerTableRow({
   return (
     <tr className="border-b border-border hover:bg-surface-container-low/60 group transition-colors">
       {/* Name */}
-      <td className="px-4 py-3 max-w-[200px]">
+      <td className="px-4 py-3 max-w-50">
         <Link href={`/buyers/${buyer.id}`} className="block">
           <span className="flex items-center gap-1.5">
             {(() => {
@@ -152,7 +149,7 @@ export function BuyerTableRow({
       </td>
 
       {/* Suburb */}
-      <td className="px-4 py-3 max-w-[160px]">
+      <td className="px-4 py-3 max-w-40">
         <span className="text-[13px] text-text-primary truncate block">
           {(buyer.preferred_suburbs?.length ?? 0) > 0
             ? formatSuburbs(buyer.preferred_suburbs)
@@ -273,13 +270,12 @@ export function BuyerCard({
             </span>
           );
         })()}
-        <a
-          href={buyer.phone ? `tel:${buyer.phone}` : undefined}
-          className="text-[13px] font-medium text-teal-action flex items-center gap-1"
+        <Link
+          href={`/buyers/${buyer.id}`}
+          className="text-[13px] font-medium text-teal-action"
         >
-          <Phone className="w-3 h-3" />
-          Call
-        </a>
+          View profile
+        </Link>
       </div>
     </article>
   );

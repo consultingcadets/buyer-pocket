@@ -15,15 +15,17 @@ const configs = [
   { file: "icon-maskable-512.png", size: 512, padding: 0.15 },
 ];
 
+const iconsDir = join(root, "public/icons");
+
 for (const { file, size, padding } of configs) {
-  const outPath = join(root, "public/icons", file);
+  const outPath = join(iconsDir, file);
 
   if (padding) {
     // Maskable: shrink icon to safe zone (80%), pad with navy background
     const innerSize = Math.round(size * (1 - padding * 2));
     const inner = await sharp(svgBuffer).resize(innerSize, innerSize).toBuffer();
     await sharp({
-      create: { width: size, height: size, channels: 4, background: "#0F1C2C" },
+      create: { width: size, height: size, channels: 4, background: "#0B1F3A" },
     })
       .composite([{ input: inner, gravity: "center" }])
       .png()
@@ -34,5 +36,8 @@ for (const { file, size, padding } of configs) {
 
   console.log(`✓ ${file}`);
 }
+
+await sharp(svgBuffer).resize(180, 180).png().toFile(join(root, "public/apple-touch-icon.png"));
+console.log("✓ apple-touch-icon.png");
 
 console.log("Icons generated.");

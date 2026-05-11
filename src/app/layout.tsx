@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PWASetup, InstallPrompt, IOSInstallPrompt } from "@/components/PWASetup";
@@ -29,18 +28,16 @@ const ORG_SCHEMA = {
   knowsAbout: ["Real estate", "Buyer management", "Property sales", "CRM"],
 };
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://buyerpocket.com.au"),
   title: { default: "BuyerPocket", template: "%s — BuyerPocket" },
   description: "Buyer list and reminder tool for independent Australian real estate agents. Capture buyers at open homes, match them to new listings, and never miss a follow-up.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/house.svg",
+    shortcut: "/icons/house.svg",
+    apple: "/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -62,7 +59,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0F1C2C",
+  themeColor: "#0B1F3A",
   width: "device-width",
   initialScale: 1,
 };
@@ -75,7 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={cn("h-full antialiased scroll-smooth", inter.variable, "font-sans")}
+      className={cn("h-full antialiased scroll-smooth", "font-sans")}
     >
       <head>
         <script
@@ -85,7 +82,7 @@ export default function RootLayout({
         {/* iOS PWA icons */}
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         {/* Mask icon for Safari pinned tab */}
-        <link rel="mask-icon" href="/icons/icon.svg" color="#0F1C2C" />
+        <link rel="mask-icon" href="/icons/house.svg" color="#E8614A" />
       </head>
       <body className="min-h-full flex flex-col">
         <PHProvider>

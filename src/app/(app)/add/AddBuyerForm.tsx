@@ -192,7 +192,7 @@ const REMINDER_CHIPS: Array<{ id: Exclude<ReminderChip, null>; label: string }> 
 
 // ─── Main form ────────────────────────────────────────────────────────────────
 
-export function AddBuyerForm() {
+export function AddBuyerForm({ agentState }: { agentState?: string | null }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -330,7 +330,7 @@ export function AddBuyerForm() {
     <div className="h-dvh bg-background flex flex-col overflow-hidden">
       {/* ── Standard white app header ── */}
       <header className="shrink-0 bg-white z-20 border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-center">
+        <div className="w-full px-5 lg:px-6 h-14 flex items-center justify-center">
           <h1 className="text-base font-semibold text-text-primary tracking-tight">
             Add Buyer
           </h1>
@@ -339,7 +339,7 @@ export function AddBuyerForm() {
 
       {/* ── Scrollable content ── */}
       <div className={cn("flex-1 min-h-0 overflow-y-auto", footerPb)}>
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-5">
+        <div className="w-full px-4 lg:px-6 py-5">
 
           {errors._form && (
             <div className="px-4 py-3 rounded-xl bg-error/10 border border-error/20 text-sm text-error mb-4">
@@ -480,6 +480,7 @@ export function AddBuyerForm() {
                     onChange={setSuburbs}
                     placeholder="Search and add suburbs…"
                     error={errors.suburbs}
+                    preferredState={agentState}
                   />
                 </FieldRow>
 
@@ -565,7 +566,7 @@ export function AddBuyerForm() {
 
       {/* ── Sticky footer ── */}
       <div className="fixed bottom-0 left-0 right-0 lg:left-60 bg-white border-t border-border shadow-[0_-4px_16px_rgba(15,28,44,0.06)]">
-        <div className="max-w-5xl mx-auto px-4 lg:px-6 pt-3 pb-5 space-y-3">
+        <div className="w-full px-4 lg:px-6 pt-3 pb-5 space-y-3">
           {/* Reminder section */}
           <div>
             <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wide mb-2.5">

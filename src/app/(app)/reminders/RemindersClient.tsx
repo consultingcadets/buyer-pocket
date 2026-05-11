@@ -226,7 +226,7 @@ export function RemindersClient({ initialTab, initialReminders, counts: initialC
       </div>
 
       {/* Content */}
-      <div className="px-4 lg:max-w-2xl lg:mx-auto pt-4">{renderList()}</div>
+      <div className="w-full px-4 lg:px-6 pt-4 pb-6">{renderList()}</div>
 
       {snoozeReminderId && (
         <SnoozeModal

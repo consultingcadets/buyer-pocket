@@ -149,15 +149,12 @@ function ProfileSection({ profile, email }: { profile: Profile; email: string })
         </div>
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
-          <div className="flex gap-2">
-            <input type="email" value={email} readOnly className={cn(inputCls, "bg-surface-container text-text-secondary flex-1")} />
-            <a
-              href={`mailto:${SUPPORT_EMAIL}?subject=Change email address`}
-              className="h-12 px-4 rounded-lg border border-border text-accent text-sm font-medium flex items-center shrink-0 hover:bg-surface-container"
-            >
-              Change
-            </a>
-          </div>
+          <input
+            type="email"
+            value={email}
+            readOnly
+            className={cn(inputCls, "bg-surface-container text-text-secondary")}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1.5">Mobile</label>
@@ -830,7 +827,7 @@ export function SettingsClient({
     .toUpperCase();
 
   const allSections = (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <ProfileSection profile={profile} email={email} />
       <NotificationsSection initialPrefs={notifPrefs} />
       <DevicesSection tokens={pushTokens} />
@@ -843,7 +840,7 @@ export function SettingsClient({
       <HelpSection />
 
       {/* Sign out */}
-      <div className="bg-white rounded-xl border border-border p-4">
+      <div className="bg-white rounded-xl border border-border p-4 xl:col-span-2">
         <button
           type="button"
           onClick={handleSignOut}
@@ -860,7 +857,7 @@ export function SettingsClient({
     <div className="min-h-screen bg-background">
       {/* ── Desktop ── */}
       <div className="hidden lg:block">
-        <div className="max-w-2xl mx-auto px-6 py-10">
+        <div className="w-full px-6 py-10 lg:px-8">
           <h1 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary mb-8">Settings</h1>
           {allSections}
         </div>

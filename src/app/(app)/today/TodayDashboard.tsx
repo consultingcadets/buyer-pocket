@@ -227,7 +227,7 @@ export function TodayDashboard(props: Props) {
                 </h2>
                 <p className="text-[14px] text-text-secondary mt-1">{todayDateLabel()}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
+              <div className="grid grid-cols-2 gap-4 w-full">
                 <StatCard value={todayCount} label="Reminders today" />
                 <StatCard value={buyersThisWeek} label="Buyers this week" />
               </div>
@@ -235,7 +235,7 @@ export function TodayDashboard(props: Props) {
           )}
 
           {isNewUserWelcome ? (
-            <section className="max-w-3xl">
+            <section className="w-full">
               <div className="bg-white rounded-xl border border-border shadow-card p-6 space-y-5">
                 <div>
                   <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-primary">
@@ -270,7 +270,7 @@ export function TodayDashboard(props: Props) {
           ) : (
             <>
               {overdueReminders.length > 0 && (
-                <section>
+                <section className="rounded-2xl border border-border/70 bg-surface-container-low p-4 lg:p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <SectionHeading>Overdue</SectionHeading>
                     <span className="h-6 min-w-6 px-2 rounded-full bg-error text-white text-[12px] font-semibold inline-flex items-center justify-center mb-2">
@@ -292,8 +292,13 @@ export function TodayDashboard(props: Props) {
                 </section>
               )}
 
-              <section>
-                <SectionHeading>Today&apos;s reminders</SectionHeading>
+              <section className="rounded-2xl border border-border/70 bg-surface-container-low p-4 lg:p-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <SectionHeading>Today&apos;s reminders</SectionHeading>
+                  <Link href="/reminders" className="text-sm font-semibold text-teal-action hover:opacity-80">
+                    View all
+                  </Link>
+                </div>
                 {todayReminders.length > 0 ? (
                   <div className="space-y-3">
                     {todayReminders.map((r) => (
@@ -387,7 +392,7 @@ export function TodayDashboard(props: Props) {
           ) : (
             <>
               {overdueReminders.length > 0 && (
-                <section>
+                <section className="rounded-2xl border border-border/70 bg-surface-container-low p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-[20px] font-semibold text-text-primary">Overdue</h2>
                     <span className="h-6 min-w-6 px-2 rounded-full bg-error text-white text-[12px] font-semibold inline-flex items-center justify-center">
@@ -409,8 +414,13 @@ export function TodayDashboard(props: Props) {
                 </section>
               )}
 
-              <section>
-                <h2 className="text-[20px] font-semibold text-text-primary mb-3">Today&apos;s reminders</h2>
+              <section className="rounded-2xl border border-border/70 bg-surface-container-low p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h2 className="text-[20px] font-semibold text-text-primary">Today&apos;s reminders</h2>
+                  <Link href="/reminders" className="text-sm font-semibold text-teal-action">
+                    View all
+                  </Link>
+                </div>
                 {todayReminders.length > 0 ? (
                   todayReminders.length > 4 ? (
                     <>

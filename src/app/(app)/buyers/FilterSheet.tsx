@@ -118,6 +118,7 @@ export function FilterSheet({
   isOpen,
   onClose,
   desktopOpen = true,
+  agentState,
 }: {
   filters: BuyerFilters;
   onFiltersChange: (f: BuyerFilters) => void;
@@ -125,6 +126,7 @@ export function FilterSheet({
   isOpen: boolean;
   onClose: () => void;
   desktopOpen?: boolean;
+  agentState?: string | null;
 }) {
   const [pending, setPending] = useState<BuyerFilters>(filters);
   const [count, setCount] = useState<number | null>(null);
@@ -203,6 +205,7 @@ export function FilterSheet({
             value={pending.suburbs ?? []}
             onChange={(v) => setPending((f) => ({ ...f, suburbs: v }))}
             placeholder="Add suburb..."
+            preferredState={agentState}
           />
         </div>
 

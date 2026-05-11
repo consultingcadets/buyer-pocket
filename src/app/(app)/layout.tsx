@@ -45,7 +45,7 @@ export default async function AppLayout({
   return (
     <BillingGuard accessLevel={accessLevel} bannerType={bannerType}>
       <div className="app-page-shell lg:pl-64">
-        <main className="mx-auto w-full max-w-400">{children}</main>
+        <main className="w-full">{children}</main>
         <BottomNav />
       </div>
     </BillingGuard>

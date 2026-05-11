@@ -14,18 +14,22 @@ export default async function BuyersPage() {
 
   if (!user) redirect("/login");
 
-  const { data, count } = await supabase
-    .from("buyers")
-    .select("*", { count: "exact" })
-    .eq("user_id", user.id)
-    .is("archived_at", null)
-    .order("created_at", { ascending: false })
-    .range(0, PAGE_SIZE - 1);
+  const [{ data, count }, { data: profile }] = await Promise.all([
+    supabase
+      .from("buyers")
+      .select("*", { count: "exact" })
+      .eq("user_id", user.id)
+      .is("archived_at", null)
+      .order("created_at", { ascending: false })
+      .range(0, PAGE_SIZE - 1),
+    supabase.from("profiles").select("state").eq("id", user.id).single(),
+  ]);
 
   return (
     <BuyerDirectory
       initialBuyers={(data ?? []) as Buyer[]}
       initialCount={count ?? 0}
+      agentState={profile?.state}
     />
   );
 }

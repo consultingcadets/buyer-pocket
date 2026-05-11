@@ -18,14 +18,12 @@ export default async function EditBuyerPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: buyer } = await supabase
-    .from("buyers")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .single();
+  const [{ data: buyer }, { data: profile }] = await Promise.all([
+    supabase.from("buyers").select("*").eq("id", id).eq("user_id", user.id).single(),
+    supabase.from("profiles").select("state").eq("id", user.id).single(),
+  ]);
 
   if (!buyer) notFound();
 
-  return <EditBuyerForm buyer={buyer} />;
+  return <EditBuyerForm buyer={buyer} agentState={profile?.state} />;
 }

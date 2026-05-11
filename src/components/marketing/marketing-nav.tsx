@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import CTAButton from "./cta-button";
@@ -25,9 +26,10 @@ export default function MarketingNav({ isLoggedIn: initialIsLoggedIn }: { isLogg
       >
         <Link
           href="/"
-          className="font-bold text-[18px] text-primary tracking-tight shrink-0"
+          className="flex items-center gap-2.5 font-bold text-[18px] text-primary tracking-tight shrink-0"
           aria-label="BuyerPocket home"
         >
+          <Image src="/icons/house.svg" alt="BuyerPocket logo" width={28} height={28} className="rounded-md" />
           BuyerPocket
         </Link>
 
